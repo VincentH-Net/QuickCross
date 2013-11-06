@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  MvvmQuickCross code snippets (snippet version: 1.5).
+  To import, modify or create code snippets, see "Creating a Code Snippet" at http://msdn.microsoft.com/en-us/library/ms165394(v=vs.110).aspx
+-->
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MvvmQuickCross One-Way Bindable Viewmodel Property</Title>
+      <Author>Vincent Hoogendoorn</Author>
+      <Description>Adds a one-way data-bindable property to a Viewmodel in MvvmQuickCross (snippet version: 1.0)</Description>
+      <Shortcut>propdb1</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>type</ID>
+          <ToolTip>Property type</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>property</ID>
+          <ToolTip>Property name</ToolTip>
+          <Default>MyProperty</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[public $type$ $property$ /* One-way data-bindable property generated with propdb1 snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { return _$property$; } set { if (_$property$ != value) { _$property$ = value; RaisePropertyChanged(PROPERTYNAME_$property$); } } } private $type$ _$property$; public const string PROPERTYNAME_$property$ = "$property$";
+	$end$]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MvvmQuickCross One-Way Bindable Collection Viewmodel Property</Title>
+      <Author>Vincent Hoogendoorn</Author>
+      <Description>Adds a one-way data-bindable Collection property, a corresponding HasItems property and an UpdateHasItems() method to a Viewmodel in MvvmQuickCross  (snippet version: 1.1)</Description>
+      <Shortcut>propdbcol</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>collectiontype</ID>
+          <ToolTip>Collection type</ToolTip>
+          <Default>ObservableCollection</Default>
+        </Literal>
+        <Literal>
+          <ID>elementtype</ID>
+          <ToolTip>Collection element type</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>property</ID>
+          <ToolTip>Property name</ToolTip>
+          <Default>MyProperty</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[public $collectiontype$<$elementtype$> $property$ /* One-way data-bindable property generated with propdbcol snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { return _$property$; } set { if (_$property$ != value) { _$property$ = value; RaisePropertyChanged(PROPERTYNAME_$property$); Update$property$HasItems(); } } } private $collectiontype$<$elementtype$> _$property$; public const string PROPERTYNAME_$property$ = "$property$";
+  public bool $property$HasItems /* One-way data-bindable property generated with propdbcol snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { return _$property$HasItems; } protected set { if (_$property$HasItems != value) { _$property$HasItems = value; RaisePropertyChanged(PROPERTYNAME_$property$HasItems); } } } private bool _$property$HasItems; public const string PROPERTYNAME_$property$HasItems = "$property$HasItems";
+  protected void Update$property$HasItems() /* Helper method generated with propdbcol snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { $property$HasItems = _$property$ != null && _$property$.Count > 0; }
+	$end$]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MvvmQuickCross Two-Way Bindable Viewmodel Property</Title>
+      <Author>Vincent Hoogendoorn</Author>
+      <Description>Adds a two-way data-bindable property to a Viewmodel in MvvmQuickCross (snippet version: 1.5)</Description>
+      <Shortcut>propdb2</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>type</ID>
+          <ToolTip>Property type</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>property</ID>
+          <ToolTip>Property name</ToolTip>
+          <Default>MyProperty</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[public $type$ $property$ /* Two-way data-bindable property generated with propdb2 snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { return _$property$; } set { if (_$property$ != value) { _$property$ = value; RaisePropertyChanged(PROPERTYNAME_$property$); } } } private $type$ _$property$; public const string PROPERTYNAME_$property$ = "$property$";
+	$end$]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MvvmQuickCross Two-Way Bindable Viewmodel Property with Custom Setter Code</Title>
+      <Author>Vincent Hoogendoorn</Author>
+      <Description>Adds a two-way data-bindable property and a method for custom setter code to a Viewmodel in MvvmQuickCross (snippet version: 1.5)</Description>
+      <Shortcut>propdb2c</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>type</ID>
+          <ToolTip>Property type</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>property</ID>
+          <ToolTip>Property name</ToolTip>
+          <Default>MyProperty</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[public $type$ $property$ /* Two-way data-bindable property that calls custom code in On$property$Changed() from setter, generated with propdb2c snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { return _$property$; } set { if (_$property$ != value) { _$property$ = value; RaisePropertyChanged(PROPERTYNAME_$property$); On$property$Changed(); } } } private $type$ _$property$; public const string PROPERTYNAME_$property$ = "$property$";
+ 
+	private void On$property$Changed()
+	{
+		throw new NotImplementedException(); // TODO: Implement On$property$Changed()
+	}
+	$end$]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MvvmQuickCross Bindable Viewmodel Command</Title>
+      <Author>Vincent Hoogendoorn</Author>
+      <Description>Adds a data-bindable command to a Viewmodel in MvvmQuickCross (snippet version: 1.0)</Description>
+      <Shortcut>cmd</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>command</ID>
+          <ToolTip>Command name (the suffix 'Command' is appended automatically)</ToolTip>
+          <Default>My</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[public RelayCommand $command$Command /* Data-bindable command that calls $command$(), generated with cmd snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { if (_$command$Command == null) _$command$Command = new RelayCommand($command$); return _$command$Command; } } private RelayCommand _$command$Command;
+      
+	private void $command$()
+	{
+		throw new NotImplementedException(); // TODO: Implement $command$()
+	}
+	$end$]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MvvmQuickCross Bindable Viewmodel Command with Parameter</Title>
+      <Author>Vincent Hoogendoorn</Author>
+      <Description>Adds a data-bindable command with a parameter to a Viewmodel in MvvmQuickCross (snippet version: 1.0)</Description>
+      <Shortcut>cmdp</Shortcut>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>command</ID>
+          <ToolTip>Command name (the suffix 'Command' is appended automatically)</ToolTip>
+          <Default>My</Default>
+        </Literal>
+        <Literal>
+          <ID>parametertype</ID>
+          <ToolTip>Parameter type</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>parameter</ID>
+          <ToolTip>Parameter name</ToolTip>
+          <Default>myParameter</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="csharp">
+        <![CDATA[public RelayCommand $command$Command /* Data-bindable command with parameter that calls $command$(), generated with cmdp snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { if (_$command$Command == null) _$command$Command = new RelayCommand($command$); return _$command$Command; } } private RelayCommand _$command$Command;
+
+  private void $command$(object parameter)
+	{
+		var $parameter$ = ($parametertype$)parameter;
+		throw new NotImplementedException(); // TODO: Implement $command$()
+	}
+	$end$]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

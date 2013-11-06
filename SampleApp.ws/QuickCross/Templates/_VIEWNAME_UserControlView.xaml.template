@@ -1,0 +1,25 @@
+﻿<UserControl
+    x:Class="MvvmQuickCross.Templates._VIEWNAME_View"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MvvmQuickCross.Templates"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    xmlns:vm="using:MvvmQuickCrossLibrary.Templates.ViewModels.Design"
+    d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=vm:_VIEWNAME_ViewModelDesign}">
+  <Grid>
+    <!-- Example markup, TODO: Remove -->
+    <StackPanel>
+      <TextBlock Text="_VIEWNAME_" Style="{StaticResource PageSubheaderTextStyle}" />
+      <StackPanel Orientation="Horizontal" >
+        <Button Content="Click Me!" Command="{Binding IncreaseCountCommand}" FontSize="24" />
+        <TextBlock Text="Clicked:" FontSize="24" Margin="10,14,0,0" />
+        <TextBlock Text="{Binding Count}" FontSize="24" Margin="10,14,0,0" />
+      </StackPanel>
+    </StackPanel>
+    <!-- End of example markup -->
+  </Grid>
+</UserControl>

@@ -1,0 +1,35 @@
+﻿<Page
+    x:Class="SampleApp.SampleItemListView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:SampleApp.Shared.ViewModels.Design"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=vm:SampleItemListViewModelDesign}"
+    Width="480" FontSize="24" Background="Gray" >
+
+    <Grid x:Name="PageRoot" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" >
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <ListView x:Name="ItemsList" ItemsSource="{Binding Items}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <!--<Button Command="{Binding DataContext.ViewItemCommand, ElementName=PageRoot}" CommandParameter="{Binding}">-->
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}" FontWeight="Bold" />
+                            <TextBlock Text="{Binding Description}" />
+                        </StackPanel>
+                    <!--</Button>-->
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <StackPanel Orientation="Horizontal" Grid.Row="2">
+            <Button Content="Add" Command="{Binding AddItemCommand}" />
+            <Button Content="View" Command="{Binding ViewItemCommand}" CommandParameter="{Binding SelectedItem, ElementName=ItemsList}" />
+            <Button Content="Remove" Command="{Binding RemoveItemCommand}" CommandParameter="{Binding SelectedItem, ElementName=ItemsList}" />
+        </StackPanel>
+    </Grid>
+</Page>
