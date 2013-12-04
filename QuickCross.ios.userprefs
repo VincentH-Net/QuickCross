@@ -1,0 +1,14 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/QuickCross/ViewDataBindings.cs">
+    <Files>
+      <File FileName="SampleApp.ios/QuickCross/ObjcMagic.cs" Line="32" Column="27" />
+      <File FileName="SampleApp.ios/QuickCross/ViewDataBindings.cs" Line="27" Column="54" />
+      <File FileName="SampleApp.ios/Main.cs" Line="18" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
