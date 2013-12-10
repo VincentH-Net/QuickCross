@@ -3,13 +3,18 @@ using System.Drawing;
 using System.Collections.Generic;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using QuickCross;
+using SampleApp.Shared;
+using SampleApp.Shared.ViewModels;
 
 namespace SampleApp.ios
 {
-    public partial class DetailViewController : UIViewController
+	public partial class DetailViewController : ViewControllerBase
     {
         UIPopoverController masterPopoverController;
         object detailItem;
+
+		private SampleItemViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemViewModel; } }
 
         public DetailViewController(IntPtr handle) : base(handle)
         {
@@ -32,8 +37,8 @@ namespace SampleApp.ios
         void ConfigureView()
         {
             // Update the user interface for the detail item
-            if (IsViewLoaded && detailItem != null)
-                detailDescriptionLabel.Text = detailItem.ToString();
+			// TODO: if (IsViewLoaded && detailItem != null)
+			//    detailDescriptionLabel.Text = detailItem.ToString();
         }
 
         public override void DidReceiveMemoryWarning()
@@ -49,7 +54,10 @@ namespace SampleApp.ios
             base.ViewDidLoad();
 			
             // Perform any additional setup after loading the view, typically from a nib.
-            ConfigureView();
+			//ConfigureView();
+			SampleAppApplication.Instance.ContinueToSampleItem(); // Ensure that the viewmodel is initialized if not the application but the OS navigates to here
+			ViewModel.Title = detailItem.ToString() + " bound :-)";
+			base.InitializeBindings(View, ViewModel);
         }
 
         [Export("splitViewController:willHideViewController:withBarButtonItem:forPopoverController:")]

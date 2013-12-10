@@ -1,6 +1,7 @@
 using System;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using SampleApp.Shared;
 
 namespace SampleApp.ios
 {
@@ -17,9 +18,16 @@ namespace SampleApp.ios
             set;
         }
 
+		public static SampleAppApplication EnsureSampleAppApplication(ISampleAppNavigator navigator)
+		{
+			Console.WriteLine("EnsureSampleAppApplication ...");
+			return SampleAppApplication.Instance ?? new SampleAppApplication(navigator, null); // TODO: remove navigator from application
+		}
+
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             // Override point for customization after application launch.
+			SampleAppNavigator navigator;
             if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
             {
                 var splitViewController = (UISplitViewController)Window.RootViewController;
@@ -35,8 +43,13 @@ namespace SampleApp.ios
 
                 // Set the DetailViewController as the UISplitViewController Delegate.
                 splitViewController.WeakDelegate = detailViewController;
-            }
 
+				navigator = new SampleAppNavigator(masterNavigationController, detailNavigationController);
+			} else {
+				navigator = new SampleAppNavigator((UINavigationController)Window.RootViewController);
+			}
+
+			EnsureSampleAppApplication(navigator);
             return true;
         }
         //

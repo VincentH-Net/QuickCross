@@ -126,6 +126,7 @@ namespace SampleApp.ios
 				return true;
 			}
 			*/
+
             public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
