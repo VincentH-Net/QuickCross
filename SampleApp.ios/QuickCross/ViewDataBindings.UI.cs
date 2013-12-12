@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using MonoTouch.UIKit;
+using MonoTouch.Foundation;
 
 namespace QuickCross
 {
@@ -49,11 +50,18 @@ namespace QuickCross
 					case "MonoTouch.UIKit.UILabel":
 						((UILabel)view).Text = value.ToString();
 						break;
+					case "MonoTouch.UIKit.UITextField":
+						{
+							var textField = (UITextField)view;
+							string text = value.ToString();
+							if (textField.Text != text) textField.Text = text;
+						}
+						break;
 					case "MonoTouch.UIKit.UITextView":
 						{
-							var v = (UITextView)view;
+							var textView = (UITextView)view;
 							string text = value.ToString();
-							if (v.Text != text) v.Text = text;
+							if (textView.Text != text) textView.Text = text;
 						}
 						break;
                     default:
@@ -66,7 +74,9 @@ namespace QuickCross
 
         #region View types that support two-way data binding
 
-        private void AddTwoWayHandler(DataBinding binding)
+		private NSObject textFieldTextDidChangeObserver;
+
+		private void AddTwoWayHandler(DataBinding binding)
         {
             var view = binding.View;
             if (view == null) return;
@@ -74,9 +84,30 @@ namespace QuickCross
             switch (viewTypeName)
             {
                 // TODO: Add cases here for specialized view types, as needed
-                default:
-                    throw new NotImplementedException("View type not implemented: " + viewTypeName);
+				case "MonoTouch.UIKit.UITextField":
+					if (textFieldTextDidChangeObserver == null) {
+						textFieldTextDidChangeObserver = NSNotificationCenter.DefaultCenter.AddObserver(
+							UITextField.TextFieldTextDidChangeNotification, HandleTextFieldTextDidChangeNotification
+						);
+					}
+					break;
+				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed       += HandleTextViewChanged; break;
+				default: throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
+        }
+
+		private void HandleTextFieldTextDidChangeNotification(NSNotification notification)
+		{
+			UITextField view = (UITextField)notification.Object;
+			var binding = FindBindingForView(view);
+			if (binding != null) binding.ViewModelPropertyInfo.SetValue(viewModel, view.Text);
+		}
+
+        void HandleTextViewChanged (object sender, EventArgs e)
+        {
+			var view = (UITextView)sender;
+			var binding = FindBindingForView(view);
+			if (binding != null) binding.ViewModelPropertyInfo.SetValue(viewModel, view.Text);
         }
 
         private void RemoveTwoWayHandler(DataBinding binding)
@@ -87,8 +118,14 @@ namespace QuickCross
             switch (viewTypeName)
             {
                 // TODO: Add cases here for specialized view types, as needed
-                default:
-                    throw new NotImplementedException("View type not implemented: " + viewTypeName);
+				case "MonoTouch.UIKit.UITextField":
+					 if (textFieldTextDidChangeObserver != null)	{
+					     NSNotificationCenter.DefaultCenter.RemoveObserver(textFieldTextDidChangeObserver);
+						 textFieldTextDidChangeObserver = null;
+					 }
+					 break;
+				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed       -= HandleTextViewChanged; break;
+				default: throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
         }
 
