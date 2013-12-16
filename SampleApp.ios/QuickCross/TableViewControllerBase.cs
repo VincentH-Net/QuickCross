@@ -5,9 +5,9 @@ using System.Collections.Specialized;
 
 namespace QuickCross
 {
-	public class ViewControllerBase : UIViewController, ViewDataBindings.ViewExtensionPoints
+	public class TableViewControllerBase : UITableViewController, ViewDataBindings.ViewExtensionPoints
     {
-		public ViewControllerBase(IntPtr handle) : base(handle)
+		public TableViewControllerBase(IntPtr handle) : base(handle)
         {
         }
 

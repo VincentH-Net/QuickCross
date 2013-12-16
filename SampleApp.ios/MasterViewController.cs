@@ -3,12 +3,16 @@ using System.Drawing;
 using System.Collections.Generic;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using QuickCross;
+using SampleApp.Shared;
+using SampleApp.Shared.ViewModels;
 
 namespace SampleApp.ios
 {
-    public partial class MasterViewController : UITableViewController
+	public partial class MasterViewController : TableViewControllerBase
     {
-        DataSource dataSource;
+		//DataSource dataSource;
+		private SampleItemListViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemListViewModel; } }
 
         public MasterViewController(IntPtr handle) : base(handle)
         {
@@ -31,10 +35,11 @@ namespace SampleApp.ios
 
         void AddNewItem(object sender, EventArgs args)
         {
-            dataSource.Objects.Insert(0, DateTime.Now);
+			ViewModel.Items.Add(new SampleApp.Shared.Models.SampleItem { Title = DateTime.Now.ToShortTimeString(), Description = DateTime.Now.ToLongTimeString() });
+			//dataSource.Objects.Insert(0, DateTime.Now);
 
-            using (var indexPath = NSIndexPath.FromRowSection(0, 0))
-                TableView.InsertRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
+			//using (var indexPath = NSIndexPath.FromRowSection(0, 0))
+			//    TableView.InsertRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
         }
 
         public override void DidReceiveMemoryWarning()
@@ -55,9 +60,11 @@ namespace SampleApp.ios
             var addButton = new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewItem);
             NavigationItem.RightBarButtonItem = addButton;
 
-            TableView.Source = dataSource = new DataSource(this);
+			//TableView.Source = dataSource = new DataSource(this);
+			SampleAppApplication.Instance.ContinueToSampleItemList(true); // Ensure that the viewmodel is initialized if not the application but the OS navigates to here
+			base.InitializeBindings(View, ViewModel);
         }
-
+		/*
         class DataSource : UITableViewSource
         {
             static readonly NSString CellIdentifier = new NSString("Cell");
@@ -111,7 +118,7 @@ namespace SampleApp.ios
                 {
                     // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
                 }
-            }
+            } */
             /*
 			// Override to support rearranging the table view.
 			public override void MoveRow (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
@@ -127,21 +134,21 @@ namespace SampleApp.ios
 			}
 			*/
 
-            public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+		/* public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
                 if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
                     controller.DetailViewController.SetDetailItem(objects[indexPath.Row]);
             }
         }
-
+	*/
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
             if (segue.Identifier == "showDetail")
             {
                 var indexPath = TableView.IndexPathForSelectedRow;
-                var item = dataSource.Objects[indexPath.Row];
-
-                ((DetailViewController)segue.DestinationViewController).SetDetailItem(item);
+			SampleAppApplication.Instance.ContinueToSampleItem(ViewModel.Items[indexPath.Row], true);
+				// var item = dataSource.Objects[indexPath.Row];
+			    // ((DetailViewController)segue.DestinationViewController).SetDetailItem(item);
             }
         }
     }

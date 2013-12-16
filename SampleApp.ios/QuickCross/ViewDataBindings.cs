@@ -11,6 +11,7 @@ using MonoTouch.ObjCRuntime;
 using MonoTouch.Foundation;
 
 using MonoMac;
+using System.Collections;
 
 namespace QuickCross
 {
@@ -85,8 +86,8 @@ namespace QuickCross
 			var bp = ParseBindingParameters(bindingParameters);
 			if (bp == null)
 				throw new ArgumentException("Invalid data binding parameters: " + bindingParameters);
-			if (string.IsNullOrEmpty(bp.PropertyName))
-				throw new ArgumentException("Required PropertyName parameter missing in data binding parameters: " + bindingParameters);
+			if (string.IsNullOrEmpty(bp.PropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
+				throw new ArgumentException("At least one of PropertyName and ListPropertyName must be specified in data binding parameters: " + bindingParameters);
 			bp.View = view;
 
 			if (RootViewBindingParameters == null)
@@ -111,7 +112,7 @@ namespace QuickCross
 			public PropertyInfo ViewModelPropertyInfo;
 
 			public PropertyInfo ViewModelListPropertyInfo;
-			// TODO: public IDataBindableListAdapter ListAdapter;
+			public DataBindableUITableViewSource TableViewSource;
 
 			// TODO: public int? CommandParameterListId;
 			// TODO: public AdapterView CommandParameterListView;
@@ -384,13 +385,31 @@ namespace QuickCross
 			{
 				View = view,
 				Mode = mode,
-				ViewModelPropertyInfo = viewModel.GetType().GetProperty(propertyName) // TODO:,
+				ViewModelPropertyInfo = string.IsNullOrEmpty(propertyName) ? null : viewModel.GetType().GetProperty(propertyName) // TODO,
 				// CommandParameterListId = commandParameterListId,
 				// CommandParameterListView = commandParameterSelectedItemAdapterView
 			};
 
+			if (binding.View is UITableView)
+			{
+				if (listPropertyName == null) listPropertyName = propertyName + "List";
+				var pi = viewModel.GetType().GetProperty(listPropertyName);
+				if (pi == null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
+				{ // TODO: check if we dont need this anymore because we dont work with ids? 
+					listPropertyName = propertyName;
+					pi = binding.ViewModelPropertyInfo;
+					binding.ViewModelPropertyInfo = null;
+				}
+				binding.ViewModelListPropertyInfo = pi;
 
-			// TODO:
+				var tableView = (UITableView)binding.View;
+				if (tableView.Source == null)
+				{
+					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(tableView, rootViewExtensionPoints);
+					// TODO: how do we set a specific list item template in iOS? through code? in XCode?
+				}
+			}
+
 			/*
 			if (binding.View is AdapterView)
 			{
@@ -457,17 +476,15 @@ namespace QuickCross
 
 		private void UpdateList(DataBinding binding)
 		{
-			// TODO:
-			/*if (binding.ViewModelListPropertyInfo != null && binding.ListAdapter != null)
+			if (binding.ViewModelListPropertyInfo != null && binding.TableViewSource != null)
 			{
 				var list = (IList)binding.ViewModelListPropertyInfo.GetValue(viewModel);
-				if (binding.ListAdapter.SetList(list))
+				if (binding.TableViewSource.SetList(list))
 				{
-					var listView = binding.View;
-					if (listView is AbsListView) ((AbsListView)listView).ClearChoices(); // Apparently, calling BaseAdapter.NotifyDataSetChanged() does not clear the choices, so we do that here.
+					// TODO: not needed with iOS lists? var listView = binding.View;
+					// if (listView is AbsListView) ((AbsListView)listView).ClearChoices(); // Apparently, calling BaseAdapter.NotifyDataSetChanged() does not clear the choices, so we do that here.
 				}
-			} */
+			}
 		}	
-	
     }
 }

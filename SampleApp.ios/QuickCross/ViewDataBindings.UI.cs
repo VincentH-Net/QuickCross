@@ -91,7 +91,7 @@ namespace QuickCross
 						);
 					}
 					break;
-				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed       += HandleTextViewChanged; break;
+				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed += HandleTextViewChanged; break;
 				default: throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
         }

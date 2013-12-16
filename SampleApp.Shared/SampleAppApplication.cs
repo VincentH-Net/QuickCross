@@ -36,11 +36,11 @@ namespace SampleApp.Shared
             if (!skipNavigation) RunOnUIThread(() => _navigator.NavigateToSampleItemListView(CurrentNavigationContext));
         }
 
-        public void ContinueToSampleItem(SampleItem item = null)
+		public void ContinueToSampleItem(SampleItem item = null, bool skipNavigation = false)
         {
             if (SampleItemViewModel == null) SampleItemViewModel = new SampleItemViewModel(_itemService);
             SampleItemViewModel.Initialize(item);
-            RunOnUIThread(() => _navigator.NavigateToSampleItemView(CurrentNavigationContext));
+			if (!skipNavigation) RunOnUIThread(() => _navigator.NavigateToSampleItemView(CurrentNavigationContext));
         }
     }
 }

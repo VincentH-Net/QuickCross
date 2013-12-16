@@ -125,6 +125,8 @@
     <Compile Include="QuickCross\ViewDataBindings.UI.cs" />
     <Compile Include="SampleAppNavigator.cs" />
     <Compile Include="QuickCross\ViewControllerBase.cs" />
+    <Compile Include="QuickCross\DataBindableUITableViewSource.cs" />
+    <Compile Include="QuickCross\TableViewControllerBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard_iPhone.storyboard" />
