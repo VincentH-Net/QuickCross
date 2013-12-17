@@ -20,9 +20,10 @@ namespace QuickCross
 	public class BindingParameters
 	{
 		public string PropertyName;
-		public string ListPropertyName;
 		public BindingMode Mode = BindingMode.OneWay;
 		public UIView View;
+		public string ListPropertyName;
+		public string ListItemTemplateName;
 		// TODO: public AdapterView CommandParameterSelectedItemAdapterView;
 	}
 
@@ -255,7 +256,7 @@ namespace QuickCross
 				{
 					if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
 					if (dataBindings.ContainsKey(IdName(bp.PropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.PropertyName));
-					AddBinding(bp.View, bp.PropertyName, bp.Mode, bp.ListPropertyName); // TODO: , bp.CommandParameterSelectedItemAdapterView);
+					AddBinding(bp.View, bp.PropertyName, bp.Mode, bp.ListPropertyName, bp.ListItemTemplateName); // TODO: , bp.CommandParameterSelectedItemAdapterView);
 				}
 			}
 		}
@@ -294,7 +295,7 @@ namespace QuickCross
 										case "Mode": Enum.TryParse<BindingMode>(value, true, out bp.Mode); break;
 										case "ItemsSource": bp.ListPropertyName = value; break;
 										// TODO: case "ItemIsValue": Boolean.TryParse(value, out itemIsValue); break;
-										// TODO: case "ItemTemplate": itemTemplateName = value; break;
+										case "ItemTemplate": bp.ListItemTemplateName = value; break;
 										// TODO: case "ItemValueId": itemValueId = value; break;
 										// TODO: case "ListId":
 											// commandParameterListId = AndroidHelpers.FindResourceId(value);
@@ -312,15 +313,16 @@ namespace QuickCross
 		}
 
 
-		private DataBinding AddBinding(UIView view, string propertyName, BindingMode mode = BindingMode.OneWay, string listPropertyName = null) // TODO: , AdapterView commandParameterSelectedItemAdapterView = null)
+		private DataBinding AddBinding(UIView view, string propertyName, BindingMode mode = BindingMode.OneWay, string listPropertyName = null, string itemTemplateName = null) // TODO: , AdapterView commandParameterSelectedItemAdapterView = null)
 		{
 			string idName = IdName(propertyName);
 			if (view == null) return null;
 
-			bool itemIsValue = false;
-			string itemTemplateName = null, itemValueId = null;
-			int? commandParameterListId = null;
 			/*
+			bool itemIsValue = false;
+			string itemValueId = null;
+			int? commandParameterListId = null;
+
 			if (view.Tag != null)
 			{
 				// Get optional parameters from tag:
@@ -405,8 +407,8 @@ namespace QuickCross
 				var tableView = (UITableView)binding.View;
 				if (tableView.Source == null)
 				{
-					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(tableView, rootViewExtensionPoints);
-					// TODO: how do we set a specific list item template in iOS? through code? in XCode?
+					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
+					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(tableView, itemTemplateName, rootViewExtensionPoints);
 				}
 			}
 

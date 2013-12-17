@@ -39,7 +39,7 @@ namespace SampleApp.Shared
 		public void ContinueToSampleItem(SampleItem item = null, bool skipNavigation = false)
         {
             if (SampleItemViewModel == null) SampleItemViewModel = new SampleItemViewModel(_itemService);
-            SampleItemViewModel.Initialize(item);
+			if (item != null) SampleItemViewModel.Initialize(item);
 			if (!skipNavigation) RunOnUIThread(() => _navigator.NavigateToSampleItemView(CurrentNavigationContext));
         }
     }

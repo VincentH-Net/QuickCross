@@ -35,16 +35,14 @@ namespace QuickCross
 		private readonly ViewDataBindings.ViewExtensionPoints viewExtensionPoints;
 
 		private IList list;
-		private List<ItemDataBinding> itemDataBindings;
-		private bool? itemIsViewModel;
 
 		private readonly UITableView tableView;
 		private readonly NSString cellIdentifier;
 
-		public DataBindableUITableViewSource(UITableView tableView, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
         {
 			this.tableView = tableView;
-			this.cellIdentifier = new NSString(tableView.Handle.ToString());
+			this.cellIdentifier = new NSString(cellIdentifier);
 			this.viewExtensionPoints = viewExtensionPoints;
         }
 
@@ -104,56 +102,49 @@ namespace QuickCross
 		// Customize the appearance of table view cells.
 		public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
 		{
-			var cell = (UITableViewCell)tableView.DequeueReusableCell(cellIdentifier, indexPath); // *** HERE EX MUST REGISTER OR ... solve
+			var cell = (UITableViewCell)tableView.DequeueReusableCell(cellIdentifier, indexPath);
 			// At this point, the Bind property has been loaded and binding parameters have been created, grouped under for the root view
-
 			if (list != null)
 			{
 				object itemObject = list[indexPath.Row];
 				if (itemObject != null)
 				{
-					EnsureBindings(cell, itemObject);
-					if (itemIsViewModel.Value)
+					if (itemObject is ViewModelBase)
 					{
-						EnsureViewDataBindingsHolder(cell, (ViewModelBase)itemObject);
+						EnsureViewDataBindingsHolder(cell, (ViewModelBase)itemObject); // TODO: rename to Update... put ensure in submethod?
 					}
 					else
 					{
-						foreach (var idb in itemDataBindings) UpdateView(idb.View, idb.GetValue(itemObject));
+						EnsureItemDataBindingsHolder(cell, itemObject);
 					}
 				}
 			}
 			return cell;
 		}
 
-		private void EnsureBindings(UITableViewCell rootView, object itemObject)
+		private ItemDataBindingsHolder CreateItemDataBindings(UITableViewCell rootView, object itemObject)
 		{
-			if (itemDataBindings == null && !itemIsViewModel.HasValue)
+			ItemDataBindingsHolder itemDataBindings = null;
+			Console.WriteLine("Creating bindings for rootView: " + rootView.ToString());
+			List<BindingParameters> bindingParametersList;
+			if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
 			{
-				Console.WriteLine("Creating bindings for rootView: " + rootView.ToString());
-				itemIsViewModel = itemObject is ViewModelBase;
-				if (!itemIsViewModel.Value)
+				Console.WriteLine("Adding list bindings from markup ...");
+				Type itemType = itemObject.GetType();
+				itemDataBindings = new ItemDataBindingsHolder();
+				foreach (var bindingParameter in bindingParametersList)
 				{
-					List<BindingParameters> bindingParametersList;
-					if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
+					var pi = itemType.GetProperty(bindingParameter.PropertyName);
+					if (pi != null)
 					{
-						Console.WriteLine("Adding list bindings from markup ...");
-						Type itemType = itemObject.GetType();
-						itemDataBindings = new List<ItemDataBinding>();
-						foreach (var bindingParameter in bindingParametersList)
-						{
-							var pi = itemType.GetProperty(bindingParameter.PropertyName);
-							if (pi != null)
-							{
-								itemDataBindings.Add(new ItemDataBinding(pi, bindingParameter.View));
-							} else {
-								var fi = itemType.GetField(bindingParameter.PropertyName);
-								if (fi != null) itemDataBindings.Add(new ItemDataBinding(fi, bindingParameter.View));
-							}
-						}
+						itemDataBindings.Add(new ItemDataBinding(pi, bindingParameter.View));
+					} else {
+						var fi = itemType.GetField(bindingParameter.PropertyName);
+						if (fi != null) itemDataBindings.Add(new ItemDataBinding(fi, bindingParameter.View));
 					}
 				}
 			}
+			return itemDataBindings;
 		}
 
 		// If the list item is a viewmodel, we can bind it using a ViewBindings instance, which then becomes the viewholder
@@ -203,6 +194,23 @@ namespace QuickCross
 		}
 
 		private Dictionary<IntPtr, ViewDataBindingsHolder> viewDataBindingsHolders = new Dictionary<IntPtr, ViewDataBindingsHolder>();
+
+		private class ItemDataBindingsHolder : List<ItemDataBinding> { }
+
+		private Dictionary<IntPtr, ItemDataBindingsHolder> itemDataBindingsHolders = new Dictionary<IntPtr, ItemDataBindingsHolder>();
+
+		// If the list item is not a viewmodel, we bind it using a list of ItemDataBindings, which then becomes the viewholder
+		private void EnsureItemDataBindingsHolder(UITableViewCell rootView, object itemObject)
+		{
+			ItemDataBindingsHolder holder;
+			if (!itemDataBindingsHolders.TryGetValue(rootView.Handle, out holder))
+			{
+				holder = CreateItemDataBindings(rootView, itemObject);
+				if (holder == null)	return;
+				itemDataBindingsHolders.Add(rootView.Handle, holder);
+			}
+			foreach (var idb in holder) UpdateView(idb.View, idb.GetValue(itemObject));
+		}
 
 		/// <summary>
 		/// Override this method in a derived tableviewsource class to change how a data-bound value is set for specific views

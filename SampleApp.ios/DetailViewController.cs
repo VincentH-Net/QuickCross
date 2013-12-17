@@ -56,7 +56,6 @@ namespace SampleApp.ios
             // Perform any additional setup after loading the view, typically from a nib.
 			//ConfigureView();
 			SampleAppApplication.Instance.ContinueToSampleItem(); // Ensure that the viewmodel is initialized if not the application but the OS navigates to here
-			ViewModel.Title = detailItem.ToString() + " bound :-)";
 			base.InitializeBindings(View, ViewModel);
         }
 
