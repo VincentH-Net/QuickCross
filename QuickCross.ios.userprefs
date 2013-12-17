@@ -1,19 +1,25 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/QuickCross/ViewControllerBase.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhone" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneDeviceTarget.Timphone" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/QuickCross/ObjcMagic.cs">
     <Files>
-      <File FileName="SampleApp.ios/QuickCross/ViewDataBindings.cs" Line="64" Column="87" />
-      <File FileName="SampleApp.ios/QuickCross/ViewDataBindings.UI.cs" Line="76" Column="78" />
-      <File FileName="../MvvmQuickCross/SampleApp.android/MvvmQuickCross/ViewDataBindings.cs" Line="77" Column="1" />
-      <File FileName="SampleApp.ios/DetailViewController.cs" Line="18" Column="1" />
-      <File FileName="SampleApp.ios/SampleAppNavigator.cs" Line="32" Column="4" />
-      <File FileName="SampleApp.ios/AppDelegate.cs" Line="69" Column="1" />
-      <File FileName="../MvvmQuickCross/SampleApp.android/MvvmQuickCross/ActivityViewBase.cs" Line="116" Column="1" />
-      <File FileName="SampleApp.ios/QuickCross/ViewControllerBase.cs" Line="31" Column="7" />
+      <File FileName="SampleApp.ios/QuickCross/ViewDataBindings.cs" Line="38" Column="1" />
+      <File FileName="SampleApp.ios/QuickCross/ViewControllerBase.cs" Line="14" Column="35" />
+      <File FileName="SampleApp.ios/MasterViewController.cs" Line="149" Column="1" />
+      <File FileName="../MvvmQuickCross/SampleApp.android/MvvmQuickCross/DataBindableListAdapter.cs" Line="113" Column="1" />
+      <File FileName="SampleApp.ios/QuickCross/DataBindableUITableViewSource.cs" Line="214" Column="1" />
+      <File FileName="SampleApp.ios/QuickCross/TableViewControllerBase.cs" Line="75" Column="1" />
+      <File FileName="SampleApp.ios/DetailViewController.cs" Line="55" Column="1" />
+      <File FileName="SampleApp.Shared/SampleAppApplication.cs" Line="42" Column="22" />
+      <File FileName="SampleApp.Shared/ViewModels/SampleItemViewModel.cs" Line="21" Column="9" />
+      <File FileName="SampleApp.ios/Info.plist" />
+      <File FileName="SampleApp.ios/QuickCross/ObjcMagic.cs" Line="93" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.SampleApp.ios>
+    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="QB8PCNGG2C" TeamId="GEUG29A389" />
+  </MonoDevelop.Ide.ItemProperties.SampleApp.ios>
 </Properties>

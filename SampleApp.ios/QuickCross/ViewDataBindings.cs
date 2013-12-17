@@ -12,6 +12,7 @@ using MonoTouch.Foundation;
 
 using MonoMac;
 using System.Collections;
+using MonoTouch;
 
 namespace QuickCross
 {
@@ -26,14 +27,21 @@ namespace QuickCross
 		public string ListItemTemplateName;
 		// TODO: public AdapterView CommandParameterSelectedItemAdapterView;
 	}
-
+	
 	public partial class ViewDataBindings
     {
 		#region Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
 
 		[DllImport ("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSendSuper")]
-		private static extern void void_objc_msgSendSuper_intptr_intptr (IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
+		static extern void void_objc_msgSendSuper_intptr_intptr (IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
+		delegate void SetValueForUndefinedKeyCallBack (IntPtr selfPtr, IntPtr cmdPtr, IntPtr valuePtr, IntPtr undefinedKeyPtr);
+
+		//static Action<IntPtr, IntPtr, IntPtr, IntPtr> SetValueForUndefinedKeyDelegate = SetValueForUndefinedKey;
+		static SetValueForUndefinedKeyCallBack SetValueForUndefinedKeyDelegate = SetValueForUndefinedKey;
+		//[Preserve]
+
+		[MonoPInvokeCallback (typeof(SetValueForUndefinedKeyCallBack))]
 		private static void SetValueForUndefinedKey(IntPtr selfPtr, IntPtr cmdPtr, IntPtr valuePtr, IntPtr undefinedKeyPtr)
 		{
 			UIView self = (UIView) Runtime.GetNSObject(selfPtr); // this is	basically your "this"
@@ -49,7 +57,8 @@ namespace QuickCross
 		}
 
 		private static string BindKey;
-		private static Action<IntPtr, IntPtr, IntPtr, IntPtr> SetValueForUndefinedKeyDelegate = SetValueForUndefinedKey;
+
+
 		private static IntPtr UIViewSuperClass, SetValueForUndefinedKeySelector;
 
 		public static void RegisterBindKey(string key = "Bind")
