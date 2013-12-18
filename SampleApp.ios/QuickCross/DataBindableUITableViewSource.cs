@@ -39,6 +39,8 @@ namespace QuickCross
 		private readonly UITableView tableView;
 		private readonly NSString cellIdentifier;
 
+		public RelayCommand RowSelectedCommand;
+
 		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
         {
 			this.tableView = tableView;
@@ -260,6 +262,11 @@ namespace QuickCross
 		public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
 		{
 			// TODO: this should be a command. if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)	controller.DetailViewController.SetDetailItem(objects[indexPath.Row]);
+			if (RowSelectedCommand != null)
+			{
+				object itemObject = list[indexPath.Row];
+				RowSelectedCommand.Execute(itemObject);
+			}
 		}
     }
 }

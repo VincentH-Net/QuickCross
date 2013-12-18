@@ -36,15 +36,12 @@ namespace QuickCross
 		static extern void void_objc_msgSendSuper_intptr_intptr (IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
 		delegate void SetValueForUndefinedKeyCallBack (IntPtr selfPtr, IntPtr cmdPtr, IntPtr valuePtr, IntPtr undefinedKeyPtr);
-
-		//static Action<IntPtr, IntPtr, IntPtr, IntPtr> SetValueForUndefinedKeyDelegate = SetValueForUndefinedKey;
 		static SetValueForUndefinedKeyCallBack SetValueForUndefinedKeyDelegate = SetValueForUndefinedKey;
-		//[Preserve]
 
 		[MonoPInvokeCallback (typeof(SetValueForUndefinedKeyCallBack))]
 		private static void SetValueForUndefinedKey(IntPtr selfPtr, IntPtr cmdPtr, IntPtr valuePtr, IntPtr undefinedKeyPtr)
 		{
-			UIView self = (UIView) Runtime.GetNSObject(selfPtr); // this is	basically your "this"
+			UIView self = (UIView) Runtime.GetNSObject(selfPtr);
 			var value = Runtime.GetNSObject(valuePtr);
 			var key = (NSString) Runtime.GetNSObject(undefinedKeyPtr);
 			if (key == BindKey) {
@@ -57,12 +54,11 @@ namespace QuickCross
 		}
 
 		private static string BindKey;
-
-
 		private static IntPtr UIViewSuperClass, SetValueForUndefinedKeySelector;
 
 		public static void RegisterBindKey(string key = "Bind")
 		{
+			RootViewBindingParameters = new Dictionary<UIView, List<BindingParameters> >();
 			BindKey = key;
 			Console.WriteLine("Replacing implementation of SetValueForUndefinedKey on UIView...");
 			var uiViewClass = Class.GetHandle("UIView");
@@ -70,6 +66,7 @@ namespace QuickCross
 			SetValueForUndefinedKeySelector = Selector.GetHandle("setValue:forUndefinedKey:");
 			ObjcMagic.AddMethod(uiViewClass, SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
 		}
+
 		#endregion Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
 
 		public static Dictionary<UIView, List<BindingParameters> > RootViewBindingParameters { get; private set; }
@@ -99,9 +96,6 @@ namespace QuickCross
 			if (string.IsNullOrEmpty(bp.PropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
 				throw new ArgumentException("At least one of PropertyName and ListPropertyName must be specified in data binding parameters: " + bindingParameters);
 			bp.View = view;
-
-			if (RootViewBindingParameters == null)
-				RootViewBindingParameters = new Dictionary<UIView, List<BindingParameters> >();
 
 			List<BindingParameters> bindingParametersList;
 			if (!RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
