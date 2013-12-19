@@ -17,9 +17,71 @@ namespace QuickCross
             switch (viewTypeName)
             {
                 // TODO: Add cases here for specialized view types, as needed
+				case "MonoTouch.UIKit.UIButton":
+					{
+						var button = (UIButton)view;
+						button.TouchUpInside += HandleTouchUpInside;
+						var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
+						if (command != null)
+						{
+							command.CanExecuteChanged += binding.Command_CanExecuteChanged;
+							button.Enabled = command.IsEnabled;
+						}
+					}
+					break;
                 default:
                     break;
             }
+        }
+
+        void HandleTouchUpInside (object sender, EventArgs e)
+        {
+			var view = (UIView)sender;
+			var binding = FindBindingForView(view);
+			if (binding != null)
+			{
+				var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
+				object parameter = null;
+				/* TODO
+				if (binding.CommandParameterListView != null)
+				{
+					var adapter = binding.CommandParameterListView.GetAdapter() as IDataBindableListAdapter;
+					if (adapter != null)
+					{
+						var adapterView = binding.CommandParameterListView;
+						if (adapterView is AbsListView)
+						{
+							var absListView = (AbsListView)adapterView;
+							switch (absListView.ChoiceMode)
+							{
+								case ChoiceMode.Single:
+									parameter = adapter.GetItemAsObject(absListView.CheckedItemPosition);
+									break;
+								case ChoiceMode.Multiple:
+									{
+										var checkedItems = new ArrayList();
+										var positions = absListView.CheckedItemPositions;
+										for (int i = 0; i < positions.Size(); i++)
+										{
+											if (positions.ValueAt(i))
+											{
+												int position = positions.KeyAt(i);
+												checkedItems.Add(adapter.GetItemAsObject(position));
+											}
+										}
+										if (checkedItems.Count > 0) parameter = checkedItems;
+									}
+									break;
+							}
+						}
+						else
+						{
+							parameter = adapter.GetItemAsObject(adapterView.SelectedItemPosition);
+						}
+					}
+				} */
+				command.Execute(parameter);
+			}
         }
 
         private void RemoveCommandHandler(DataBinding binding)
@@ -30,6 +92,13 @@ namespace QuickCross
             switch (viewTypeName)
             {
                 // TODO: Add cases here for specialized view types, as needed
+				case "MonoTouch.UIKit.UIButton":
+					{
+						var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
+						if (command != null) command.CanExecuteChanged -= binding.Command_CanExecuteChanged;
+						((UIButton)view).TouchUpInside -= HandleTouchUpInside;
+					}
+					break;
                 default:
                     break;
             }
