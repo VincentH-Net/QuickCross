@@ -35,22 +35,31 @@ namespace QuickCross
 		private readonly ViewDataBindings.ViewExtensionPoints viewExtensionPoints;
 
 		private IList list;
+		private bool listIsObservable, ignoreCollectionChanged;
 
 		private readonly UITableView tableView;
 		private readonly NSString cellIdentifier;
 
-		public RelayCommand RowSelectedCommand;
+		private readonly string rowSelectedCommandName, deleteRowCommandName, insertRowCommandName, canEdit, canMove;
+		private readonly ViewModelBase viewModel;
 
-		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+
+		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedCommandName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
         {
 			this.tableView = tableView;
 			this.cellIdentifier = new NSString(cellIdentifier);
+			this.viewModel = viewModel;
+			this.canEdit = canEdit;
+			this.canMove = canMove;
 			this.viewExtensionPoints = viewExtensionPoints;
+			this.rowSelectedCommandName = rowSelectedCommandName;
+			this.deleteRowCommandName = deleteRowCommandName;
+			this.insertRowCommandName = insertRowCommandName;
         }
 
 		private void AddListHandler()
 		{
-			if (list is INotifyCollectionChanged)
+			if (listIsObservable)
 			{
 				((INotifyCollectionChanged)list).CollectionChanged += DataBindableListAdapter_CollectionChanged;
 			}
@@ -58,10 +67,28 @@ namespace QuickCross
 
 		private void RemoveListHandler()
 		{
-			if (list is INotifyCollectionChanged)
+			if (listIsObservable)
 			{
 				((INotifyCollectionChanged)list).CollectionChanged -= DataBindableListAdapter_CollectionChanged;
 			}
+		}
+
+		/// <summary>
+		/// Override this method in a derived adapter class to register additional event handlers for your adapter. Always call base.AddHandlers() in your override.
+		/// </summary>
+		public virtual void AddHandlers() 
+		{ 
+			AddListHandler();
+			foreach (var viewDataBindingsHolder in viewDataBindingsHolders) { viewDataBindingsHolder.Value.AddHandlers(); }
+		}
+
+		/// <summary>
+		/// Override this method in a derived adapter class to unregister additional event handlers for your adapter. Always call base.AddHandlers() in your override.
+		/// </summary>
+		public virtual void RemoveHandlers() 
+		{ 
+			RemoveListHandler();
+			foreach (var viewDataBindingsHolder in viewDataBindingsHolders) { viewDataBindingsHolder.Value.RemoveHandlers(); }
 		}
 
 		/// <summary>
@@ -71,7 +98,10 @@ namespace QuickCross
 		/// <param name="e">See http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html for details</param>
 		protected virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			tableView.ReloadData(); // MQC TODO: Check if this should & can be optimized, see for details documentation at http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html
+			if (!ignoreCollectionChanged)
+			{
+				tableView.ReloadData(); // MQC TODO: Check if this should & can be optimized, see for details documentation at http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html
+			}
 			if (viewExtensionPoints != null) viewExtensionPoints.OnCollectionChanged(sender, e);
 		}
 
@@ -85,9 +115,16 @@ namespace QuickCross
 			if (Object.ReferenceEquals(this.list, list)) return false;
 			RemoveListHandler();
 			this.list = list;
+			listIsObservable = list is INotifyCollectionChanged;
 			AddListHandler();
 			tableView.ReloadData();
 			return true;
+		}
+
+		protected object GetItem(NSIndexPath path)
+		{
+			int i = path.Row;
+			return (list != null && i >= 0 && i < list.Count) ? list[i] : null;
 		}
 
 		// Customize the number of sections in the table view.
@@ -101,14 +138,13 @@ namespace QuickCross
 			return list == null ? 0 : list.Count;
 		}
 
-		// Customize the appearance of table view cells.
 		public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
 		{
 			var cell = (UITableViewCell)tableView.DequeueReusableCell(cellIdentifier, indexPath);
-			// At this point, the Bind property has been loaded and binding parameters have been created, grouped under for the root view
+			// At this point, the Bind property has been loaded and binding parameters have been created, grouped under the cell root view
 			if (list != null)
 			{
-				object itemObject = list[indexPath.Row];
+				object itemObject = GetItem(indexPath);
 				if (itemObject != null)
 				{
 					if (itemObject is ViewModelBase)
@@ -224,49 +260,73 @@ namespace QuickCross
 			if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(view, value); else ViewDataBindings.UpdateView(view, value);
 		}
 
+		protected bool GetItemFlag(NSIndexPath indexPath, string flag)
+		{
+			// Check for constant values true or false
+			if (string.IsNullOrEmpty(flag) || flag.ToLower() == "false") return false;
+			if (flag.ToLower() == "true") return true;
+
+			// The flag is the name of a boolean property or field of the item object
+			var itemObject = GetItem(indexPath);
+			if (itemObject != null)
+			{
+				Type itemType = itemObject.GetType();
+				var pi = itemType.GetProperty(flag);
+				if (pi != null)	return (bool)pi.GetValue(itemObject);
+				var fi = itemType.GetField(flag);
+				if (fi != null)	return (bool)fi.GetValue(itemObject);
+			}
+			return false;
+		}
+
 		public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
 		{
-			// Return false if you do not want the specified item to be editable.
-			return true;
+			return GetItemFlag(indexPath, canEdit);
 		}
 
 		public override void CommitEditingStyle(UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
 		{
-			if (editingStyle == UITableViewCellEditingStyle.Delete)
+			if (viewModel != null)
 			{
-				// Delete the row from the data source.
-				// TODO: should this be a command instead? or is this the action as long as there is no command bound? how do we bind delete command?
-				list.RemoveAt(indexPath.Row);
-				tableView.DeleteRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Fade);
-			}
-			else if (editingStyle == UITableViewCellEditingStyle.Insert)
-			{
-				// Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
+				if (editingStyle == UITableViewCellEditingStyle.Delete)
+				{
+					if (viewModel.ExecuteCommand(deleteRowCommandName, GetItem(indexPath)))
+					{
+						if (!listIsObservable) tableView.DeleteRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
+					}
+				}
+				else if (editingStyle == UITableViewCellEditingStyle.Insert)
+				{
+					// TODO: check if the indexpath is relevant here? E.g. is it the insert position or the previous/next item?
+					if (viewModel.ExecuteCommand(insertRowCommandName, GetItem(indexPath)))
+					{
+						if (!listIsObservable) tableView.InsertRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
+					}
+				}
 			}
 		}
-		/*		
-			// Override to support rearranging the table view.
+
 		public override void MoveRow (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
 		{
+			var itemObject = GetItem(sourceIndexPath);
+			int deleteAt = sourceIndexPath.Row;
+			int insertAt = destinationIndexPath.Row;
+			if (itemObject == null || deleteAt == insertAt) return;
+
+			ignoreCollectionChanged = true;
+			list.RemoveAt(deleteAt);
+			list.Insert(insertAt, itemObject);
+			ignoreCollectionChanged = false;
 		}
-		*/
-		/*
-		// Override to support conditional rearranging of the table view.
+
 		public override bool CanMoveRow (UITableView tableView, NSIndexPath indexPath)
 		{
-			// Return false if you do not want the item to be re-orderable.
-			return true;
+			return GetItemFlag(indexPath, canMove);
 		}
-		*/
 
 		public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
 		{
-			// TODO: this should be a command. if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)	controller.DetailViewController.SetDetailItem(objects[indexPath.Row]);
-			if (RowSelectedCommand != null)
-			{
-				object itemObject = list[indexPath.Row];
-				RowSelectedCommand.Execute(itemObject);
-			}
+			if (viewModel != null) viewModel.ExecuteCommand(rowSelectedCommandName, GetItem(indexPath));
 		}
     }
 }

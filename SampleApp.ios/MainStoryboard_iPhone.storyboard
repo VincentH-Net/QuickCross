@@ -56,7 +56,7 @@
                         </prototypes>
                         <sections/>
                         <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="string" keyPath="Bind" value="{List ItemsSource=Items}"/>
+                            <userDefinedRuntimeAttribute type="string" keyPath="Bind" value="{List ItemsSource=Items, RemoveCommand=RemoveItemCommand, CanEdit=true, CanMove=true}"/>
                         </userDefinedRuntimeAttributes>
                         <connections>
                             <outlet property="dataSource" destination="pGg-6v-bdr" id="P41-gY-KXY"/>

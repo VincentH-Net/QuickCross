@@ -25,6 +25,10 @@ namespace QuickCross
 		public UIView View;
 		public string ListPropertyName;
 		public string ListItemTemplateName;
+		public string ListAddItemCommandName;
+		public string ListRemoveItemCommandName;
+		public string ListCanEditItem;
+		public string ListCanMoveItem;
 		// TODO: public AdapterView CommandParameterSelectedItemAdapterView;
 	}
 	
@@ -243,12 +247,12 @@ namespace QuickCross
 
 		private void RemoveListHandlers(DataBinding binding)
 		{
-			// TODO: if (binding != null && binding.ListAdapter != null) binding.ListAdapter.RemoveHandlers();
+			if (binding != null && binding.TableViewSource != null) binding.TableViewSource.RemoveHandlers();
 		}
 
 		private void AddListHandlers(DataBinding binding)
 		{
-			// TODO: if (binding != null && binding.ListAdapter != null) binding.ListAdapter.AddHandlers();
+			if (binding != null && binding.TableViewSource != null) binding.TableViewSource.AddHandlers();
 		}
 
 		public void AddBindings(BindingParameters[] bindingsParameters)
@@ -259,7 +263,7 @@ namespace QuickCross
 				{
 					if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
 					if (dataBindings.ContainsKey(IdName(bp.PropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.PropertyName));
-					AddBinding(bp.View, bp.PropertyName, bp.Mode, bp.ListPropertyName, bp.ListItemTemplateName); // TODO: , bp.CommandParameterSelectedItemAdapterView);
+					AddBinding(bp); // TODO: , bp.CommandParameterSelectedItemAdapterView);
 				}
 			}
 		}
@@ -299,6 +303,10 @@ namespace QuickCross
 										case "ItemsSource": bp.ListPropertyName = value; break;
 										// TODO: case "ItemIsValue": Boolean.TryParse(value, out itemIsValue); break;
 										case "ItemTemplate": bp.ListItemTemplateName = value; break;
+										case "AddCommand": bp.ListAddItemCommandName = value; break;
+										case "RemoveCommand": bp.ListRemoveItemCommandName = value; break;
+										case "CanEdit": bp.ListCanEditItem = value; break;
+										case "CanMove": bp.ListCanMoveItem = value; break;
 										// TODO: case "ItemValueId": itemValueId = value; break;
 										// TODO: case "ListId":
 											// commandParameterListId = AndroidHelpers.FindResourceId(value);
@@ -316,9 +324,16 @@ namespace QuickCross
 		}
 
 
-		private DataBinding AddBinding(UIView view, string propertyName, BindingMode mode = BindingMode.OneWay, string listPropertyName = null, string itemTemplateName = null) // TODO: , AdapterView commandParameterSelectedItemAdapterView = null)
+		private DataBinding AddBinding(BindingParameters bp)
 		{
-			string idName = IdName(propertyName);
+			var view = bp.View;
+			var propertyName = bp.PropertyName;
+			var mode = bp.Mode;
+			var listPropertyName = bp.ListPropertyName;
+			var itemTemplateName = bp.ListItemTemplateName;
+			 // TODO: , AdapterView commandParameterSelectedItemAdapterView = null
+
+			var idName = IdName(propertyName);
 			if (view == null) return null;
 
 			/*
@@ -411,7 +426,18 @@ namespace QuickCross
 				if (tableView.Source == null)
 				{
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
-					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(tableView, itemTemplateName, rootViewExtensionPoints);
+					string listItemSelectedCommandName = (mode == BindingMode.Command) ? bp.PropertyName : null;
+					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(
+						tableView, 
+						itemTemplateName,
+						viewModel,
+						bp.ListCanEditItem,
+						bp.ListCanMoveItem,
+						listItemSelectedCommandName,
+						bp.ListRemoveItemCommandName,
+						bp.ListAddItemCommandName,
+						rootViewExtensionPoints
+					);
 				}
 			}
 

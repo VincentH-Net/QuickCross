@@ -18,8 +18,6 @@ namespace QuickCross
             {
                 // TODO: Add cases here for specialized view types, as needed
                 default:
-					if (binding.TableViewSource != null)
-						binding.TableViewSource.RowSelectedCommand = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
                     break;
             }
         }
@@ -33,7 +31,6 @@ namespace QuickCross
             {
                 // TODO: Add cases here for specialized view types, as needed
                 default:
-					if (binding.TableViewSource != null) binding.TableViewSource.RowSelectedCommand = null;
                     break;
             }
         }

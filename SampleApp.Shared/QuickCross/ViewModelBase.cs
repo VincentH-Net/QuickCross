@@ -48,6 +48,26 @@ namespace QuickCross
         {
             return (T)GetType().GetProperty(propertyName).GetValue(this);
         }
+
+		public bool ExecuteCommand(string commandName, object parameter = null)
+		{
+			bool isExecuted = false;
+			if (!string.IsNullOrEmpty(commandName))
+			{
+				var pi = this.GetType().GetProperty(commandName);
+				if (pi != null)
+				{
+					var command = pi.GetValue(this) as RelayCommand;
+					if (command != null)
+					{
+						command.Execute(parameter);
+						isExecuted = true;
+					}	
+				}
+			}
+			return isExecuted;
+		}
+
         #endif
 
         public event PropertyChangedEventHandler PropertyChanged;
