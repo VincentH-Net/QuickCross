@@ -11,7 +11,6 @@ namespace SampleApp.ios
 {
 	public partial class MasterViewController : TableViewControllerBase
     {
-		//DataSource dataSource;
 		private SampleItemListViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemListViewModel; } }
 
         public MasterViewController(IntPtr handle) : base(handle)
@@ -23,8 +22,6 @@ namespace SampleApp.ios
                 ContentSizeForViewInPopover = new SizeF(320f, 600f);
                 ClearsSelectionOnViewWillAppear = false;
             }
-			
-            // Custom initialization
         }
 
         public DetailViewController DetailViewController
@@ -33,13 +30,9 @@ namespace SampleApp.ios
             set;
         }
 
-        void AddNewItem(object sender, EventArgs args)
+		void AddNewItem(object sender, EventArgs args)
         {
-			ViewModel.Items.Add(new SampleApp.Shared.Models.SampleItem { Title = DateTime.Now.ToShortTimeString(), Description = DateTime.Now.ToLongTimeString() });
-			//dataSource.Objects.Insert(0, DateTime.Now);
-
-			//using (var indexPath = NSIndexPath.FromRowSection(0, 0))
-			//    TableView.InsertRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
+			ViewModel.AddItemCommand.Execute(null);
         }
 
         public override void DidReceiveMemoryWarning()
@@ -60,8 +53,6 @@ namespace SampleApp.ios
             var addButton = new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewItem);
             NavigationItem.RightBarButtonItem = addButton;
 
-			//TableView.Source = dataSource = new DataSource(this);
-			SampleAppApplication.Instance.ContinueToSampleItemList(true); // Ensure that the viewmodel is initialized if not the application but the OS navigates to here
 			base.InitializeBindings(View, ViewModel);
         }
 		/*
@@ -119,20 +110,6 @@ namespace SampleApp.ios
                     // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
                 }
             } */
-            /*
-			// Override to support rearranging the table view.
-			public override void MoveRow (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
-			{
-			}
-			*/
-            /*
-			// Override to support conditional rearranging of the table view.
-			public override bool CanMoveRow (UITableView tableView, NSIndexPath indexPath)
-			{
-				// Return false if you do not want the item to be re-orderable.
-				return true;
-			}
-			*/
 
 		/* public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
             {
@@ -140,15 +117,15 @@ namespace SampleApp.ios
                     controller.DetailViewController.SetDetailItem(objects[indexPath.Row]);
             }
         }
-	*/
+    	*/
+
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
-            if (segue.Identifier == "showDetail")
+			if (sender is SampleAppNavigator) return;
+			if (segue.Identifier == "showDetail")
             {
                 var indexPath = TableView.IndexPathForSelectedRow;
-			SampleAppApplication.Instance.ContinueToSampleItem(ViewModel.Items[indexPath.Row], true);
-				// var item = dataSource.Objects[indexPath.Row];
-			    // ((DetailViewController)segue.DestinationViewController).SetDetailItem(item);
+				ViewModel.ViewItemCommand.Execute(ViewModel.Items[indexPath.Row]);
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using MonoTouch.UIKit;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using SampleApp.Shared;
 
 namespace QuickCross
 {
@@ -14,6 +15,12 @@ namespace QuickCross
 		private ViewModelBase viewModel;
 
 		protected ViewDataBindings Bindings { get; private set; }
+
+//		public override void ViewDidLoad()
+//		{
+//			base.ViewDidLoad();
+//			SampleAppApplication.Instance.CurrentNavigationContext = this;
+//		}
 
 		/// <summary>
 		/// Call Initialize() in the OnCreate method of a derived view class to create the data bindings and update the view with the current view model values.

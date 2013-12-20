@@ -12,7 +12,6 @@ namespace SampleApp.ios
 	public partial class DetailViewController : ViewControllerBase
     {
         UIPopoverController masterPopoverController;
-        object detailItem;
 
 		private SampleItemViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemViewModel; } }
 
@@ -22,23 +21,8 @@ namespace SampleApp.ios
 
         public void SetDetailItem(object newDetailItem)
         {
-            if (detailItem != newDetailItem)
-            {
-                detailItem = newDetailItem;
-				
-                // Update the view
-                ConfigureView();
-            }
-			
             if (masterPopoverController != null)
                 masterPopoverController.Dismiss(true);
-        }
-
-        void ConfigureView()
-        {
-            // Update the user interface for the detail item
-			// TODO: if (IsViewLoaded && detailItem != null)
-			//    detailDescriptionLabel.Text = detailItem.ToString();
         }
 
         public override void DidReceiveMemoryWarning()
@@ -52,10 +36,6 @@ namespace SampleApp.ios
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-			
-            // Perform any additional setup after loading the view, typically from a nib.
-			//ConfigureView();
-			SampleAppApplication.Instance.ContinueToSampleItem(); // Ensure that the viewmodel is initialized if not the application but the OS navigates to here
 			base.InitializeBindings(View, ViewModel);
         }
 
@@ -76,4 +56,3 @@ namespace SampleApp.ios
         }
     }
 }
-

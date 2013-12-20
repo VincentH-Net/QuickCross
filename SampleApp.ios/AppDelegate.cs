@@ -49,7 +49,7 @@ namespace SampleApp.ios
 				navigator = new SampleAppNavigator((UINavigationController)Window.RootViewController);
 			}
 
-			EnsureSampleAppApplication(navigator);
+			EnsureSampleAppApplication(navigator).ContinueToSampleItemList(true);
             return true;
         }
         //
