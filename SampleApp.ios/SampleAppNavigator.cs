@@ -25,13 +25,11 @@ namespace SampleApp.ios
 
 		public void NavigateToSampleItemListView(object navigationContext)
 		{
-			if (masterNavigationController.TopViewController is MasterViewController) return;
 			if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone)
 			{
-				if (masterNavigationController.TopViewController is DetailViewController)
-				{
-					masterNavigationController.PopViewControllerAnimated(true);
-				}
+				if (masterNavigationController.TopViewController is MasterViewController) return;
+				masterNavigationController.PopToRootViewController(true);
+				//if (masterNavigationController.TopViewController is DetailViewController) masterNavigationController.PopViewControllerAnimated(true);
 			}
 		}
 
@@ -39,14 +37,16 @@ namespace SampleApp.ios
 		{
 			if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone)
 			{
-				if (masterNavigationController.TopViewController is DetailViewController)
-					return;
-				// Segue navigation works:
-				// masterNavigationController.TopViewController.PerformSegue("showDetail", this);
+				if (masterNavigationController.TopViewController is DetailViewController) return;
 
-				// Non-segue nav works also; todo check if we need to cache the ctrl instance in the navigator or is sb does that for us 
-				var ctrl = (UIViewController)masterNavigationController.Storyboard.InstantiateViewController("DetailViewController");
-				masterNavigationController.PushViewController(ctrl, true);
+				const bool useSegue = true;
+				if (useSegue)
+				{
+					masterNavigationController.TopViewController.PerformSegue("ViewItemCommand", this);
+				} else {
+					var detailViewController = (DetailViewController)masterNavigationController.Storyboard.InstantiateViewController("DetailViewController");
+					masterNavigationController.PushViewController(detailViewController, true);
+				}
 			}
 		}
     }

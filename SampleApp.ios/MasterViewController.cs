@@ -24,36 +24,19 @@ namespace SampleApp.ios
             }
         }
 
-        public DetailViewController DetailViewController
-        {
-            get;
-            set;
-        }
+		public DetailViewController DetailViewController { get; set; }
 
 		void AddNewItem(object sender, EventArgs args)
         {
 			ViewModel.AddItemCommand.Execute(null);
         }
 
-        public override void DidReceiveMemoryWarning()
-        {
-            // Releases the view if it doesn't have a superview.
-            base.DidReceiveMemoryWarning();
-			
-            // Release any cached data, images, etc that aren't in use.
-        }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
-            // Perform any additional setup after loading the view, typically from a nib.
             NavigationItem.LeftBarButtonItem = EditButtonItem;
-
-            var addButton = new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewItem);
-            NavigationItem.RightBarButtonItem = addButton;
-
-			base.InitializeBindings(View, ViewModel);
+			NavigationItem.RightBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewItem);
+			InitializeBindings(View, ViewModel);
         }
 		/*
         class DataSource : UITableViewSource
@@ -111,23 +94,14 @@ namespace SampleApp.ios
                 }
             } */
 
-		/* public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-            {
-                if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
-                    controller.DetailViewController.SetDetailItem(objects[indexPath.Row]);
-            }
-        }
-    	*/
-
-        public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
-        {
-			if (sender is SampleAppNavigator) return;
-			if (segue.Identifier == "showDetail")
-            {
-                var indexPath = TableView.IndexPathForSelectedRow;
-				ViewModel.ViewItemCommand.Execute(ViewModel.Items[indexPath.Row]);
-            }
-        }
+		protected override object GetCommandParameter(string commandName)
+		{
+			if (commandName == "ViewItemCommand")
+			{
+				var indexPath = TableView.IndexPathForSelectedRow;
+				if (indexPath != null) return ViewModel.Items[indexPath.Row];
+			}
+			return base.GetCommandParameter(commandName);
+		}
     }
 }
-

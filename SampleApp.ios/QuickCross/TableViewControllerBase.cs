@@ -3,27 +3,33 @@ using MonoTouch.UIKit;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using SampleApp.Shared;
+using MonoTouch.Foundation;
+using SampleApp.ios;
 
 namespace QuickCross
 {
 	public class TableViewControllerBase : UITableViewController, ViewDataBindings.ViewExtensionPoints
     {
-		public TableViewControllerBase(IntPtr handle) : base(handle)
-        {
-        }
+		public TableViewControllerBase(IntPtr handle) : base(handle) { }
 
 		private ViewModelBase viewModel;
 
 		protected ViewDataBindings Bindings { get; private set; }
 
-//		public override void ViewDidLoad()
-//		{
-//			base.ViewDidLoad();
-//			SampleAppApplication.Instance.CurrentNavigationContext = this;
-//		}
+		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
+		{
+			if (!(sender is SampleAppNavigator) && viewModel != null)
+			{
+				string commandName = segue.Identifier;
+				if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
+			} 
+			base.PrepareForSegue(segue, sender);
+		}
+
+		protected virtual object GetCommandParameter(string commandName) { return null; }
 
 		/// <summary>
-		/// Call Initialize() in the OnCreate method of a derived view class to create the data bindings and update the view with the current view model values.
+		/// Call InitializeBindings() in the ViewDidLoad method of a derived view class to create the data bindings and update the view with the current view model values.
 		/// </summary>
 		/// <param name="rootView">The view that should display the viewModel</param>
 		/// <param name="viewModel">The view model</param>
