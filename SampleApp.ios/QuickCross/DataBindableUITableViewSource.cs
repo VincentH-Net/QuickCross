@@ -209,7 +209,6 @@ namespace QuickCross
 			{
 				this.viewModel = viewModel;
 				bindings = new ViewDataBindings(rootView, viewModel, idPrefix);
-				bindings.EnsureCommandBindings();  // Then add any command bindings that were not specified in code (based on the Id naming convention)
 				AddHandlers();
 				viewModel.RaisePropertiesChanged();
 			}

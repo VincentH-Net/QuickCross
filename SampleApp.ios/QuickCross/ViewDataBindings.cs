@@ -74,13 +74,10 @@ namespace QuickCross
 		#endregion Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
 
 		public static Dictionary<UIView, List<BindingParameters> > RootViewBindingParameters { get; private set; }
-		// TODO: remove rootView ref and dictionary item when view is destroyed
 
 		private static void AddBinding(UIView view, string bindingParameters)
 		{
 			Console.WriteLine("Binding parameters: {0}", bindingParameters);
-			// First store all binding properties and UIView objects? or just the id? or the Ptr?
-			// How do we cleanup? Associated objects?
 
 			// Get the rootview so we can group binding parameters under it.
 			var rootView = view;
@@ -161,26 +158,6 @@ namespace QuickCross
 			viewModel = newViewModel;
 			AddHandlers();
 			UpdateView();
-		}
-
-		// *** HERE *** -> note: leave add/remove handlers in place until we know whether they are needed;
-		// different flow of creating bindings:
-		// 1) sb loaded OR code creates bindings directly: -> bindings created with view instance and property name
-		//    sb: keep dictionary of view bindings with ? topview handle? as id? uiview int id?
-		// 2) db event from model: lookup binding from property name, same as android
-		//    ui event: find binding from what? UIView? UIView handle? int id?
-
-		public void EnsureCommandBindings()
-		{
-			foreach (string commandName in viewModel.CommandNames)
-			{
-				DataBinding binding;
-				if (!dataBindings.TryGetValue(IdName(commandName), out binding))
-				{
-					// TODO: AddBinding(commandName, BindingMode.Command);
-					// Probably no need to add commands from VM - they will be added from storyboard load or with code
-				}
-			}
 		}
 
 		public void UpdateView()
@@ -267,9 +244,9 @@ namespace QuickCross
 		private static BindingParameters ParseBindingParameters(string parameters)
 		{
 			BindingParameters bp = null;
-			if (parameters != null && parameters.Contains("{"))
+			if (!string.IsNullOrEmpty(parameters))
 			{
-				var match = Regex.Match(parameters, @"({Binding\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{List\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{CommandParameter\s+((?<assignment>[^,{}]+),?)+\s*})?");
+				var match = Regex.Match(parameters, @"(({Binding\s)?\s*((?<assignment>[^,{}]+),?)+\s*}?)?(\s*{List\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{CommandParameter\s+((?<assignment>[^,{}]+),?)+\s*})?");
 				if (match.Success)
 				{
 					var gc = match.Groups["assignment"];
@@ -321,6 +298,7 @@ namespace QuickCross
 		private DataBinding AddBinding(BindingParameters bp)
 		{
 			var view = bp.View;
+			if (view == null) return null;
 			var propertyName = bp.PropertyName;
 			var mode = bp.Mode;
 			var listPropertyName = bp.ListPropertyName;
@@ -328,72 +306,6 @@ namespace QuickCross
 			 // TODO: , AdapterView commandParameterSelectedItemAdapterView = null
 
 			var idName = IdName(propertyName);
-			if (view == null) return null;
-
-			/*
-			bool itemIsValue = false;
-			string itemValueId = null;
-			int? commandParameterListId = null;
-
-			if (view.Tag != null)
-			{
-				// Get optional parameters from tag:
-				// {Binding propertyName, Mode=OneWay|TwoWay|Command}
-				// {List ItemsSource=listPropertyName, ItemIsValue=false|true, ItemTemplate=listItemTemplateName, ItemValueId=listItemValueId}
-				// {CommandParameter ListId=<view Id>}
-				// Defaults:
-				//   propertyName is known by convention from view Id = <rootview prefix><propertyName>; the default for the rootview prefix is the rootview class name + "_".
-				//   Mode = OneWay
-				// Additional defaults for views derived from AdapterView (i.e. lists):
-				//   ItemsSource = propertyName + "List"
-				//   ItemIsValue = false
-				//   ItemTemplate = ItemsSource + "Item"
-				//   ItemValueId : if ItemIsValue = true then the default for ItemValueId = ItemTemplate
-				string tag = view.Tag.ToString();
-				if (tag != null && tag.Contains("{"))
-				{
-					var match = Regex.Match(tag, @"({Binding\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{List\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{CommandParameter\s+((?<assignment>[^,{}]+),?)+\s*})?");
-					if (match.Success)
-					{
-						var gc = match.Groups["assignment"];
-						if (gc != null)
-						{
-							var cc = gc.Captures;
-							if (cc != null)
-							{
-								for (int i = 0; i < cc.Count; i++)
-								{
-									string[] assignmentElements = cc[i].Value.Split('=');
-									if (assignmentElements.Length == 1)
-									{
-										string value = assignmentElements[0].Trim();
-										if (value != "") propertyName = value;
-									}
-									else if (assignmentElements.Length == 2)
-									{
-										string name = assignmentElements[0].Trim();
-										string value = assignmentElements[1].Trim();
-										switch (name)
-										{
-											case "Mode": Enum.TryParse<BindingMode>(value, true, out mode); break;
-											case "ItemsSource": listPropertyName = value; break;
-											case "ItemIsValue": Boolean.TryParse(value, out itemIsValue); break;
-											case "ItemTemplate": itemTemplateName = value; break;
-											case "ItemValueId": itemValueId = value; break;
-											case "ListId":
-												// TODO:
-												// commandParameterListId = AndroidHelpers.FindResourceId(value);
-												// if (commandParameterSelectedItemAdapterView == null && commandParameterListId.HasValue) commandParameterSelectedItemAdapterView = rootView.FindViewById<AdapterView>(commandParameterListId.Value);
-												break;
-											default: throw new ArgumentException("Unknown tag binding parameter: " + name);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			} */
 
 			var binding = new DataBinding
 			{
