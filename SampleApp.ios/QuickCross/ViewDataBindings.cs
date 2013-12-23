@@ -332,14 +332,14 @@ namespace QuickCross
 				if (tableView.Source == null)
 				{
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
-					string listItemSelectedCommandName = (mode == BindingMode.Command) ? bp.PropertyName : null;
+					string listItemSelectedPropertyName = (mode == BindingMode.Command || mode == BindingMode.TwoWay) ? bp.PropertyName : null;
 					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(
 						tableView, 
 						itemTemplateName,
 						viewModel,
 						bp.ListCanEditItem,
 						bp.ListCanMoveItem,
-						listItemSelectedCommandName,
+						listItemSelectedPropertyName,
 						bp.ListRemoveItemCommandName,
 						bp.ListAddItemCommandName,
 						rootViewExtensionPoints

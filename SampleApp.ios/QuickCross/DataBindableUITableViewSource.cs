@@ -40,11 +40,12 @@ namespace QuickCross
 		private readonly UITableView tableView;
 		private readonly NSString cellIdentifier;
 
-		private readonly string rowSelectedCommandName, deleteRowCommandName, insertRowCommandName, canEdit, canMove;
+		private readonly string rowSelectedPropertyName, deleteRowCommandName, insertRowCommandName, canEdit, canMove;
+		private readonly bool rowSelectedPropertyIsCommand;
 		private readonly ViewModelBase viewModel;
 
 
-		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedCommandName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedPropertyName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
         {
 			this.tableView = tableView;
 			this.cellIdentifier = new NSString(cellIdentifier);
@@ -52,9 +53,11 @@ namespace QuickCross
 			this.canEdit = canEdit;
 			this.canMove = canMove;
 			this.viewExtensionPoints = viewExtensionPoints;
-			this.rowSelectedCommandName = rowSelectedCommandName;
+			this.rowSelectedPropertyName = rowSelectedPropertyName;
 			this.deleteRowCommandName = deleteRowCommandName;
 			this.insertRowCommandName = insertRowCommandName;
+
+			if (this.rowSelectedPropertyName != null) this.rowSelectedPropertyIsCommand = this.viewModel.CommandNames.Contains(this.rowSelectedPropertyName);
         }
 
 		private void AddListHandler()
@@ -121,10 +124,19 @@ namespace QuickCross
 			return true;
 		}
 
-		protected object GetItem(NSIndexPath path)
+		public object GetItem(NSIndexPath path)
 		{
+			if (path == null) return null;
 			int i = path.Row;
 			return (list != null && i >= 0 && i < list.Count) ? list[i] : null;
+		}
+
+		public NSIndexPath GetIndexPath(object itemObject)
+		{
+			if (list == null) return null;
+			var row = list.IndexOf(itemObject);
+			if (row < 0) return null;
+			return NSIndexPath.FromRowSection(row, 0);
 		}
 
 		// Customize the number of sections in the table view.
@@ -325,7 +337,15 @@ namespace QuickCross
 
 		public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
 		{
-			if (viewModel != null) viewModel.ExecuteCommand(rowSelectedCommandName, GetItem(indexPath));
+			if (viewModel != null) 
+			{
+				var itemObject = GetItem(indexPath);
+				if (rowSelectedPropertyIsCommand) {
+					viewModel.ExecuteCommand(rowSelectedPropertyName, itemObject);
+				} else {
+					viewModel.SetPropertyValue(rowSelectedPropertyName, itemObject);
+				}
+			}
 		}
     }
 }

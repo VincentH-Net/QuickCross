@@ -46,8 +46,15 @@ namespace QuickCross
 
         public T GetPropertyValue<T>(string propertyName)
         {
-            return (T)GetType().GetProperty(propertyName).GetValue(this);
+			var pi = GetType().GetProperty(propertyName);
+			return (pi == null) ? default(T) : (T)pi.GetValue(this);
         }
+
+		public void SetPropertyValue(string propertyName, object value)
+		{
+			var pi = GetType().GetProperty(propertyName);
+			if (pi != null) pi.SetValue(this, value);
+		}
 
 		public bool ExecuteCommand(string commandName, object parameter = null)
 		{

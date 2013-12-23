@@ -133,8 +133,22 @@ namespace QuickCross
 							if (textView.Text != text) textView.Text = text;
 						}
 						break;
-                    default:
-						throw new NotImplementedException("View type not implemented: " + viewTypeName);
+					default:
+						if (view is UITableView)
+						{
+							var tableView = (UITableView)view;
+							var source = tableView.Source as DataBindableUITableViewSource;
+							if (source != null)
+							{
+								var indexPath = source.GetIndexPath(value);
+								tableView.SelectRow(indexPath, true, UITableViewScrollPosition.Middle);
+							}
+						}
+						else
+						{
+							throw new NotImplementedException("View type not implemented: " + viewTypeName);
+						}
+						break;
                 }
             }
         }
@@ -161,7 +175,9 @@ namespace QuickCross
 					}
 					break;
 				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed += HandleTextViewChanged; break;
-				default: throw new NotImplementedException("View type not implemented: " + viewTypeName);
+				default: 
+					if (view is UITableView) break;
+					throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
         }
 
@@ -194,7 +210,9 @@ namespace QuickCross
 					 }
 					 break;
 				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed       -= HandleTextViewChanged; break;
-				default: throw new NotImplementedException("View type not implemented: " + viewTypeName);
+				default:
+					 if (view is UITableView) break;
+					 throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
         }
 
