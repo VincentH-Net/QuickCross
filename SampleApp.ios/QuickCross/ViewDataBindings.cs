@@ -80,13 +80,9 @@ namespace QuickCross
 		{
 			Console.WriteLine("Binding parameters: {0}", bindingParameters);
 			// First store all binding properties and UIView objects? or just the id? or the Ptr?
-			// How do we group the UIViews? On controller? On root views?
-			// How do we know the grouping object?
 			// How do we cleanup? Associated objects?
 
-			// Below is just an experiment to get to a root view - what we really want is 
-			// to find the viewbindings object for the toplevel view
-			// Look at options: find controller from vie
+			// Get the rootview so we can group binding parameters under it.
 			var rootView = view;
 			while (rootView.Superview != null && rootView.Superview != rootView) {
 				rootView = rootView.Superview;
@@ -109,8 +105,6 @@ namespace QuickCross
 			}
 
 			bindingParametersList.Add(bp);
-
-			// Do we use base classes for controllers?
 		}
 
 		private class DataBinding

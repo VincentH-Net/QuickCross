@@ -12,6 +12,7 @@ namespace QuickCross
     {
 		public ViewControllerBase(IntPtr handle) : base(handle) { }
 
+		private bool areHandlersAdded;
 		private ViewModelBase viewModel;
 
 		protected ViewDataBindings Bindings { get; private set; }
@@ -24,6 +25,38 @@ namespace QuickCross
 				if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
 			} 
 			base.PrepareForSegue(segue, sender);
+		}
+
+		/// <summary>
+		/// Override this method in a derived view class to register additional event handlers for your view. Always call base.AddHandlers() in your override.
+		/// </summary>
+		protected virtual void AddHandlers() 
+		{
+			viewModel.PropertyChanged += ViewModel_PropertyChanged;
+			Bindings.AddHandlers();
+		}
+
+		/// <summary>
+		/// Override this method in a derived view class to unregister additional event handlers for your view. Always call base.AddHandlers() in your override.
+		/// </summary>
+		protected virtual void RemoveHandlers() 
+		{ 
+			Bindings.RemoveHandlers();
+			viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+		}
+
+		private void EnsureHandlersAreAdded()
+		{
+			if (areHandlersAdded) return;
+			AddHandlers();
+			areHandlersAdded = true;
+		}
+
+		private void EnsureHandlersAreRemoved()
+		{
+			if (!areHandlersAdded) return;
+			RemoveHandlers();
+			areHandlersAdded = false;
 		}
 
 		protected virtual object GetCommandParameter(string commandName) { return null; }
@@ -40,9 +73,7 @@ namespace QuickCross
 			Bindings = new ViewDataBindings(rootView, viewModel, idPrefix ?? this.GetType().Name + "_");
 			this.viewModel = viewModel;
 
-			// TODO: base.Initialize();
-			viewModel.PropertyChanged += ViewModel_PropertyChanged;
-
+			EnsureHandlersAreAdded();
 
 			Bindings.AddBindings(bindingsParameters); // First add any bindings that were specified in code
 			// TODO: Bindings.EnsureCommandBindings();  // Then add any command bindings that were not specified in code (based on the Id naming convention)
@@ -51,11 +82,22 @@ namespace QuickCross
 			if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
 			{
 				Console.WriteLine("Adding bindings from markup ...");
+				ViewDataBindings.RootViewBindingParameters.Remove(rootView); // Remove the static reference to the views to prevent memory leaks. Note that if we would want to recreate the bindings later, we could also store the parameters list in the bindings.
 				Bindings.AddBindings(bindingParametersList.ToArray());
 			}
+		}
 
-			this.viewModel.RaisePropertiesChanged(); // Finally update the root view with the current property values
-			//isJustInitialized = true;
+		public override void ViewWillAppear(bool animated)
+		{
+			base.ViewWillAppear(animated);
+			EnsureHandlersAreAdded();
+			viewModel.RaisePropertiesChanged(); // Update the root view with the current property values
+		}
+
+		public override void ViewDidDisappear(bool animated)
+		{
+			EnsureHandlersAreRemoved();
+			base.ViewDidDisappear(animated);
 		}
 
 		/// <summary>
