@@ -19,7 +19,7 @@ namespace SampleApp.ios
         {
         }
 
-        public void SetDetailItem(object newDetailItem)
+		public void DismissMasterPopoverController()
         {
             if (masterPopoverController != null)
                 masterPopoverController.Dismiss(true);

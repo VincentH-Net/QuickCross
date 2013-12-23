@@ -33,7 +33,7 @@ namespace SampleApp.ios
                 var splitViewController = (UISplitViewController)Window.RootViewController;
 
                 // Get the UINavigationControllers containing our master & detail view controllers
-                var masterNavigationController = (UINavigationController)splitViewController.ViewControllers[0];
+				var masterNavigationController = (UINavigationController)splitViewController.ViewControllers[0];
                 var detailNavigationController = (UINavigationController)splitViewController.ViewControllers[1];
 
                 var masterViewController = (MasterViewController)masterNavigationController.TopViewController;
@@ -45,11 +45,13 @@ namespace SampleApp.ios
                 splitViewController.WeakDelegate = detailViewController;
 
 				navigator = new SampleAppNavigator(masterNavigationController, detailNavigationController);
+				EnsureSampleAppApplication(navigator).ContinueToSampleItemList(true);
+				SampleAppApplication.Instance.ContinueToSampleItem(null, true);
 			} else {
 				navigator = new SampleAppNavigator((UINavigationController)Window.RootViewController);
+				EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
 			}
 
-			EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
             return true;
         }
         //

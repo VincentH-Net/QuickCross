@@ -7,9 +7,6 @@ namespace SampleApp.ios
 {
 	public class SampleAppNavigator : NSObject, ISampleAppNavigator
     {
-		public static MasterViewController masterViewController;
-
-		// TODO: figure universal app nav out better...
 		private UINavigationController masterNavigationController, detailNavigationController;
 
 		public SampleAppNavigator(UINavigationController masterNavigationController, UINavigationController detailNavigationController = null)
@@ -29,7 +26,6 @@ namespace SampleApp.ios
 			{
 				if (masterNavigationController.TopViewController is MasterViewController) return;
 				masterNavigationController.PopToRootViewController(true);
-				//if (masterNavigationController.TopViewController is DetailViewController) masterNavigationController.PopViewControllerAnimated(true);
 			}
 		}
 
@@ -39,14 +35,17 @@ namespace SampleApp.ios
 			{
 				if (masterNavigationController.TopViewController is DetailViewController) return;
 
-				const bool useSegue = true;
+				const bool useSegue = true; // Just a hardcoded switch so we can test navigation with and without a segue
 				if (useSegue)
 				{
-					masterNavigationController.TopViewController.PerformSegue("ViewItemCommand", this);
+					masterNavigationController.TopViewController.PerformSegue("showDetail", this);
 				} else {
 					var detailViewController = (DetailViewController)masterNavigationController.Storyboard.InstantiateViewController("DetailViewController");
 					masterNavigationController.PushViewController(detailViewController, true);
 				}
+			} else {
+				var detailViewController = (DetailViewController)detailNavigationController.TopViewController;
+				detailViewController.DismissMasterPopoverController();
 			}
 		}
     }

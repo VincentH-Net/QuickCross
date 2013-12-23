@@ -31,6 +31,8 @@ namespace SampleApp.Shared.Services
         public SampleItem UpdateItem(SampleItem item)
         {
             SampleItem existingItem = _items.Find(i => { return i.Id == item.Id; });
+			if (existingItem == null) return AddItem(item.Title, item.Description);
+
             existingItem.Title = item.Title;
             existingItem.Description = item.Description;
             return existingItem;
