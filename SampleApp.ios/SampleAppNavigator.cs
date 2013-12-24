@@ -7,47 +7,97 @@ namespace SampleApp.ios
 {
 	public class SampleAppNavigator : NSObject, ISampleAppNavigator
     {
-		private UINavigationController masterNavigationController, detailNavigationController;
+		private UINavigationController navigationContext, detailNavigationController;
 
-		public SampleAppNavigator(UINavigationController masterNavigationController, UINavigationController detailNavigationController = null)
+		public SampleAppNavigator(UINavigationController navigationContext, UINavigationController detailNavigationController = null)
 		{
-			this.masterNavigationController = masterNavigationController;
+			this.navigationContext = navigationContext;
 			this.detailNavigationController = detailNavigationController;
 		}
 
-		private void Navigate(UINavigationController navigationController, UIViewController viewController, bool animated = false)
+		#region Generic navigation helpers
+
+		private static bool IsPhone { get { return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone; } }
+
+		private void Navigate(UIViewController viewController, bool animated = false)
 		{
-			navigationController.PushViewController(viewController, animated);
+			if (Object.ReferenceEquals(navigationContext.TopViewController, viewController)) return;
+			foreach (var stackViewController in navigationContext.ViewControllers)
+			{
+				if (Object.ReferenceEquals(stackViewController, viewController))
+				{
+					navigationContext.PopToViewController(viewController, animated);
+					return;
+				}
+			}
+			navigationContext.PushViewController(viewController, animated);
 		}
 
-		public void NavigateToSampleItemListView(object navigationContext)
+		private void Navigate(string viewControllerIdentifier = null, Type viewControllerType = null, bool animated = false)
 		{
-			if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone)
+			if (viewControllerType != null)
 			{
-				if (masterNavigationController.TopViewController is MasterViewController) return;
-				masterNavigationController.PopToRootViewController(true);
+				if (navigationContext.TopViewController != null && viewControllerType == navigationContext.TopViewController.GetType()) return;
+				if (navigationContext.ViewControllers != null)
+				{
+					foreach (var stackViewController in navigationContext.ViewControllers)
+					{
+						if (stackViewController.GetType() == viewControllerType)
+						{
+							navigationContext.PopToViewController(stackViewController, animated);
+							return;
+						}
+					}
+				}
+			}
+
+			if (viewControllerIdentifier != null)
+			{
+				var viewController = (UIViewController)navigationContext.Storyboard.InstantiateViewController(viewControllerIdentifier);
+				navigationContext.PushViewController(viewController, animated);
 			}
 		}
 
-		public void NavigateToSampleItemView(object navigationContext)
+		private void NavigateBack(bool animated = false)
 		{
-			if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone)
-			{
-				if (masterNavigationController.TopViewController is DetailViewController) return;
+			navigationContext.PopViewControllerAnimated(animated);
+		}
 
-				const bool useSegue = true; // Just a hardcoded switch so we can test navigation with and without a segue
-				if (useSegue)
-				{
-					masterNavigationController.TopViewController.PerformSegue("showDetail", this);
-				} else {
-					var detailViewController = (DetailViewController)masterNavigationController.Storyboard.InstantiateViewController("DetailViewController");
-					masterNavigationController.PushViewController(detailViewController, true);
-				}
+		private void NavigateSegue(string segueIdentifier, Type viewControllerType = null)
+		{
+			if (navigationContext.TopViewController != null)
+			{
+				if (viewControllerType != null && viewControllerType == navigationContext.TopViewController.GetType()) return;
+				navigationContext.TopViewController.PerformSegue(segueIdentifier, this);
+			}
+		}
+
+		#endregion Generic navigation helpers
+
+		public void NavigateToSampleItemListView()
+		{
+			if (IsPhone) Navigate(null, typeof(MasterViewController), true);
+		}
+
+		public void NavigateToSampleItemView()
+		{
+			if (IsPhone)
+			{
+				NavigateSegue("showDetail", typeof(DetailViewController)); // Navigate with a segue
+				// Navigate("DetailViewController", typeof(DetailViewController), true); // Navigate without a segue
 			} else {
 				var detailViewController = (DetailViewController)detailNavigationController.TopViewController;
 				detailViewController.DismissMasterPopoverController();
 			}
 		}
-    }
+
+		/* TODO: For each view, add a method to navigate to that view like this:
+
+        public void NavigateTo_VIEWNAME_View()
+        {
+            Navigate("_VIEWNAME_View", typeof(_VIEWNAME_View), true);
+        }
+         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/MvvmQuickCross#new-view). */
+		}
 }
 

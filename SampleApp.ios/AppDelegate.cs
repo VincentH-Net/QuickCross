@@ -45,8 +45,8 @@ namespace SampleApp.ios
                 splitViewController.WeakDelegate = detailViewController;
 
 				navigator = new SampleAppNavigator(masterNavigationController, detailNavigationController);
-				EnsureSampleAppApplication(navigator).ContinueToSampleItemList(true);
-				SampleAppApplication.Instance.ContinueToSampleItem(null, true);
+				EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
+				SampleAppApplication.Instance.ContinueToSampleItem();
 			} else {
 				navigator = new SampleAppNavigator((UINavigationController)Window.RootViewController);
 				EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
