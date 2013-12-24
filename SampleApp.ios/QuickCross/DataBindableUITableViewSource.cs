@@ -225,7 +225,7 @@ namespace QuickCross
 			ViewDataBindingsHolder holder;
 			if (!viewDataBindingsHolders.TryGetValue(rootView.Handle, out holder))
 			{
-				holder = new ViewDataBindingsHolder(rootView, viewModel, "TODO:"); // TODO: do we need a prefix?
+				holder = new ViewDataBindingsHolder(rootView, viewModel, "TODO:", viewExtensionPoints); // TODO: do we need a prefix?
 				viewDataBindingsHolders.Add(rootView.Handle, holder);
 			}
 			else
@@ -239,10 +239,10 @@ namespace QuickCross
 			private ViewModelBase viewModel;
 			private readonly ViewDataBindings bindings;
 
-			public ViewDataBindingsHolder(UIView rootView, ViewModelBase viewModel, string idPrefix)
+			public ViewDataBindingsHolder(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
 			{
 				this.viewModel = viewModel;
-				bindings = new ViewDataBindings(rootView, viewModel, idPrefix);
+				bindings = new ViewDataBindings(rootView, viewModel, idPrefix, viewExtensionPoints);
 				AddHandlers();
 				viewModel.RaisePropertiesChanged();
 			}
@@ -293,6 +293,13 @@ namespace QuickCross
 			if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(view, value); else ViewDataBindings.UpdateView(view, value);
 		}
 
+		private bool ExecuteCommand(string commandName, object parameter = null)
+		{
+			if (viewModel == null || string.IsNullOrEmpty(commandName)) return false;
+			if (viewExtensionPoints != null) parameter = viewExtensionPoints.GetCommandParameter(commandName, parameter);
+			return viewModel.ExecuteCommand(commandName, parameter);
+		}
+
 		protected bool GetItemFlag(NSIndexPath indexPath, string flag)
 		{
 			// Check for constant values true or false
@@ -323,7 +330,7 @@ namespace QuickCross
 			{
 				if (editingStyle == UITableViewCellEditingStyle.Delete)
 				{
-					if (viewModel.ExecuteCommand(deleteRowCommandName, GetItem(indexPath)))
+					if (ExecuteCommand(deleteRowCommandName, GetItem(indexPath)))
 					{
 						if (!listIsObservable) tableView.DeleteRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
 					}
@@ -331,7 +338,7 @@ namespace QuickCross
 				else if (editingStyle == UITableViewCellEditingStyle.Insert)
 				{
 					// TODO: check if the indexpath is relevant here? E.g. is it the insert position or the previous/next item?
-					if (viewModel.ExecuteCommand(insertRowCommandName, GetItem(indexPath)))
+					if (ExecuteCommand(insertRowCommandName, GetItem(indexPath)))
 					{
 						if (!listIsObservable) tableView.InsertRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);
 					}
@@ -363,7 +370,7 @@ namespace QuickCross
 			{
 				var itemObject = GetItem(indexPath);
 				if (rowSelectedPropertyIsCommand) {
-					viewModel.ExecuteCommand(rowSelectedPropertyName, itemObject);
+					ExecuteCommand(rowSelectedPropertyName, itemObject);
 				} else {
 					viewModel.SetPropertyValue(rowSelectedPropertyName, itemObject);
 				}

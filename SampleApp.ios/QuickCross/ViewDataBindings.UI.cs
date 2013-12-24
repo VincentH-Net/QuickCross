@@ -40,7 +40,6 @@ namespace QuickCross
 			var binding = FindBindingForView(view);
 			if (binding != null)
 			{
-				var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
 				object parameter = null;
 				/* TODO
 				if (binding.CommandParameterListView != null)
@@ -80,7 +79,7 @@ namespace QuickCross
 						}
 					}
 				} */
-				command.Execute(parameter);
+				ExecuteCommand(binding, parameter);
 			}
         }
 

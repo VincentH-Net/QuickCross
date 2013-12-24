@@ -70,7 +70,7 @@ namespace QuickCross
 		/// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
 		protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
 		{
-			Bindings = new ViewDataBindings(rootView, viewModel, idPrefix ?? this.GetType().Name + "_");
+			Bindings = new ViewDataBindings(rootView, viewModel, idPrefix ?? this.GetType().Name + "_", this);
 			this.viewModel = viewModel;
 
 			EnsureHandlersAreAdded();
@@ -131,6 +131,14 @@ namespace QuickCross
 		/// <param name="e">See http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html for details</param>
 		public virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { }
 
+
+		/// <summary>
+		/// Override this method in a derived view class to supply of modify the parameter for a command in code, when the command is executed.
+		/// </summary>
+		/// <returns>The command parameter. Can be null.</returns>
+		/// <param name="commandName">The command name</param>
+		/// <param name="parameter">The command parameter as specified in the binding, or null if none was specified</param>
+		public virtual object GetCommandParameter(string commandName, object parameter = null) { return parameter; }
     }
 }
 

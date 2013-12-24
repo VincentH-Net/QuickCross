@@ -136,16 +136,17 @@ namespace QuickCross
 		{
 			void UpdateView(UIView view, object value);
 			void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
+			object GetCommandParameter(string commandName, object parameter = null);
 		}
 
-		public ViewDataBindings(UIView rootView, ViewModelBase viewModel, string idPrefix)
+		public ViewDataBindings(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewExtensionPoints rootViewExtensionPoints = null)
 		{
 			if (rootView == null)
 				throw new ArgumentNullException("rootView");
 			if (viewModel == null)
 				throw new ArgumentNullException("viewModel");
 			this.rootView = rootView;
-			this.rootViewExtensionPoints = rootView as ViewExtensionPoints;
+			this.rootViewExtensionPoints = rootViewExtensionPoints;
 			this.viewModel = viewModel;
 			this.idPrefix = idPrefix; // Note that on iOS we may use idPrefix only for connecting outlet names to vm property names;
 			// The uiviews that have no outlets do noyt need a name or id; all info is in the Bind property
@@ -421,6 +422,13 @@ namespace QuickCross
 					// if (listView is AbsListView) ((AbsListView)listView).ClearChoices(); // Apparently, calling BaseAdapter.NotifyDataSetChanged() does not clear the choices, so we do that here.
 				}
 			}
+		}
+
+		private void ExecuteCommand(DataBinding binding, object parameter = null)
+		{
+			if (rootViewExtensionPoints != null) parameter = rootViewExtensionPoints.GetCommandParameter(binding.ViewModelPropertyInfo.Name, parameter);
+			var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
+			command.Execute(parameter);
 		}	
     }
 }
