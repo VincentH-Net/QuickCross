@@ -16,8 +16,21 @@ namespace QuickCross
 			public readonly FieldInfo ObjectFieldInfo;
 			public readonly UIView View;
 
-			public string Name { get { return (ObjectPropertyInfo != null) ? ObjectPropertyInfo.Name : ObjectFieldInfo.Name; } }
-			public object GetValue(object item) { return (ObjectPropertyInfo != null) ? ObjectPropertyInfo.GetValue(item) : ObjectFieldInfo.GetValue(item); }
+			public string Name 
+			{ 
+				get {
+					if (ObjectPropertyInfo != null) return ObjectPropertyInfo.Name;
+					if (ObjectFieldInfo != null) return ObjectFieldInfo.Name;
+					return ".";
+				} 
+			}
+
+			public object GetValue(object item) 
+			{ 
+				if (ObjectPropertyInfo != null) return ObjectPropertyInfo.GetValue(item);
+				if (ObjectFieldInfo != null) return ObjectFieldInfo.GetValue(item);
+				return item;
+			}
 
 			public ItemDataBinding(PropertyInfo objectPropertyInfo, UIView view)
 			{
@@ -28,6 +41,11 @@ namespace QuickCross
 			public ItemDataBinding(FieldInfo objectFieldInfo, UIView view)
 			{
 				this.ObjectFieldInfo = objectFieldInfo;
+				this.View = view;
+			}
+
+			public ItemDataBinding(UIView view)
+			{
 				this.View = view;
 			}
 		}
@@ -43,7 +61,6 @@ namespace QuickCross
 		private readonly string rowSelectedPropertyName, deleteRowCommandName, insertRowCommandName, canEdit, canMove;
 		private readonly bool rowSelectedPropertyIsCommand;
 		private readonly ViewModelBase viewModel;
-
 
 		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedPropertyName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
         {
@@ -184,13 +201,18 @@ namespace QuickCross
 				itemDataBindings = new ItemDataBindingsHolder();
 				foreach (var bindingParameter in bindingParametersList)
 				{
-					var pi = itemType.GetProperty(bindingParameter.PropertyName);
-					if (pi != null)
+					if (bindingParameter.PropertyName == ".")
 					{
-						itemDataBindings.Add(new ItemDataBinding(pi, bindingParameter.View));
+						itemDataBindings.Add(new ItemDataBinding(bindingParameter.View));
 					} else {
-						var fi = itemType.GetField(bindingParameter.PropertyName);
-						if (fi != null) itemDataBindings.Add(new ItemDataBinding(fi, bindingParameter.View));
+						var pi = itemType.GetProperty(bindingParameter.PropertyName);
+						if (pi != null)
+						{
+							itemDataBindings.Add(new ItemDataBinding(pi, bindingParameter.View));
+						} else {
+							var fi = itemType.GetField(bindingParameter.PropertyName);
+							if (fi != null) itemDataBindings.Add(new ItemDataBinding(fi, bindingParameter.View));
+						}
 					}
 				}
 			}

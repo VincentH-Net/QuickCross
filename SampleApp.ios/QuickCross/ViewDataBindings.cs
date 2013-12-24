@@ -272,7 +272,6 @@ namespace QuickCross
 									{
 										case "Mode": Enum.TryParse<BindingMode>(value, true, out bp.Mode); break;
 										case "ItemsSource": bp.ListPropertyName = value; break;
-										// TODO: case "ItemIsValue": Boolean.TryParse(value, out itemIsValue); break;
 										case "ItemTemplate": bp.ListItemTemplateName = value; break;
 										case "AddCommand": bp.ListAddItemCommandName = value; break;
 										case "RemoveCommand": bp.ListRemoveItemCommandName = value; break;
@@ -311,7 +310,7 @@ namespace QuickCross
 			{
 				View = view,
 				Mode = mode,
-				ViewModelPropertyInfo = string.IsNullOrEmpty(propertyName) ? null : viewModel.GetType().GetProperty(propertyName) // TODO,
+				ViewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName) // TODO,
 				// CommandParameterListId = commandParameterListId,
 				// CommandParameterListView = commandParameterSelectedItemAdapterView
 			};
@@ -320,8 +319,8 @@ namespace QuickCross
 			{
 				if (listPropertyName == null) listPropertyName = propertyName + "List";
 				var pi = viewModel.GetType().GetProperty(listPropertyName);
-				if (pi == null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
-				{ // TODO: check if we dont need this anymore because we dont work with ids? 
+				if (pi == null && binding.ViewModelPropertyInfo != null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
+				{
 					listPropertyName = propertyName;
 					pi = binding.ViewModelPropertyInfo;
 					binding.ViewModelPropertyInfo = null;
@@ -403,10 +402,10 @@ namespace QuickCross
 
 		private void UpdateView(DataBinding binding)
 		{
-			if ((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay) && binding.View != null && binding.ViewModelPropertyInfo != null)
+			if ((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay) && binding.View != null)
 			{
 				var view = binding.View;
-				var value = binding.ViewModelPropertyInfo.GetValue(viewModel);
+				var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
 				if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(view, value); else UpdateView(view, value);
 			}
 		}
