@@ -97,7 +97,7 @@ namespace SampleApp.ios
         {
             Navigate("_VIEWNAME_View", typeof(_VIEWNAME_View), true);
         }
-         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/MvvmQuickCross#new-view). */
+         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
 		}
 }
 

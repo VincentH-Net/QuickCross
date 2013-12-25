@@ -4,7 +4,7 @@ using MonoTouch.Foundation;
 using QuickCross.Templates;
 using MonoTouch.UIKit;
 
-namespace MvvmQuickCross.Templates
+namespace QuickCross.Templates
 {
 	public class _APPNAME_Navigator : NSObject, I_APPNAME_Navigator
     {
@@ -84,7 +84,7 @@ namespace MvvmQuickCross.Templates
         {
             Navigate("_VIEWNAME_View", typeof(_VIEWNAME_View), true);
         }
-         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/MvvmQuickCross#new-view). */
+         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
 }
 #endif // TEMPLATE

@@ -1,6 +1,4 @@
 using System;
-using System.Drawing;
-using System.Collections.Generic;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using QuickCross;
@@ -15,9 +13,7 @@ namespace SampleApp.ios
 
 		private SampleItemViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemViewModel; } }
 
-        public DetailView(IntPtr handle) : base(handle)
-        {
-        }
+		public DetailView(IntPtr handle) : base(handle) { }
 
 		public void DismissMasterPopoverController()
         {
@@ -25,18 +21,10 @@ namespace SampleApp.ios
                 masterPopoverController.Dismiss(true);
         }
 
-        public override void DidReceiveMemoryWarning()
-        {
-            // Releases the view if it doesn't have a superview.
-            base.DidReceiveMemoryWarning();
-			
-            // Release any cached data, images, etc that aren't in use.
-        }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-			base.InitializeBindings(View, ViewModel);
+			InitializeBindings(View, ViewModel);
         }
 
         [Export("splitViewController:willHideViewController:withBarButtonItem:forPopoverController:")]
