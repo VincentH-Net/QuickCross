@@ -11,8 +11,8 @@ namespace QuickCross.Templates
     {
         private I_APPNAME_Navigator _navigator;
 
-        public _APPNAME_Application(I_APPNAME_Navigator navigator, object currentNavigationContext = null, TaskScheduler uiTaskScheduler = null)
-            : base(currentNavigationContext, uiTaskScheduler)
+        public _APPNAME_Application(I_APPNAME_Navigator navigator, TaskScheduler uiTaskScheduler = null)
+            : base(uiTaskScheduler)
         {
             // Services that have a platform-specific implementation, such as the navigator,
             // are instantiated in a platform-specific project and passed to this application 
@@ -32,14 +32,12 @@ namespace QuickCross.Templates
         /* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
          * and then navigate to the view using the navigator, like this:
 
-        public void ContinueTo_VIEWNAME_(bool skipNavigation = false)
+        public void ContinueTo_VIEWNAME_()
         {
             if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = new _VIEWNAME_ViewModelDesign(); // TODO: Once _VIEWNAME_ViewModel has runtime data, instantiate that instead of _VIEWNAME_ViewModelDesign
             // Any actions to update the viewmodel go here
-            if (!skipNavigation) RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View(CurrentNavigationContext));
+            RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
         }
-         * The skipNavigation parameter is needed in cases where the OS has already navigated to the view for you;
-         * in that case you only need to initialize the viewmodel.
          * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
 }

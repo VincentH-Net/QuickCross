@@ -124,9 +124,7 @@
     <Compile Include="QuickCross\ViewDataBindings.cs" />
     <Compile Include="QuickCross\ViewDataBindings.UI.cs" />
     <Compile Include="SampleAppNavigator.cs" />
-    <Compile Include="QuickCross\ViewControllerBase.cs" />
     <Compile Include="QuickCross\DataBindableUITableViewSource.cs" />
-    <Compile Include="QuickCross\TableViewControllerBase.cs" />
     <Compile Include="QuickCross\AppDelegate.cs" />
     <Compile Include="DetailView.cs" />
     <Compile Include="DetailView.designer.cs">
@@ -136,6 +134,9 @@
     <Compile Include="MasterView.designer.cs">
       <DependentUpon>MasterView.cs</DependentUpon>
     </Compile>
+    <Compile Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
+    <Compile Include="QuickCross\TableViewBase.cs" />
+    <Compile Include="QuickCross\ViewBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard_iPhone.storyboard" />

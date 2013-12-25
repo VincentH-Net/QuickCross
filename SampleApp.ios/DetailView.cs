@@ -9,7 +9,7 @@ using SampleApp.Shared.ViewModels;
 
 namespace SampleApp.ios
 {
-	public partial class DetailView : ViewControllerBase
+	public partial class DetailView : ViewBase
     {
         UIPopoverController masterPopoverController;
 

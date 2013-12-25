@@ -9,7 +9,7 @@ using SampleApp.Shared.ViewModels;
 
 namespace SampleApp.ios
 {
-	public partial class MasterView : TableViewControllerBase
+	public partial class MasterView : TableViewBase
     {
 		private SampleItemListViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemListViewModel; } }
 

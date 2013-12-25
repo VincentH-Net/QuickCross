@@ -1,11 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../MvvmQuickCross/SampleApp.wp/MvvmQuickCross/Templates/App.xaml.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPad.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/QuickCross/Templates/_APPNAME_Navigator.cs">
     <Files>
-      <File FileName="../MvvmQuickCross/SampleApp.wp/MvvmQuickCross/Templates/App.xaml.cs" Line="1" Column="13" />
-      <File FileName="SampleApp.ios/AppDelegate.cs" Line="1" Column="1" />
-      <File FileName="SampleApp.Shared/SampleAppApplication.cs" Line="1" Column="1" />
-      <File FileName="SampleApp.ios/QuickCross/AppDelegate.cs" Line="1" Column="1" />
+      <File FileName="SampleApp.ios/QuickCross/Templates/_APPNAME_Navigator.cs" Line="1" Column="13" />
+      <File FileName="../MvvmQuickCross/SampleApp.android/MvvmQuickCross/Templates/_APPNAME_Navigator.cs" Line="9" Column="51" />
+      <File FileName="SampleApp.ios/SampleAppNavigator.cs" Line="8" Column="44" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
