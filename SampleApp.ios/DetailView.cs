@@ -9,13 +9,13 @@ using SampleApp.Shared.ViewModels;
 
 namespace SampleApp.ios
 {
-	public partial class DetailViewController : ViewControllerBase
+	public partial class DetailView : ViewControllerBase
     {
         UIPopoverController masterPopoverController;
 
 		private SampleItemViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemViewModel; } }
 
-        public DetailViewController(IntPtr handle) : base(handle)
+        public DetailView(IntPtr handle) : base(handle)
         {
         }
 

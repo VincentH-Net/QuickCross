@@ -8,8 +8,8 @@ using System.CodeDom.Compiler;
 
 namespace SampleApp.ios
 {
-    [Register("DetailViewController")]
-    partial class DetailViewController
+    [Register("DetailView")]
+    partial class DetailView
     {
         [Outlet]
         [GeneratedCodeAttribute("iOS Designer", "1.0")]

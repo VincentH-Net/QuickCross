@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;__MOBILE__;__IOS__;</DefineConstants>
+    <DefineConstants>DEBUG;__MOBILE__;__IOS__;TEMPLATE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -120,14 +120,6 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="MasterViewController.cs" />
-    <Compile Include="MasterViewController.designer.cs">
-      <DependentUpon>MasterViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DetailViewController.cs" />
-    <Compile Include="DetailViewController.designer.cs">
-      <DependentUpon>DetailViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="QuickCross\ObjcMagic.cs" />
     <Compile Include="QuickCross\ViewDataBindings.cs" />
     <Compile Include="QuickCross\ViewDataBindings.UI.cs" />
@@ -135,6 +127,15 @@
     <Compile Include="QuickCross\ViewControllerBase.cs" />
     <Compile Include="QuickCross\DataBindableUITableViewSource.cs" />
     <Compile Include="QuickCross\TableViewControllerBase.cs" />
+    <Compile Include="QuickCross\AppDelegate.cs" />
+    <Compile Include="DetailView.cs" />
+    <Compile Include="DetailView.designer.cs">
+      <DependentUpon>DetailView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MasterView.cs" />
+    <Compile Include="MasterView.designer.cs">
+      <DependentUpon>MasterView.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard_iPhone.storyboard" />
@@ -149,5 +150,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="QuickCross\" />
+    <Folder Include="QuickCross\Templates\" />
   </ItemGroup>
 </Project>

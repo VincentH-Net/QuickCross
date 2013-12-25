@@ -1,22 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPad.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/QuickCross/ViewDataBindings.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../MvvmQuickCross/SampleApp.wp/MvvmQuickCross/Templates/App.xaml.cs">
     <Files>
-      <File FileName="SampleApp.ios/QuickCross/ViewDataBindings.cs" Line="62" Column="1" />
-      <File FileName="SampleApp.ios/QuickCross/ViewControllerBase.cs" Line="1" Column="1" />
-      <File FileName="SampleApp.ios/MasterViewController.cs" Line="136" Column="3" />
-      <File FileName="../MvvmQuickCross/SampleApp.android/MvvmQuickCross/DataBindableListAdapter.cs" Line="1" Column="1" />
-      <File FileName="SampleApp.ios/QuickCross/DataBindableUITableViewSource.cs" Line="1" Column="1" />
-      <File FileName="SampleApp.ios/QuickCross/TableViewControllerBase.cs" Line="38" Column="37" />
-      <File FileName="SampleApp.ios/DetailViewController.cs" Line="54" Column="32" />
-      <File FileName="SampleApp.ios/MasterViewController.designer.cs" Line="1" Column="1" />
+      <File FileName="../MvvmQuickCross/SampleApp.wp/MvvmQuickCross/Templates/App.xaml.cs" Line="1" Column="13" />
+      <File FileName="SampleApp.ios/AppDelegate.cs" Line="1" Column="1" />
+      <File FileName="SampleApp.Shared/SampleAppApplication.cs" Line="1" Column="1" />
+      <File FileName="SampleApp.ios/QuickCross/AppDelegate.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/VincentH/QuickCross/SampleApp.ios/MasterViewController.cs" line="149" column="1" />
-      <Breakpoint file="/Users/VincentH/QuickCross/SampleApp.ios/DetailViewController.cs" line="54" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.SampleApp.ios>

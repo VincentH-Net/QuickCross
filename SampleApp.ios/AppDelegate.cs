@@ -11,18 +11,11 @@ namespace SampleApp.ios
     [Register("AppDelegate")]
     public partial class AppDelegate : UIApplicationDelegate
     {
-        // class-level declarations
         public override UIWindow Window
         {
             get;
             set;
         }
-
-		public static SampleAppApplication EnsureSampleAppApplication(ISampleAppNavigator navigator)
-		{
-			Console.WriteLine("EnsureSampleAppApplication ...");
-			return SampleAppApplication.Instance ?? new SampleAppApplication(navigator, null); // TODO: remove navigator from application
-		}
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
@@ -36,8 +29,8 @@ namespace SampleApp.ios
 				var masterNavigationController = (UINavigationController)splitViewController.ViewControllers[0];
                 var detailNavigationController = (UINavigationController)splitViewController.ViewControllers[1];
 
-                var masterViewController = (MasterViewController)masterNavigationController.TopViewController;
-                var detailViewController = (DetailViewController)detailNavigationController.TopViewController;
+                var masterViewController = (MasterView)masterNavigationController.TopViewController;
+                var detailViewController = (DetailView)detailNavigationController.TopViewController;
 
                 masterViewController.DetailViewController = detailViewController;
 

@@ -8,8 +8,8 @@ using MonoTouch.Foundation;
 
 namespace SampleApp.ios
 {
-    [Register("MasterViewController")]
-    partial class MasterViewController
+    [Register("MasterView")]
+    partial class MasterView
     {
         void ReleaseDesignerOutlets()
         {

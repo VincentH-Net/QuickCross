@@ -76,17 +76,17 @@ namespace SampleApp.ios
 
 		public void NavigateToSampleItemListView()
 		{
-			if (IsPhone) Navigate(null, typeof(MasterViewController), true);
+			if (IsPhone) Navigate(null, typeof(MasterView), true);
 		}
 
 		public void NavigateToSampleItemView()
 		{
 			if (IsPhone)
 			{
-				NavigateSegue("showDetail", typeof(DetailViewController)); // Navigate with a segue
-				// Navigate("DetailViewController", typeof(DetailViewController), true); // Navigate without a segue
+				NavigateSegue("showDetail", typeof(DetailView)); // Navigate with a segue
+				// Navigate("DetailView", typeof(DetailView), true); // Navigate without a segue
 			} else {
-				var detailViewController = (DetailViewController)detailNavigationController.TopViewController;
+				var detailViewController = (DetailView)detailNavigationController.TopViewController;
 				detailViewController.DismissMasterPopoverController();
 			}
 		}
