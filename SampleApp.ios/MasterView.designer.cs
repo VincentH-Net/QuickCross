@@ -6,7 +6,7 @@
 //
 using MonoTouch.Foundation;
 
-namespace SampleApp.ios
+namespace SampleApp
 {
     [Register("MasterView")]
     partial class MasterView

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using QuickCross.Templates;
-using QuickCrossLibrary.Templates;
+using SampleApp;
+using SampleApp.Shared;
 
 namespace QuickCross
 {
-	public class ViewBase : UIViewController, ViewDataBindings.ViewExtensionPoints
+	public class TableViewBase : UITableViewController, ViewDataBindings.ViewExtensionPoints
     {
-		public ViewBase(IntPtr handle) : base(handle) { }
+		public TableViewBase(IntPtr handle) : base(handle) { }
 
 		private bool areHandlersAdded;
 		private ViewModelBase viewModel;
@@ -19,7 +19,7 @@ namespace QuickCross
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
 		{
-			if (!(sender is _APPNAME_Navigator) && viewModel != null)
+            if (!(sender is SampleAppNavigator) && viewModel != null)
 			{
 				string commandName = segue.Identifier;
 				if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
@@ -58,6 +58,8 @@ namespace QuickCross
 			RemoveHandlers();
 			areHandlersAdded = false;
 		}
+
+		protected virtual object GetCommandParameter(string commandName) { return null; }
 
 		/// <summary>
 		/// Call InitializeBindings() in the ViewDidLoad method of a derived view class to create the data bindings and update the view with the current view model values.
@@ -128,6 +130,7 @@ namespace QuickCross
 		/// <param name="sender">The ObservableCollection that was changed</param>
 		/// <param name="e">See http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html for details</param>
 		public virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { }
+
 
 		/// <summary>
 		/// Override this method in a derived view class to supply of modify the parameter for a command in code, when the command is executed.

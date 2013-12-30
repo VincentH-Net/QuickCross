@@ -3,7 +3,7 @@ using SampleApp.Shared;
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 
-namespace SampleApp.ios
+namespace SampleApp
 {
 	public class SampleAppNavigator : NSObject, ISampleAppNavigator
     {

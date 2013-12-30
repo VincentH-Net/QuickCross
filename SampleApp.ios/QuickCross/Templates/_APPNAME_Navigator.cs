@@ -2,6 +2,7 @@
 using System;
 using MonoTouch.Foundation;
 using QuickCross.Templates;
+using QuickCrossLibrary.Templates;
 using MonoTouch.UIKit;
 
 namespace QuickCross.Templates

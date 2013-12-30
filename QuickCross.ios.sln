@@ -5,6 +5,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.ios", "SampleApp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.Shared.ios", "SampleApp.Shared\SampleApp.Shared.ios.csproj", "{A9BDBA29-96B5-4CAF-B030-16766BFAC75C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{09630A6E-40E0-49C2-8F17-0E1FB75CB3FB}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{681A9180-9E4B-4334-9A23-738A013DE4FD}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet\about_QuickCross.help.txt = NuGet\about_QuickCross.help.txt
+		NuGet\CreatePackage.cmd = NuGet\CreatePackage.cmd
+		NuGet\Init.ps1 = NuGet\Init.ps1
+		NuGet\PublishToPublicNuGet.cmd = NuGet\PublishToPublicNuGet.cmd
+		NuGet\QuickCross.nuspec = NuGet\QuickCross.nuspec
+		NuGet\QuickCross.psm1 = NuGet\QuickCross.psm1
+		NuGet\readme.txt = NuGet\readme.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|iPhone = Ad-Hoc|iPhone

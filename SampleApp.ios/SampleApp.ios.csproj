@@ -8,7 +8,7 @@
     <ProjectGuid>{09DFD300-738B-43EF-90FE-60B1548405C7}</ProjectGuid>
     <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SampleApp.ios</RootNamespace>
+    <RootNamespace>SampleApp</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>SampleAppios</AssemblyName>
   </PropertyGroup>
@@ -121,19 +121,23 @@
     <BundleResource Include="Resources\Default-568h%402x.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppDelegate.QC.cs" />
+    <Compile Include="TableViewBase.cs" />
+    <Compile Include="ViewBase.cs" />
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
-    <None Include="QuickCross\Templates\_VIEWNAME_View.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_StoryBoardView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="QuickCross\ObjcMagic.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_StoryBoardTableView.cs" />
     <Compile Include="QuickCross\ViewDataBindings.cs" />
     <Compile Include="QuickCross\ViewDataBindings.UI.cs" />
     <Compile Include="SampleAppNavigator.cs" />
     <Compile Include="QuickCross\DataBindableUITableViewSource.cs" />
-    <Compile Include="QuickCross\AppDelegate.cs" />
+    <None Include="QuickCross\AppDelegate.cs" />
     <Compile Include="DetailView.cs" />
     <Compile Include="DetailView.designer.cs">
       <DependentUpon>DetailView.cs</DependentUpon>
@@ -142,9 +146,9 @@
     <Compile Include="MasterView.designer.cs">
       <DependentUpon>MasterView.cs</DependentUpon>
     </Compile>
-    <Compile Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
-    <Compile Include="QuickCross\TableViewBase.cs" />
-    <Compile Include="QuickCross\ViewBase.cs" />
+    <None Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
+    <None Include="QuickCross\TableViewBase.cs" />
+    <None Include="QuickCross\ViewBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard_iPhone.storyboard" />

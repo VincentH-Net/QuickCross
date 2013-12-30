@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using QuickCross.Templates;
-using QuickCrossLibrary.Templates;
+using SampleApp;
+using SampleApp.Shared;
 
 namespace QuickCross
 {
@@ -19,7 +19,7 @@ namespace QuickCross
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
 		{
-			if (!(sender is _APPNAME_Navigator) && viewModel != null)
+			if (!(sender is SampleAppNavigator) && viewModel != null)
 			{
 				string commandName = segue.Identifier;
 				if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;

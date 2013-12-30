@@ -2,19 +2,20 @@
 <package>
   <metadata>
     <id>QuickCross</id>
-    <version>1.6.0.0</version>
+    <version>2.0.0-beta</version>
     <authors>Vincent Hoogendoorn [Macaw]</authors>
     <owners>Vincent Hoogendoorn [Macaw]</owners>
     <description>
-      Version 2.0 and later of MvvmQuickCross will be published in this package under the name QuickCross. This version will add iOS data binding support. Versions prior to 2.0 will be supported at the existing repository and the existing MvvmQuickCross NuGet packages will remain available.
-      
-      Note: This version (1.6) of QuickCross is not fully functional; you should not upgrade from MvvmQuickCross to QuickCross until version 2.0 is published.
+      QuickCross is a lightweight (no binaries) cross-platform MVVM pattern to quickly build native Xamarin.iOS, Xamarin.Android, Windows Phone and Windows Store Apps with shared C# code.
 
-      Upgrading existing applications to version 2.0 will be quick (pun intended); simply uninstall MvvmQuickCross, install QuickCross, and replace "MvvmQuickCross" with "MvvmCross" in your source code.QuickCross is a lightweight (no binaries) cross-platform MVVM pattern to quickly build native Xamarin.iOS, Xamarin.Android, Windows Phone and Windows Store Apps with shared C# code.
-
-      QuickCross provides data binding for Android (and for iOS soon). It accelerates development with scaffolders and code snippets, also for a single platform app. For cross-platform apps QuickCross increases code sharing with an Application-Navigator pattern.
+      QuickCross provides data binding for Android and for iOS. It accelerates development with scaffolders and code snippets, also for a single platform app. For cross-platform apps QuickCross increases code sharing with an Application-Navigator pattern.
 
       QuickCross aims to leave you in full control; it does not get in the way if you want to do some things differently, and you can simply extend or modify it.
+
+      NOTE: This version (2.0) of QuickCross is in beta now; the iOS data bindings are working but they are currently documented at a minimum level; more elaborate iOS example documentation will be added soon.
+      The purpose of this beta release is to gain feedback on the iOS data bindings implementation; if you are building a production application or if you are targeting other platforms than iOS, it is recommended to keep using the previous version until the QuickCross release version is published.
+      Versions before 2.0 were published under the name MvvmQuickCross. They will continue to be supported at the existing MvvmQuickCross GitHub repository, and the existing MvvmQuickCross NuGet packages will remain available.
+      Upgrading from MvvmQuickCross to QuickCross is quick (pun intended); see TODO URL for details.
 
       See the project site on GitHub for news, example apps and full reference documentation.
     </description>
@@ -27,12 +28,26 @@
     <tags>iOS Android WP8 Win8 MVVM CrossPlatform Xamarin Mobile App</tags>
   </metadata>
   <files>
-    <file src="readme.txt"                                 target="" />
+    <file src="readme.txt"                             target="" />
 
     <!-- Tools -->
-    <file src="Init.ps1"                                   target="tools\Init.ps1" />
+    <file src="Init.ps1"                               target="tools\Init.ps1" />
     <file src="QuickCross.psm1"                        target="tools\QuickCross.psm1" />
     <file src="about_QuickCross.help.txt"              target="tools\about_QuickCross.help.txt" />
 
+    <!-- Cross-platform library project files -->
+    <file src="..\SampleApp.Shared\QuickCross\**\*.*"  target="tools\library\QuickCross\" />
+
+    <!-- iOS application project files -->
+    <file src="..\SampleApp.ios\QuickCross\**\*.*"     target="tools\app.ios\QuickCross\" />
+
+    <!-- Android application project files TODO
+    <file src="..\SampleApp.android\QuickCross\**\*.*" target="tools\app.android\QuickCross\" /> -->
+
+    <!-- Windows Phone application project files TODO
+    <file src="..\SampleApp.wp\QuickCross\**\*.*"      target="tools\app.wp\QuickCross\" />  -->
+
+    <!-- Windows Store application project files -->
+    <file src="..\SampleApp.ws\QuickCross\**\*.*"      target="tools\app.ws\QuickCross\" />
   </files>
 </package>

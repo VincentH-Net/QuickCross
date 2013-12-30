@@ -1,13 +1,13 @@
 using MonoTouch.UIKit;
-using SampleApp.Shared;
+using QuickCrossLibrary.Templates;
 
-namespace SampleApp.ios
+namespace QuickCross.Templates
 {
     public partial class AppDelegate : UIApplicationDelegate
     {
-		public static SampleAppApplication EnsureSampleAppApplication(ISampleAppNavigator navigator)
+        public static _APPNAME_Application Ensure_APPNAME_Application(I_APPNAME_Navigator navigator)
 		{
-			return SampleAppApplication.Instance ?? new SampleAppApplication(navigator);
+            return _APPNAME_Application.Instance ?? new _APPNAME_Application(navigator);
 		}
     }
 

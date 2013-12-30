@@ -14,10 +14,15 @@ if ((Get-Module MvvmQuickCross) -ne $null)
     Write-Host "Removing existing MvvmQuickCross module"
     Remove-Module -Name MvvmQuickCross 
 }
-$modulePath = Join-Path -Path $toolsPath -ChildPath MvvmQuickCross.psm1
-Write-Host "Importing MvvmQuickCross module from $modulePath"
+if ((Get-Module QuickCross) -ne $null) 
+{
+    Write-Host "Removing existing QuickCross module"
+    Remove-Module -Name QuickCross 
+}
+$modulePath = Join-Path -Path $toolsPath -ChildPath QuickCross.psm1
+Write-Host "Importing QuickCross module from $modulePath"
 Import-Module -Name $modulePath
-$commands = Get-Command -Module MvvmQuickCross -Syntax | Out-String
+$commands = Get-Command -Module QuickCross -Syntax | Out-String
 $commands = $commands -replace '[\r\n]+', "`r`n"
-Write-Host "Available MvvmQuickCross Commands:`r`n$commands"
+Write-Host "Available QuickCross Commands:`r`n$commands"
 Write-Host 'For detailed help, type "Get-Help <command> -Online"'

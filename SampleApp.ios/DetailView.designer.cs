@@ -6,7 +6,7 @@
 using MonoTouch.Foundation;
 using System.CodeDom.Compiler;
 
-namespace SampleApp.ios
+namespace SampleApp
 {
     [Register("DetailView")]
     partial class DetailView

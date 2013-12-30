@@ -5,7 +5,7 @@ using QuickCross;
 using SampleApp.Shared;
 using SampleApp.Shared.ViewModels;
 
-namespace SampleApp.ios
+namespace SampleApp
 {
 	public partial class DetailView : ViewBase
     {

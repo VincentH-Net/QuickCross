@@ -1,10 +1,10 @@
 using System;
-using MonoTouch.UIKit;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using SampleApp.Shared;
 using MonoTouch.Foundation;
-using SampleApp.ios;
+using MonoTouch.UIKit;
+using QuickCross.Templates;
+using QuickCrossLibrary.Templates;
 
 namespace QuickCross
 {
@@ -19,7 +19,7 @@ namespace QuickCross
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
 		{
-			if (!(sender is SampleAppNavigator) && viewModel != null)
+			if (!(sender is _APPNAME_Navigator) && viewModel != null)
 			{
 				string commandName = segue.Identifier;
 				if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;

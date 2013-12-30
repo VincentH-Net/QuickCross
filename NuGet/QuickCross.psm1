@@ -123,7 +123,7 @@ function GetProjectPlatform
     # Windows Store:   .NETCore,Version=v4.5
     # Windows Phone:   WindowsPhone,Version=v8.0
     # Xamarin.Android: MonoAndroid,Version=v4.2
-    # Xamarin.iOS:     TODO CHECK: MonoTouch?,?
+    # Xamarin.iOS:     MonoTouch,Version=v1.0
 
     $targetFrameworkName = $targetFrameworkMoniker.Split(',')[0]
     switch ($targetFrameworkName)
@@ -275,7 +275,7 @@ function GetContentReplacements
     if ($cs) {
         $defaultNamespace = $project.Properties.Item("DefaultNamespace").Value
         $contentReplacements = @{
-            'MvvmQuickCross.Templates' = $defaultNamespace;
+            'QuickCross.Templates' = $defaultNamespace;
             '(?m)^\s*#if\s+TEMPLATE\s+[^\r\n]*[\r\n]+' = '';
             '(?m)^\s*#endif\s+//\s*TEMPLATE[^\r\n]*[\r\n]*' = ''
         } 
@@ -283,9 +283,9 @@ function GetContentReplacements
             $libraryProject = GetDefaultProject
             if ($libraryProject -eq $null)  { throw "No library project found. Add a class library project for your target platform to the solution." }
             $libraryDefaultNamespace = $libraryProject.Properties.Item("DefaultNamespace").Value
-            $contentReplacements.Add('MvvmQuickCrossLibrary\.Templates', $libraryDefaultNamespace)
+            $contentReplacements.Add('QuickCrossLibrary\.Templates', $libraryDefaultNamespace)
             $libraryAssemblyName =  $libraryProject.Properties.Item("AssemblyName").Value
-            $contentReplacements.Add('MvvmQuickCrossLibraryAssembly', $libraryAssemblyName)
+            $contentReplacements.Add('QuickCrossLibraryAssembly', $libraryAssemblyName)
         }
     } else {
         $contentReplacements = @{ }
@@ -317,7 +317,7 @@ function GetDefaultProject
 
 function Install-Mvvm
 {
-    [CmdletBinding(HelpURI="http://github.com/MacawNL/MvvmQuickCross#install-mvvm")]
+    [CmdletBinding(HelpURI="http://github.com/MacawNL/QuickCross#install-mvvm")]
     Param(
        [string]$ProjectName
     )
@@ -352,7 +352,7 @@ function Install-Mvvm
         $projectType = ('library', 'application')[$isApplication]
 
         Write-Host '-------------------------'
-        Write-Host "Installing MvvmQuickCross $platform $projectType files in project $ProjectName ..."
+        Write-Host "Installing QuickCross $platform $projectType files in project $ProjectName ..."
 
         $toolsPath = $PSScriptRoot
         $nameReplacements = @{
@@ -367,7 +367,7 @@ function Install-Mvvm
         {
             $contentReplacements = @{
                 '_APPNAME_' = $appName;
-                'MvvmQuickCross\.Templates' = $defaultNamespace
+                'QuickCross\.Templates' = $defaultNamespace
             }
             $librarySourceDirectory = Join-Path -Path $toolsPath -ChildPath library
             AddProjectItemsFromDirectory -project $project -sourceDirectory $librarySourceDirectory -contentReplacements $contentReplacements
@@ -376,12 +376,12 @@ function Install-Mvvm
             $null = AddProjectItem  -project $project `
                                     -destinationProjectRelativePath ('I{0}Navigator.cs' -f $appName) `
                                     -templatePackageFolder          'library' `
-                                    -templateProjectRelativePath    'MvvmQuickCross\Templates\I_APPNAME_Navigator.cs' `
+                                    -templateProjectRelativePath    'QuickCross\Templates\I_APPNAME_Navigator.cs' `
                                     -contentReplacements            $csContentReplacements
             $null = AddProjectItem  -project $project `
                                     -destinationProjectRelativePath ('{0}Application.cs' -f $appName) `
                                     -templatePackageFolder          'library' `
-                                    -templateProjectRelativePath    'MvvmQuickCross\Templates\_APPNAME_Application.cs' `
+                                    -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Application.cs' `
                                     -contentReplacements            $csContentReplacements
             New-ViewModel -ViewModelName Main
         }
@@ -389,8 +389,8 @@ function Install-Mvvm
         if ($isApplication) {
             $contentReplacements = @{
                 '_APPNAME_' = $appName;
-                'MvvmQuickCrossLibrary\.Templates' = $csContentReplacements['MvvmQuickCrossLibrary\.Templates'];
-                'MvvmQuickCross\.Templates' = $defaultNamespace
+                'QuickCrossLibrary\.Templates' = $csContentReplacements['QuickCrossLibrary\.Templates'];
+                'QuickCross\.Templates' = $defaultNamespace
             }
 
             $appSourceDirectory = Join-Path -Path $toolsPath -ChildPath "app.$platform"
@@ -399,39 +399,48 @@ function Install-Mvvm
             # Create default project items
             switch ($platform)
             {
+                'ios' {
+                    $null = AddProjectItem -project $project `
+                                           -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
+                                           -templatePackageFolder          'app.ios' `
+                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
+                                           -contentReplacements            $csContentReplacements
+                    New-View -ViewName Main
+                }
+
                 'android' {
                     $null = AddProjectItem -project $project `
                                            -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
                                            -templatePackageFolder          'app.android' `
-                                           -templateProjectRelativePath    'MvvmQuickCross\Templates\_APPNAME_Navigator.cs' `
+                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                            -contentReplacements            $csContentReplacements
                     New-View -ViewName Main -ViewType MainLauncher
                 }
 
                 'wp' {
                     $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('MvvmQuickCross\App.xaml.cs' -f $appName) `
+                                           -destinationProjectRelativePath ('QuickCross\App.xaml.cs' -f $appName) `
                                            -templatePackageFolder          'app.wp' `
-                                           -templateProjectRelativePath    'MvvmQuickCross\Templates\App.xaml.cs' `
+                                           -templateProjectRelativePath    'QuickCross\Templates\App.xaml.cs' `
                                            -contentReplacements            $csContentReplacements
                     $null = AddProjectItem -project $project `
                                            -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
                                            -templatePackageFolder          'app.wp' `
-                                           -templateProjectRelativePath    'MvvmQuickCross\Templates\_APPNAME_Navigator.cs' `
+                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                            -contentReplacements            $csContentReplacements
                     New-View -ViewName Main
                 }
 
                 'ws' {
                     $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('MvvmQuickCross\App.xaml.cs' -f $appName) `
+                                           -destinationProjectRelativePath ('QuickCross\App.xaml.cs' -f $appName) `
                                            -templatePackageFolder          'app.ws' `
-                                           -templateProjectRelativePath    'MvvmQuickCross\Templates\App.xaml.cs' `
+                                           -templateProjectRelativePath    'QuickCross\Templates\App.xaml.cs' `
                                            -contentReplacements            $csContentReplacements
                     $null = AddProjectItem -project $project `
                                            -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
                                            -templatePackageFolder          'app.ws' `
-                                           -templateProjectRelativePath    'MvvmQuickCross\Templates\_APPNAME_Navigator.cs' `
+                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                            -contentReplacements            $csContentReplacements
                     New-View -ViewName Main
                 }
@@ -451,7 +460,7 @@ function Install-Mvvm
 
 function New-ViewModel
 {
-    [CmdletBinding(HelpURI="http://github.com/MacawNL/MvvmQuickCross#new-viewmodel")]
+    [CmdletBinding(HelpURI="http://github.com/MacawNL/QuickCross#new-viewmodel")]
     Param(
         [Parameter(Mandatory=$true)] [string]$ViewModelName,
         [string]$ProjectName,
@@ -474,7 +483,7 @@ function New-ViewModel
     $addedViewModel = AddProjectItem   -project $project `
                                        -destinationProjectRelativePath ('ViewModels\{0}ViewModel.cs' -f $ViewModelName) `
                                        -templatePackageFolder          'library' `
-                                       -templateProjectRelativePath    'MvvmQuickCross\Templates\_VIEWNAME_ViewModel.cs' `
+                                       -templateProjectRelativePath    'QuickCross\Templates\_VIEWNAME_ViewModel.cs' `
                                        -contentReplacements            $csContentReplacements
 
     if ($addedViewModel -and (-not $NotInApplication))
@@ -487,7 +496,7 @@ function New-ViewModel
 
 function New-View
 {
-    [CmdletBinding(HelpURI="http://github.com/MacawNL/MvvmQuickCross#new-view")]
+    [CmdletBinding(HelpURI="http://github.com/MacawNL/QuickCross#new-view")]
     Param(
         [Parameter(Mandatory=$true)] [string]$ViewName,
         [string]$ViewType,
@@ -528,6 +537,17 @@ function New-View
     $platform = GetProjectPlatform -project $project
     switch ($platform)
     {
+        'ios' {
+            if ("$ViewType" -eq '') { $ViewType = 'StoryBoard' }
+            $viewNameSuffix = ''
+            if ($ViewType.StartsWith('StoryBoard')) { $viewNameSuffix = '.TODO' }
+            $null = AddProjectItem -project $project `
+                                   -destinationProjectRelativePath ('{0}View{1}.cs' -f $ViewName, $viewNameSuffix) `
+                                   -templatePackageFolder          'app.ios' `
+                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
+                                   -contentReplacements            $csContentReplacements
+        }
+
         'android' {
             if ("$ViewType" -eq '') { $ViewType = 'Activity' }
             foreach ($markupType in @($ViewType, ''))
@@ -535,7 +555,7 @@ function New-View
                 if (AddProjectItem -project $project `
                                    -destinationProjectRelativePath ('Resources\Layout\{0}View.axml' -f $ViewName) `
                                    -templatePackageFolder          'app.android' `
-                                   -templateProjectRelativePath    ('MvvmQuickCross\Templates\_VIEWNAME_{0}View.axml.template' -f $markupType) `
+                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.axml.template' -f $markupType) `
                                    -contentReplacements            @{ '_VIEWNAME_' = $ViewName } `
                                    -isOptionalItem:($markupType -ne ''))
                 { break }
@@ -543,7 +563,7 @@ function New-View
             $null = AddProjectItem -project $project `
                                    -destinationProjectRelativePath ('{0}View.cs' -f $ViewName) `
                                    -templatePackageFolder          'app.android' `
-                                   -templateProjectRelativePath    ('MvvmQuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
+                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
                                    -contentReplacements            $csContentReplacements
         }
 
@@ -554,7 +574,7 @@ function New-View
                 if (AddProjectItem -project $project `
                                    -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
                                    -templatePackageFolder          'app.wp' `
-                                   -templateProjectRelativePath    ('MvvmQuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
+                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
                                    -contentReplacements            $csContentReplacements `
                                    -isOptionalItem:($markupType -ne ''))
                 { break }
@@ -562,7 +582,7 @@ function New-View
             $null = AddProjectItem -project $project `
                                    -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
                                    -templatePackageFolder          'app.wp' `
-                                   -templateProjectRelativePath    ('MvvmQuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
+                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
                                    -contentReplacements            $csContentReplacements
         }
 
@@ -573,7 +593,7 @@ function New-View
                 if (AddProjectItem -project $project `
                                    -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
                                    -templatePackageFolder          'app.ws' `
-                                   -templateProjectRelativePath    ('MvvmQuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
+                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
                                    -contentReplacements            $csContentReplacements `
                                    -isOptionalItem:($markupType -ne ''))
                 { break }
@@ -581,11 +601,11 @@ function New-View
             $null = AddProjectItem -project $project `
                                    -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
                                    -templatePackageFolder          'app.ws' `
-                                   -templateProjectRelativePath    ('MvvmQuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
+                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
                                    -contentReplacements            $csContentReplacements
         }
 
-        default { Write-Host "New-View currenty only supports Android, Windows Phone and Windows Store application projects"; return }
+        default { Write-Host "New-View currenty only supports iOS, Android, Windows Phone and Windows Store application projects"; return }
     }
 }
 

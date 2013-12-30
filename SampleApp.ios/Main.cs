@@ -5,7 +5,7 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using QuickCross;
 
-namespace SampleApp.ios
+namespace SampleApp
 {
     public class Application
     {
