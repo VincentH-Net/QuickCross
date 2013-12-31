@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using QuickCross;
 
 namespace SampleApp
 {
@@ -14,7 +13,7 @@ namespace SampleApp
         {
             // if you want to use a different Application Delegate class from "AppDelegate"
             // you can specify it here.
-			ViewDataBindings.RegisterBindKey();
+            QuickCross.ViewDataBindings.RegisterBindKey();
             UIApplication.Main(args, null, "AppDelegate");
         }
     }

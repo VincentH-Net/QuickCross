@@ -11,10 +11,10 @@ namespace QuickCross.Templates
 		}
     }
 
-	// TODO: Add the following code to FinishedLaunching:
+    // TODO: In Application.Main(), add the following code before the call to UIApplication.Main():
+    //    QuickCross.ViewDataBindings.RegisterBindKey();
+
+    // TODO: Add the following code to FinishedLaunching after Window.RootViewController has been set:
 	// 	  var navigator = new _APPNAME_Navigator((UINavigationController)Window.RootViewController);
 	//    Ensure_APPNAME_Application(navigator).ContinueToMain();
-
-	// TODO: Add the following code to Application_Activated:
-	//    Ensure_APPNAME_Application(RootFrame);
 }
