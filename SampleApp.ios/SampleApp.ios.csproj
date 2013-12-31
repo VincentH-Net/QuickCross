@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.QC.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_CodeView.cs" />
     <Compile Include="TableViewBase.cs" />
     <Compile Include="ViewBase.cs" />
     <None Include="Info.plist" />
