@@ -3,7 +3,7 @@
  *
  * 1 From Xamarin Studio, open the storyboard file to which you want to add the view.
  * 2 XCode will now open. In XCode, add your view to the storyboard.
- * 3 Set the Class name and the Storyboard ID to _VIEWNAME_View 
+ * 3 Set the Class name and the Storyboard ID for the controller to _VIEWNAME_View 
  *   (it is recommended to also check 'Use Storyboard ID' so you will use the same name for the Restoration ID).
  * 4 Switch back from XCode to Xamarin Studio to have the _VIEWNAME_View.cs and _VIEWNAME_View.designer.cs files generated.
  * 5 Copy and paste the complete code below over the content in the generated _VIEWNAME_View.cs file.

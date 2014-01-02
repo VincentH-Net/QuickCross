@@ -20,6 +20,7 @@ namespace QuickCross.Templates
             View.Frame = UIScreen.MainScreen.Bounds;
             View.BackgroundColor = UIColor.White;
 
+            #region Bind to example property and command
             var button = UIButton.FromType(UIButtonType.System);
             float buttonWidth = 200, buttonHeight = 30;
             button.Frame = new RectangleF(View.Frame.Width / 2 - buttonWidth / 2, View.Frame.Height / 2 - buttonHeight / 2, buttonWidth, buttonHeight);
@@ -34,6 +35,7 @@ namespace QuickCross.Templates
                 new BindingParameters { View = button, PropertyName = _VIEWNAME_ViewModel.COMMANDNAME_IncreaseCountCommand, Mode = BindingMode.Command },
                 new BindingParameters { View = label, PropertyName = _VIEWNAME_ViewModel.PROPERTYNAME_Count }
             };
+            #endregion Bind to example property and command
 
             InitializeBindings(View, ViewModel, bindingsParameters);
 		}

@@ -50,9 +50,9 @@ namespace QuickCross.Templates
         /// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
 		/// </summary>
 		/// <param name="viewControllerIdentifier">The storyboard identifier for a storyboard view controller; otherwise null.</param>
-		/// <param name="viewControllerType">The view controller type. Specify for automatically navigating back to an existing instance on the navigation stack. Also specify to create non-storyboard view controller if none exists in the navigation stack.</param>
-		/// <param name="animated"></param>
-        private void Navigate(string viewControllerIdentifier = null, Type viewControllerType = null, bool animated = false)
+		/// <param name="viewControllerType">The view controller type. Specify for automatically navigating back to an existing instance if that exists on the navigation stack. Also specify to create non-storyboard view controller if none exists in the navigation stack.</param>
+        /// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
+        private void Navigate(string viewControllerIdentifier, Type viewControllerType = null, bool animated = false)
 		{
 			if (viewControllerType != null)
 			{
@@ -76,6 +76,17 @@ namespace QuickCross.Templates
 			navigationContext.PushViewController(viewController, animated);
 		}
 
+		/// <summary>
+		/// Navigate to a view based on a view controller type.
+        /// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
+		/// </summary>
+		/// <param name="viewControllerType">The view controller type</param>
+		/// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
+        private void Navigate(Type viewControllerType, bool animated = false)
+        {
+            Navigate(null, viewControllerType, animated);
+        }
+
 		private void NavigateBack(bool animated = false)
 		{
 			navigationContext.PopViewControllerAnimated(animated);
@@ -97,7 +108,7 @@ namespace QuickCross.Templates
 
         public void NavigateTo_VIEWNAME_View()
         {
-            Navigate("_VIEWNAME_View", typeof(_VIEWNAME_View), true); // TODO: If this is not a storyboard view, pass null for the viewControllerIdentifier parameter
+            Navigate("_VIEWNAME_View", typeof(_VIEWNAME_View), true); // TODO: If this is not a storyboard view, remove the viewControllerIdentifier parameter
         }
          * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
