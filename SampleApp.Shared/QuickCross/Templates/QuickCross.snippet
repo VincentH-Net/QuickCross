@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
-  QuickCross code snippets (snippet version: 1.5).
+  QuickCross code snippets (snippets version: 2.0).
   To import, modify or create code snippets, see "Creating a Code Snippet" at http://msdn.microsoft.com/en-us/library/ms165394(v=vs.110).aspx
 -->
 <CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
@@ -136,7 +136,7 @@
     <Header>
       <Title>QuickCross Bindable Viewmodel Command</Title>
       <Author>Vincent Hoogendoorn</Author>
-      <Description>Adds a data-bindable command to a Viewmodel in QuickCross (snippet version: 1.0)</Description>
+      <Description>Adds a data-bindable command to a Viewmodel in QuickCross (snippet version: 2.0)</Description>
       <Shortcut>cmd</Shortcut>
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
@@ -151,7 +151,7 @@
         </Literal>
       </Declarations>
       <Code Language="csharp">
-        <![CDATA[public RelayCommand $command$Command /* Data-bindable command that calls $command$(), generated with cmd snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { if (_$command$Command == null) _$command$Command = new RelayCommand($command$); return _$command$Command; } } private RelayCommand _$command$Command;
+        <![CDATA[public RelayCommand $command$Command /* Data-bindable command that calls $command$(), generated with cmd snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { if (_$command$Command == null) _$command$Command = new RelayCommand($command$); return _$command$Command; } } private RelayCommand _$command$Command; public const string COMMANDNAME_$command$Command = "$command$Command";
       
 	private void $command$()
 	{
@@ -165,7 +165,7 @@
     <Header>
       <Title>QuickCross Bindable Viewmodel Command with Parameter</Title>
       <Author>Vincent Hoogendoorn</Author>
-      <Description>Adds a data-bindable command with a parameter to a Viewmodel in QuickCross (snippet version: 1.0)</Description>
+      <Description>Adds a data-bindable command with a parameter to a Viewmodel in QuickCross (snippet version: 2.0)</Description>
       <Shortcut>cmdp</Shortcut>
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
@@ -190,7 +190,7 @@
         </Literal>
       </Declarations>
       <Code Language="csharp">
-        <![CDATA[public RelayCommand $command$Command /* Data-bindable command with parameter that calls $command$(), generated with cmdp snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { if (_$command$Command == null) _$command$Command = new RelayCommand($command$); return _$command$Command; } } private RelayCommand _$command$Command;
+        <![CDATA[public RelayCommand $command$Command /* Data-bindable command with parameter that calls $command$(), generated with cmdp snippet. Keep on one line - see http://goo.gl/Yg6QMd for why. */ { get { if (_$command$Command == null) _$command$Command = new RelayCommand($command$); return _$command$Command; } } private RelayCommand _$command$Command; public const string COMMANDNAME_$command$Command = "$command$Command";
 
   private void $command$(object parameter)
 	{

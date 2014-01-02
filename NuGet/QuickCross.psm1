@@ -538,7 +538,7 @@ function New-View
     switch ($platform)
     {
         'ios' {
-            if ("$ViewType" -eq '') { $ViewType = 'StoryBoard' }
+            if ("$ViewType" -eq '') { $ViewType = 'Code' }
             $viewNameSuffix = ''
             if ($ViewType.StartsWith('StoryBoard')) { $viewNameSuffix = '.TODO' }
             $null = AddProjectItem -project $project `

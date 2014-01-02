@@ -10,7 +10,8 @@ namespace QuickCross
 {
 	public class ViewBase : UIViewController, ViewDataBindings.ViewExtensionPoints
     {
-		public ViewBase(IntPtr handle) : base(handle) { }
+        public ViewBase() { }
+        public ViewBase(IntPtr handle) : base(handle) { }
 
 		private bool areHandlersAdded;
 		private ViewModelBase viewModel;
