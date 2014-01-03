@@ -546,6 +546,14 @@ function New-View
                                    -templatePackageFolder          'app.ios' `
                                    -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
                                    -contentReplacements            $csContentReplacements
+            if ($ViewType.StartsWith('Xib'))
+            {
+                $null = AddProjectItem -project $project `
+                                       -destinationProjectRelativePath ('{0}View{1}.designer.cs' -f $ViewName, $viewNameSuffix) `
+                                       -templatePackageFolder          'app.ios' `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.designer.cs' -f $ViewType) `
+                                       -contentReplacements            $csContentReplacements
+            }
         }
 
         'android' {

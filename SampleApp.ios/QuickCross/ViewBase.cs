@@ -11,6 +11,7 @@ namespace QuickCross
 	public class ViewBase : UIViewController, ViewDataBindings.ViewExtensionPoints
     {
         public ViewBase() { }
+        public ViewBase(string nibName, NSBundle bundle) : base(nibName, bundle) { }
         public ViewBase(IntPtr handle) : base(handle) { }
 
 		private bool areHandlersAdded;

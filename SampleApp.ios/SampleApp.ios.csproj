@@ -123,6 +123,8 @@
   <ItemGroup>
     <Compile Include="AppDelegate.QC.cs" />
     <None Include="QuickCross\Templates\_VIEWNAME_CodeView.cs" />
+    <None Include="QuickCross\Templates\_VIEWNAME_XibView.cs" />
+    <None Include="QuickCross\Templates\_VIEWNAME_XibView.designer.cs" />
     <Compile Include="TableViewBase.cs" />
     <Compile Include="ViewBase.cs" />
     <None Include="Info.plist" />
