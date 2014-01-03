@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using MonoTouch.UIKit;
 using System.Reflection;
 using System.Collections;
@@ -243,6 +243,14 @@ namespace QuickCross
 			{
 				this.viewModel = viewModel;
 				bindings = new ViewDataBindings(rootView, viewModel, idPrefix, viewExtensionPoints);
+				List<BindingParameters> bindingParametersList;
+				if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
+				{
+					Console.WriteLine("Adding cell bindings from markup ...");
+					ViewDataBindings.RootViewBindingParameters.Remove(rootView); // Remove the static reference to the views to prevent memory leaks. Note that if we would want to recreate the bindings later, we could also store the parameters list in the bindings.
+					bindings.AddBindings(bindingParametersList.ToArray());
+				}
+
 				AddHandlers();
 				viewModel.RaisePropertiesChanged();
 			}
@@ -366,7 +374,7 @@ namespace QuickCross
 
 		public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
 		{
-			if (viewModel != null) 
+			if (viewModel != null && rowSelectedPropertyName != null)
 			{
 				var itemObject = GetItem(indexPath);
 				if (rowSelectedPropertyIsCommand) {
