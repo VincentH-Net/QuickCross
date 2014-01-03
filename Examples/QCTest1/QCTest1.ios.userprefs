@@ -1,0 +1,19 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="QCTest1.Shared/IQCTest1Navigator.cs">
+    <Files>
+      <File FileName="QCTest1.ios/QCTest1Navigator.cs" Line="1" Column="1" />
+      <File FileName="QCTest1.ios/ProductListView.cs" Line="1" Column="1" />
+      <File FileName="QCTest1.ios/QuickCross/ViewBase.cs" Line="1" Column="1" />
+      <File FileName="QCTest1.ios/TestXib2View.cs" Line="1" Column="1" />
+      <File FileName="QCTest1.Shared/QCTest1Application.cs" Line="1" Column="1" />
+      <File FileName="QCTest1.Shared/ViewModels/TestXib2ViewModel.cs" Line="1" Column="1" />
+      <File FileName="QCTest1.Shared/ViewModels/MainViewModel.cs" Line="1" Column="1" />
+      <File FileName="QCTest1.Shared/IQCTest1Navigator.cs" Line="12" Column="6" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
