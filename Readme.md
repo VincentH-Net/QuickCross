@@ -21,7 +21,7 @@ Please feel free to run and inspect the two iOS example apps and provide feedbac
 An iOS data binding is a one-on-one binding between an iOS UIView, such as a UITextField or UIButton, and a viewmodel property or command. You can specify bindings with (a combination of):
 
 1. Code in the controller that creates the containing view
-2. Binding parameters in the `Bind` user-defined runtime attribute (of type `String`) in XCode
+2. Binding parameters in the `Bind` user-defined runtime attribute (of type `String`) in XCode (this is supported in iOS 5.0 or later)
 
 Note that for performance reasons, iOS data binding allows **no more than one view** (within the same rootview) to be bound to a property. If you need to update multiple views with the same property value, you can do that by overriding the `UpdateView()` method in your controller class, and adding [a few lines of code](#binding-multiple-ios-views-to-a-viewmodel-property).
 
@@ -33,7 +33,7 @@ iOS UIViews do not have a native general-purpose property that can be used to sp
 To specify binding parameters in XCode:
 
 1. Select the object for which you want to specify the binding parameters (e.g. a UILabel, a UIButton or a UITableView).
-2. In the Identity Inspector (in the [utility area](https://developer.apple.com/library/mac/recipes/xcode_help-general/AbouttheUtilityArea/AbouttheUtilityArea.html)), under the **User Defined Runtime Attributes** header, click on the + to add an attribute.
+2. In the Identity Inspector (in the [utility area](https://developer.apple.com/library/mac/recipes/xcode_help-general/AbouttheUtilityArea/AbouttheUtilityArea.html)), under the **User Defined Runtime Attributes** header, click on the **+** to add an attribute.
 3. Change the **Key Path** of the new attribute to `Bind`, set the **Type** to `String`, and specify the binding parameters (see below for details) in **Value**.
 
 These are the binding parameters that you can specify in the Bind attribute (linebreaks added for readability):
@@ -67,8 +67,30 @@ Specifies the name of the viewmodel collection property that contains the list i
 The items in an ItemsSource viewmodel collection property can be:
 
 - An object with fields or properties (e.g. a POCO model object)
-- An 'ValueItem' object, meaning an object that implements `ToString()` to present the value of the entire object as a human-readable text
+- An value object, meaning an object that implements `ToString()` to present the value of the entire object as a human-readable text
 - A viewmodel object that has data-bindable properties and/or commands. This is also called **composite viewmodels**, which makes it possible to e.g. automatically display changes of individual fields within existing list item objects.
 
 ##### List ItemTemplate #####
-Specifies the reuse identifier of the UITableViewCell that represents a list item. E.g. the value "TweetListItem" corresponds to the UITableViewCell with reuse identifier TweetListItem. You can specify the reuse identifier in XCode by selecting the UITableViewCell and then specifying the **indentifier** field in the **Attributes Inspector**. The default value of the ItemTemplate binding parameter is the value of `ItemsSource` + "**Item**".
+Specifies the reuse identifier of the `UITableViewCell` that represents a list item. E.g. the value "TweetListItem" corresponds to the UITableViewCell with reuse identifier TweetListItem. You can specify the reuse identifier in XCode by selecting the UITableViewCell and then specifying the **indentifier** field in the **Attributes Inspector**. The default value of the ItemTemplate binding parameter is the value of `ItemsSource` + "**Item**".
+
+#### iOS Binding Parameters in Code ####
+As an alternative to using the Bind attribute in XCode, you can also specify bindings in code in an optional parameter of the `InitializeBindings()` method. The InitializeBindings method is implemented in the view controller base classes (e.g. `ViewBase` and `TableViewBase`), and it is called in your controller code from the `ViewDidLoad()` method. Here is an example of specifying binding parameters in code:
+
+```csharp
+public override void ViewDidLoad()
+{
+	base.ViewDidLoad();
+
+    var button = ...
+    var label = ...
+
+    var bindingsParameters = new BindingParameters[] {
+        new BindingParameters { View = button, PropertyName = MainViewModel.COMMANDNAME_IncreaseCountCommand, Mode = BindingMode.Command },
+        new BindingParameters { View = label,  PropertyName = MainViewModel.PROPERTYNAME_Count }
+    };
+
+    InitializeBindings(View, ViewModel, bindingsParameters);
+}
+```
+You can specify bindings in code for views created in code as well as views loaded from a xib or storyboard file (with outlets). You can specify some or all of the bindings, and in each binding some or all of the binding parameters. If you also specify parameters for a binding in Bind attribute in XCode, those will override or supplement any parameters that you specify in code.
+
