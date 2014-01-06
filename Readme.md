@@ -21,18 +21,19 @@ Please feel free to run and inspect the two iOS example apps and provide feedbac
 An iOS data binding is a one-on-one binding between an iOS UIView, such as a UITextField or UIButton, and a viewmodel property or command. You can specify bindings with (a combination of):
 
 1. Code in the controller that creates the containing view
-2. Binding parameters in the `Bind` user-defined runtime attribute (of type `String`) in XCode (this is supported in iOS 5.0 or later)
+2. Segue identifiers
+3. Binding parameters in the `Bind` user-defined runtime attribute (of type `String`) in XCode (this is supported in iOS 5.0 or later)
 
 Note that for performance reasons, iOS data binding allows **no more than one view** (within the same rootview) to be bound to a property. If you need to update multiple views with the same property value, you can do that by overriding the `UpdateView()` method in your controller class, and adding [a few lines of code](#binding-multiple-ios-views-to-a-viewmodel-property).
 
 Finally, note that **you do not need to use the QuickCross implementation of iOS data binding** if you prefer not to. You can subscribe to the standard .NET data binding events (`PropertyChanged` on viewmodels, `CanExecuteChanged` on `RelayCommand` viewmodel commands, and `CollectionChanged` on `ObservableCollection` viewmodel properties) from your code in any view type, and handle data binding any way you like. In this case you can keep using the [New-View command](#new-view), if you [add your own view template files](#customizing-and-extending-command-templates).
 
 #### iOS Binding Parameters in XCode ####
-iOS UIViews do not have a native general-purpose property that can be used to specify binding parameters (such as the Tag property on Android views). QuickCross solves this by adding support for a user-defined runtime attribute named `Bind`, of type `String`.
+iOS UIViews do not have a native general-purpose property that can be used to specify binding parameters (such as the Tag property on Android views). QuickCross solves this by adding support for a user-defined runtime attribute named `Bind`, of type `String`. In addition to using the Bind attribute, you can **bind a Storyboard Segue** to a command in XCode by setting the Segue identifier to the name of a viewmodel command.
 
-To specify binding parameters in XCode:
+To specify binding parameters in XCode through the Bind attribute:
 
-1. Select the object for which you want to specify the binding parameters (e.g. a UILabel, a UIButton or a UITableView).
+1. Select the object for which you want to specify the binding parameters (e.g. a `UILabel`, a `UIButton` or a `UITableView`).
 2. In the Identity Inspector (in the [utility area](https://developer.apple.com/library/mac/recipes/xcode_help-general/AbouttheUtilityArea/AbouttheUtilityArea.html)), under the **User Defined Runtime Attributes** header, click on the **+** to add an attribute.
 3. Change the **Key Path** of the new attribute to `Bind`, set the **Type** to `String`, and specify the binding parameters (see below for details) in **Value**.
 
@@ -57,7 +58,7 @@ Is `OneWay` by default. The mode specifies:
 - `TwoWay` data binding where the viewmodel property updates the view and vice versa, e.g. an editable UITextField. The bound property can be generated with the propdb2, propdb2c or propdbcol code snippet.
 - `Command` binding (e.g. a UIButton). The bound command can be generated with the cmd or cmdp code snippet.
 
-Note that you can also bind to the selected item in a UITableView with binding modes TwoWay or Command. When an item in the list is selected, the bound two-way property is set to the selected list item, or the bound command is invoked with the selected item as the command parameter. E.g. you can bind to a command to navigate to a detail view for the selected list item.
+Note that you can also bind to the selected item in a `UITableView` with binding modes `TwoWay` or `Command`. When an item in the list is selected, the bound two-way property is set to the selected list item, or the bound command is invoked with the selected item as the command parameter. E.g. you can bind to a command to navigate to a detail view for the selected list item.
 
 The `List` binding parameters are for use with views derived from `UITableView`. Support for collection views will be added soon.
 
@@ -72,6 +73,9 @@ The items in an ItemsSource viewmodel collection property can be:
 
 ##### List ItemTemplate #####
 Specifies the reuse identifier of the `UITableViewCell` that represents a list item. E.g. the value "TweetListItem" corresponds to the UITableViewCell with reuse identifier TweetListItem. You can specify the reuse identifier in XCode by selecting the UITableViewCell and then specifying the **indentifier** field in the **Attributes Inspector**. The default value of the ItemTemplate binding parameter is the value of `ItemsSource` + "**Item**".
+
+##### Binding a Storyboard Segue to a Command #####
+You can bind a Storyboard Segue to a Command in XCode by selecting the Segue and then setting the **Storyboard Segue identifier** field to the name of the command, e.g. ShowDetail. When preparing for the segue, the controller base class will call it's `GetCommandParameter()` method, which you can override in your controller class to provide a parameter for the command, and then the base class will execute the command (if a command with the same name as the Segue identifier exists in the viewmodel).
 
 #### iOS Binding Parameters in Code ####
 As an alternative to using the Bind attribute in XCode, you can also specify bindings in code in an optional parameter of the `InitializeBindings()` method. The InitializeBindings method is implemented in the view controller base classes (e.g. `ViewBase` and `TableViewBase`), and it is called in your controller code from the `ViewDidLoad()` method. Here is an example of specifying binding parameters in code:
@@ -94,3 +98,6 @@ public override void ViewDidLoad()
 ```
 You can specify bindings in code for views created in code as well as views loaded from a xib or storyboard file (with outlets). You can specify some or all of the bindings, and in each binding some or all of the binding parameters. If you also specify parameters for a binding in Bind attribute in XCode, those will override or supplement any parameters that you specify in code.
 
+When you specify a binding for a `UITableView`, and it does not have it's `Source` property set, a new `DataBindableUITableViewSource` is created and assigned to the `UITableView` `Source` property automatically when you call `InitializeBindings()`. Alternatively, you can create an instance of a `DataBindableUITableViewSource` (derived) class in code and set that as the `Source` before you call `InitializeBindings()`.
+
+ 
