@@ -100,4 +100,87 @@ You can specify bindings in code for views created in code as well as views load
 
 When you specify a binding for a `UITableView`, and it does not have it's `Source` property set, a new `DataBindableUITableViewSource` is created and assigned to the `UITableView` `Source` property automatically when you call `InitializeBindings()`. Alternatively, you can create an instance of a `DataBindableUITableViewSource` (derived) class in code and set that as the `Source` before you call `InitializeBindings()`.
 
+#### Customizing or Extending iOS Data Binding ####
+QuickCross allows you to simply modify or extend it with overrides in the view controller base classes `ViewBase` and `TableViewBase`, and in the `ViewDataBindings` class. You can also add more view controller base classes if you need to derive your controllers from other classes besides `UIViewController` and `UITableViewController`.
+
+##### Customizing Data Binding in iOS Views #####
+By overriding the `OnPropertyChanged()` method in your view controller class, you can handle changes for specific properties yourself instead of with the standard data binding. E.g:
+
+```csharp
+// Example of how to handle specific viewmodel property changes in code instead of with (or in addition to) data binding:
+protected override void OnPropertyChanged(string propertyName)
+{
+    switch (propertyName)
+    {
+        case OrderViewModel.PROPERTYNAME_DeliveryLocationListHasItems:
+            var hasItems = ViewModel.GetPropertyValue<bool>(
+							  OrderViewModel.PROPERTYNAME_DeliveryLocationListHasItems);
+            DeliveryLocationPicker.Hidden = !hasItems;
+            break;
+        default:
+            base.OnPropertyChanged(propertyName); break;
+    }
+}
+```
+
+You can also override the `UpdateView()` method to change how the data binding mechanism sets a property value to a specific view (or modify multiple views based on the value etc.). E.g. to display a count value as a color, you could bind a `UILabel` named `CountColorLabel` to the `Count` property of a viewmodel, and then override `UpdateView()` like this:
+
+```csharp
+public override void UpdateView(UIView view, object value)
+{
+    if (Object.ReferenceEquals(view, CountColorLabel))
+    {
+        int count = (int)value;
+		view.BackgroundColor = count > 0 ? UIColor.Green : UIColor.Red;
+        return;
+    }
+    base.UpdateView(view, value);
+}
+```
+
+> Note that `UpdateView()` is also called for **data bindings in all list items** for all data-bound lists in your view. This makes it possible to customize data binding within list items with code in a normal view, instead of writing a custom data bindable table view source to put that customization code in.
+
+###### Binding multiple iOS views to a viewmodel property ######
+Another scenario for overriding `UpdateView()` is when you want to update more than one view (within the same root view) from the same viewmodel property:
+
+```csharp
+public override void UpdateView(UIView view, object value)
+{
+    if (Object.ReferenceEquals(view, ProductNameLabel))
+    {
+        base.UpdateView(view, value); // Set the single data-bound view
+        string text = value == null ? "" : value.ToString();
+        if (ProductName2Label.Text != text) ProductName2Label.Text = text;
+        return;
+    }
+    base.UpdateView(view, value);
+}
+```
+
+You can also react to changes in lists that implement INotifyCollectionChanged (e.g. ObservableCollections) by overriding `OnCollectionChanged()` in your view:
+
+```csharp
+public override void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+{
+    ...
+}
+```
+The sender parameter is the collection. You could use this e.g. if you want to do some animation when items are added or removed in a list.
+
+Finally, you can modify or provide a parameter for a command when it is invoked, by overriding `GetCommandParameter()` in your view. E.g. you can pass the currently selected item in a table view to a command:
+
+```csharp
+public override object GetCommandParameter(string commandName, object parameter = null)
+{
+    if (commandName == MainViewModel.COMMANDNAME_ViewItemCommand)
+    {
+        var indexPath = TableView.IndexPathForSelectedRow;
+        if (indexPath != null) return ViewModel.Items[indexPath.Row];
+    }
+    return base.GetCommandParameter(commandName);
+}
+```
+
+> Note that `GetCommandParameter()` is also called for **commands in all list items that are viewmodels** for all data-bound lists in your view. This makes it possible to customize command parameter handling within list items with code in a normal view controller, instead of writing a custom data bindable table view source to put that customization code in.
+
  
