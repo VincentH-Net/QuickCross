@@ -15,6 +15,201 @@ Most of [the existing documentation for MvvmQuickCross](https://github.com/Macaw
 
 Please feel free to run and inspect the two iOS example apps and provide feedback on what you think of the approach for iOS data bindings. Thanks and NJoy!
 
+## Getting Started ##
+To create an app with QuickCross, follow these steps:
+
+1. In Visual Studio, create a new solution with an application project for the **platform** (Windows Store, Windows Phone, Android, iOS) that you are most productive with. Add a class library project **for the same platform** to the solution. Reference the class library from the application project.
+
+	**Note for Android:** Set the API level to 12 (Android 3.1) or higher in the Project properties for both projects. This is needed to support the Fragment view type. You can target lower API versions by either using the [Android Support Library](http://developer.android.com/tools/support-library/index.html) (which is supported in Xamarin) or by removing the Fragment view base class and template from the QuickCross folder in your application project.
+
+	**Note for iOS:** Select iOS 5.0 or higher; this is needed to specify data binding parameters in XCode, which relies on a User-Defined Runtime Attribute named Bind.
+
+	**Note for Windows Phone:** Select Windows Phone OS 8.0 or higher.
+
+2. Install the [QuickCross NuGet package](http://nuget.org/packages/quickcross)
+
+	The available QuickCross commands are now displayed in the package manager console.
+	Type "**Get-Help *command* -Online**" for details.
+
+3. In the Visual Studio package manager console (*menu View | Other Windows*) enter:
+
+	**[Install-Mvvm](#install-mvvm)**
+
+	An QuickCross folder is now added to your library project and your application project, and a few application-specific projects items are generated and opened in Visual Studio.
+
+	**Note** that the package installation uses the first part of the solution filename (before the first dot) as the **application name** for naming new project items and classes.
+
+4. Import the C# code snippets from the QuickCross\Templates\QuickCross.snippet file in your class library project into Visual Studio with the Code Snippets Manager (see [how](http://msdn.microsoft.com/en-us/library/ms165394\(v=vs.110\).aspx)). If you get a "Snippet With Same Name Exists" dialog, select Overwrite. 
+	
+	**Note** do not select the QuickCross\Templates folder itself as the location to import snippets **to**; that may prevent the snippets to be imported correctly, as this would mean copying the snippets file over itself.
+
+5. Add new views and viewmodels with the [`New-View`](#new-view) and [`New-ViewModel`](#new-viewmodel) commands.
+
+6. Add data-bindable properties and commands to your viewmodels with the [code snippets](#code-snippets).
+
+7. Check the TODO comments in the Visual Studio Task List *(menu View | Tast List)* to find guidance on how to complete the viewmodel, application and navigator classes. You can also check out the CloudAuction example app in this GitHub repository (TODO: create iOS implementation).
+
+## Adding platforms ##
+To code your app for more platforms:
+
+
+1. Create a new solution for each platform, with a class library project for that platform and an application project for that platform, just like you did for the first platform.
+
+2. Add all code files from the existing class library project to the class library project for the new platform.
+
+3. Install the QuickCross NuGet package and execute the Install-Mvvm command again (it won't overwrite existing files).
+
+4. Code the views, navigator and any platform specific service implementations in the application project.
+
+## Commands ##
+After installing the QuickCross NuGet package, the below commands are available in the Visual Studio **Package Manager Console**.
+
+**Note** that except for Install-Mvvm, anything that these commands do can also be done by hand; the manual steps are documented inline in the files that you add to your projects with Install-Mvvm. This makes it possible to create your initial solutions in Visual Studio, and then continue working in [Xamarin Studio](http://xamarin.com/studio) for Android or iOS, if you prefer that.
+
+### Install-Mvvm ###
+
+```posh
+Install-Mvvm 
+```
+Installs the QuickCross support files in both your library project and your application project, in a subfolder QuickCross. The files in the QuickCross folders are not application specific; unless you want to modify the standard QuickCross templates, code snippets and/or functionality you don't need to edit these.
+
+Install-Mvvm also generates a few application-specific project items for you. The generated project items are opened in the Visual Studio editor for your inspection.
+
+**Note** that Install-Mvvm uses the first part of the solution filename (before the first dot) as the **application name** for naming generated project items, classes, properties and methods.
+
+Check the **TODO comments** in the Visual Studio **Task List** to find guidance on how to complete the generated project items.
+
+Install-Mvvm will not overwrite existing files or code. If you want to recreate the default files, remove the files that you want to recreate before running Install-Mvvm.
+
+### New-View ###
+
+```posh
+New-View [-ViewName] <string> [[-ViewType] <string>] [[-ViewModelName] <string>] [-WithoutNavigation]
+```
+Generates a new view.
+
+The specified `ViewName` will be suffixed with "View", and the specified `ViewModelName` will be suffixed with "ViewModel". If no ViewModelName is specified, it will be the same as the ViewName. If the viewmodel does not exist, it will be generated with the `New-ViewModel` command.
+
+- On Windows Phone or Windows Store, the `ViewType` can be `Page` (default) or `UserControl`. 
+- On Android, it can be `MainLauncher`, `Activity` (default) or `Fragment`.
+- On iOS, it can be `Code` (default), `Xib`, `StoryBoard` or `StoryBoardTable`.
+
+The specified view type determines which view templates are used. You can find these templates in the QuickCross\Templates folder of your application project. You can simply modify these templates or add your own (which is better) by adding similar named files there.
+
+Unless the `-WithoutNavigation` switch is specified, New-View will also add basic navigation code to the navigator and application classes. The -WithoutNavigation switch is useful when creating views such as list item views, that do not need to navigated to directly from the application class.
+
+E.g. this command:
+
+```posh
+New-View Person
+```
+will generate:
+
+- A `PersonView` view markup file + class
+- A `PersonViewModel` viewmodel class
+- A `PersonViewModelDesign` viewmodel class
+- A `PersonViewModel` property in the application class
+- A `NavigateToPersonView()` method signature in the navigator interface
+- A `NavigateToPersonView()` method implementation in the navigator class
+- A `ContinueToPerson()` method in the application class
+
+Now the only thing needed to display the view, bound to the viewmodel, is to call the `ContinueToPerson()` method on the application.
+
+Check the **TODO comments** in the Visual Studio **Task List** to find guidance on how to complete the generated project items.
+
+New-View will not overwrite existing files or code. If you want to recreate files or code fragments, remove the existing one(s) first.
+  
+### New-ViewModel ###
+
+```posh
+New-ViewModel [-ViewModelName] <string> [-NotInApplication]
+```
+Generates a new viewmodel. You can use this command to create viewmodels without creating any corresponding views (yet).
+
+The specified `ViewModelName` will be suffixed with "ViewModel".
+
+Unless the `-NotInApplication` switch is specified, New-ViewModel will also add a property to contain the instance of the viewmodel to the application class. The application class will then be responsible for providing an initialized viewmodel instance before navigating to the corresponding view. The -NotInApplication switch is useful when creating viewmodels such as list item viewmodels, that do not need to be instantiated and initialized directly by the application class.
+
+E.g. this command:
+
+```posh
+New-ViewModel Person
+```
+will generate:
+
+- A PersonViewModel viewmodel class
+- A PersonViewModelDesign viewmodel class
+- A PersonViewModel property in the application class
+
+Check the **TODO comments** in the Visual Studio **Task List** to find guidance on how to complete the generated project items.
+
+New-ViewModel will not overwrite existing files or code. If you want to recreate files or code fragments, remove the existing one(s) first.
+
+### Customizing and Extending Command Templates ###
+As Described above in the usage of the ViewType parameter of the [New-View command](#new-view), you can add your own code and markup templates for custom view types by adding properly named files in the `QuickCross\Templates` folder of your application project.
+
+The code and markup template files are named:   `_VIEWNAME_<view type name>View.*`
+If no markup file for the specified view type is found, the default markup file `_VIEWNAME_View.*` is used, so you do not need to have multiple copies of the same markup template.
+
+Of course you can also modify existing templates in the `QuickCross\Templates` folder.
+
+The library project also contains a viewmodel template that can be customized, at `QuickCross\Templates\_VIEWNAME_ViewModel.cs`.
+
+In addition to the template files, you can also modify the inline code templates in the Application, INavigator and Navigator. Inline templates are used to add properties and methods in these files when a new viewmodel or view is added. An example of an inline template in the Application class for a `view` is:
+
+```csharp
+public sealed class _APPNAME_Application : ApplicationBase
+{
+	...
+
+    /* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
+     * and then navigate to the view using the navigator, like this:
+
+    public void ContinueTo_VIEWNAME_()
+    {
+        if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = new _VIEWNAME_ViewModelDesign();
+        RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
+    }
+     * Note that the New-View command adds the above code automatically 
+     * (see http://github.com/MacawNL/QuickCross#new-view). */
+}
+```
+The format of an inline template is:
+
+1. An empty line. The instantiated code will be placed directly before this line
+2. A line starting with `/* TODO: For each <template name>,`
+3. Optionally some lines starting with ` * `
+4. Lines of actual template code
+5. Optionally some lines starting with ` * `
+6. A line ending with  ` */`
+
+Currently the template name can be `view` or `viewmodel`.
+
+## Code Snippets ##
+When you run the Install-Mvvm command, the C# code snippets file `QuickCross\Templates\QuickCross.snippet` is added to your class library project. When you import this snippets file into Visual Studio with the Code Snippets Manager (see [how](http://msdn.microsoft.com/en-us/library/ms165394\(v=vs.110\).aspx)), the code snippets described below become available for coding viewmodels.
+
+Note that the code snippets and their parameters have intellisense when you invoke them in the Visual Studio C# editor.
+
+To instantiate a code snippet, place your cursor on an empty line in the `#region Data-bindable properties and commands` of a viewmodel class .cs file, type the code snippet shortcut (e.g. `propdb1`), and press Tab twice. Now you can enter the parameters of the code snippet (press Tab to cycle through all parameters). Press Enter to complete the snippet instance.
+
+### propdb1 ###
+Adds a one-way data-bindable property to a Viewmodel. You can specify the property type and name.
+### propdbcol ###
+Adds a one-way data-bindable collection property, a corresponding `(name)HasItems` property and an `Update(name)HasItems()` method to a Viewmodel. You can specify the generic collection type (e.g. `ObservableCollection` or `List`), the collection element type and the property name.
+
+If you want specific UI elements in your view to only be visible when the collection has elements (e.g. a list of error messages), you can use the HasItems property to bind to the visibility of those UI elements. In that case, you should also call the UpdateHasItems() method after you have added or removed items (this is necessary even if this is an ObservableCollection).
+
+**Note** that if you suffix a collection property name with **"List"**, you can benefit from the [list data binding naming convention in Android](#list-itemssource).
+
+### propdb2 ###
+Adds a two-way data-bindable property to a Viewmodel. You can specify the property type and name.
+### propdb2c ###
+Adds a two-way data-bindable property and a `On(name)Changed()` method for custom setter code to a Viewmodel. You can specify the property type and name.
+### cmd ###
+Adds a data-bindable command to a Viewmodel. You can specify the command name, which will be suffixed with **"Command"**.
+### cmdp ###
+Adds a data-bindable command with a parameter to a Viewmodel. You can specify the command name, which will be suffixed with **"Command"**, the parameter type and the parameter name.
+
 ## iOS ##
 Below is an overview of using QuickCross with Xamarin.iOS.
 
