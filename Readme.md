@@ -5,31 +5,36 @@ Most of [the existing documentation for MvvmQuickCross](https://github.com/Macaw
 
 - Name change from MVVMQuickCross to QuickCross
 
-- Minor change in shared code: **navigationContext** parameter was moved from the Application to the Navigator for more flexibility when using multiple navigation contexts. For existing code this means you need to pass the navigationContext parameter to the Navigator constructor instead of the Application constructor. The Navigator now manages navigation context instances and decides when to use/create which context (if more than one is needed).
+- Minor change in shared code: `navigationContext` parameter was moved from the `Application` to the `Navigator` for more flexibility when using multiple navigation contexts. For existing code this means you need to pass the navigationContext parameter to the Navigator constructor instead of the Application constructor. The Navigator now manages navigation context instances and decides when to use/create which context (if more than one is needed).
 
 - [iOS data binding](#ios-data-binding), with support for **coded views, Xib views and StoryBoard views**. When providing data binding parameters in markup, the parameter syntax is similar to the android data binding syntax, with these notable differences:
 
-	- See the **QCTest1 app source** in the Examples folder in this repository for an example of a coded view, a Xib view, and a StoryBoard view with a UITableView, including navigation.
+	- See the [QCTest1 app source](https://github.com/MacawNL/QuickCross/tree/master/Examples/QCTest1) in this repository for an example of a coded view, a Xib view, and a StoryBoard view with a UITableView, including navigation.
 
-	- **New-View** has support for these view types: Code, Xib, StoryBoard and StoryBoardTable. When you add these views, the generated view class contains inline comments on how to complete the view in xCode, if needed. More view types will be added in the final 2.0 release.
+	- The `New-View` command in the VS package manager console now has support for these view types in iOS: `Code`, `Xib`, `StoryBoard` and `StoryBoardTable`. When you add these views, the generated view class contains inline comments on how to complete the view in xCode, if needed. More view types will be added in the final 2.0 release.
 
 Please feel free to run and inspect the two iOS example apps and provide feedback on what you think of the approach for iOS data bindings. Thanks and NJoy!
 
-### iOS Data Binding ###
-> This documentation topic is under construction
+## iOS ##
+Below is an overview of using QuickCross with Xamarin.iOS.
 
-An iOS data binding is a one-on-one binding between an iOS UIView, such as a UITextField or UIButton, and a viewmodel property or command. You can specify bindings with (a combination of):
+### Create an iOS App ###
+Here is how to create an iOS Twitter app that demonstrates simple data binding:
+> Note: this documentation topic is under construction
+
+### iOS Data Binding ###
+An iOS data binding is a one-on-one binding between an iOS `UIView`, such as a `UITextField` or `UIButton`, and a viewmodel property or command. You can specify bindings with (a combination of):
 
 1. Code in the controller that creates the containing view
 2. Segue identifiers
 3. Binding parameters in the `Bind` user-defined runtime attribute (of type `String`) in XCode (this is supported in iOS 5.0 or later)
 
-Note that for performance reasons, iOS data binding allows **no more than one view** (within the same rootview) to be bound to a property. If you need to update multiple views with the same property value, you can do that by overriding the `UpdateView()` method in your controller class, and adding [a few lines of code](#binding-multiple-ios-views-to-a-viewmodel-property).
+Note that for performance reasons, iOS data binding allows **no more than one view** (within the same rootview) to be bound to a property. If you need to update multiple views with the same property value, you can do that by overriding the `UpdateView()` method in your view controller class, and adding [a few lines of code](#binding-multiple-ios-views-to-a-viewmodel-property).
 
 Finally, note that **you do not need to use the QuickCross implementation of iOS data binding** if you prefer not to. You can subscribe to the standard .NET data binding events (`PropertyChanged` on viewmodels, `CanExecuteChanged` on `RelayCommand` viewmodel commands, and `CollectionChanged` on `ObservableCollection` viewmodel properties) from your code in any view type, and handle data binding any way you like. In this case you can keep using the [New-View command](#new-view), if you [add your own view template files](#customizing-and-extending-command-templates).
 
 #### iOS Binding Parameters in XCode ####
-iOS UIViews do not have a native general-purpose property that can be used to specify binding parameters (such as the Tag property on Android views). QuickCross solves this by adding support for a user-defined runtime attribute named `Bind`, of type `String`. In addition to using the Bind attribute, you can **bind a Storyboard Segue** to a command in XCode by setting the Segue identifier to the name of a viewmodel command.
+iOS `UIViews` do not have a native general-purpose property that can be used to specify binding parameters (such as the `Tag` property on Android `Views`). QuickCross solves this by adding support for a user-defined runtime attribute named `Bind`, of type `String`. In addition to using the Bind attribute, you can **bind a Storyboard Segue** to a command in XCode by setting the Segue identifier to the name of a viewmodel command.
 
 To specify binding parameters in XCode through the Bind attribute:
 
@@ -37,14 +42,14 @@ To specify binding parameters in XCode through the Bind attribute:
 2. In the Identity Inspector (in the [utility area](https://developer.apple.com/library/mac/recipes/xcode_help-general/AbouttheUtilityArea/AbouttheUtilityArea.html)), under the **User Defined Runtime Attributes** header, click on the **+** to add an attribute.
 3. Change the **Key Path** of the new attribute to `Bind`, set the **Type** to `String`, and specify the binding parameters (see below for details) in **Value**.
 
-These are the binding parameters that you can specify in the Bind attribute (linebreaks added for readability):
+These are the binding parameters that you can specify in the `Bind` attribute (linebreaks added for readability):
 
     .|propertyName, Mode=OneWay|TwoWay|Command
     {List ItemsSource=listPropertyName, ItemTemplate=listItemTemplateName, 
           AddCommand=addCommandName, RemoveCommand=removeCommandName, 
           CanEdit=false|true|propertyName|fieldName, CanMove=false|true|propertyName|fieldName}
     
-All of these parameters except the `.` or `propertyName` are optional. The iOS syntax is similar to the Android binding parameters syntax, however the {Binding ... } delimiters are optional in iOS, since the Bind attribute will never contain something else than binding parameters.
+All of these parameters except the `.` or `propertyName` are optional. The iOS syntax is similar to the Android binding parameters syntax, however the {Binding ... } delimiters around .|propertyName and Mode are optional in iOS, since the Bind attribute will never contain anything else than binding parameters.
 
 Note that you can specify binding parameters through code in addition to / instead of in the Bind attribute.
 
@@ -84,7 +89,7 @@ Specifies the name of the viewmodel command (e.g. RemoveProductCommand) that mus
 Specifies whether list items can be edited in table view editing mode. The value `true` or `false` enables resp. disables editing for all items in the list. You can also enable or disable editing per item by adding a boolean property or field to each list item and then specifying the name of that property or field, e.g. `CanEdit=ProductIsEditable`. The default value of the CanEdit binding parameter is `false`.
 
 ##### List CanMove #####
-Specifies whether list items can be moved in table view editing mode. The value `true` or `false` enables resp. disables moving for all items in the list. You can also enable or disable moving per item by adding a boolean property or field to each list item and then specifying the name of that property or field, e.g. `CanMove=ProductCanBeReordered`. The default value of the CanMove binding parameter is `false`.
+Specifies whether list items can be [moved in table view editing mode](https://developer.apple.com/library/ios/documentation/userexperience/conceptual/tableview_iphone/ManageReorderRow/ManageReorderRow.html). The value `true` or `false` enables resp. disables moving for all items in the list. You can also enable or disable moving per item by adding a boolean property or field to each list item and then specifying the name of that property or field, e.g. `CanMove=ProductCanBeReordered`. The default value of the CanMove binding parameter is `false`.
 
 ##### Binding a Storyboard Segue to a Command #####
 You can bind a Storyboard Segue to a Command in XCode by selecting the Segue and then setting the **Storyboard Segue identifier** field to the name of the command, e.g. ShowDetail. When preparing for the segue, the controller base class will call it's `GetCommandParameter()` method, which you can override in your controller class to provide a parameter for the command, and then the base class will execute the command (if a command with the same name as the Segue identifier exists in the viewmodel).
@@ -203,3 +208,91 @@ You can create specialized table view sources (e.g. if you want to display a tab
 
 As [described](#ios-binding-parameters-in-code) above, you can create an instance of your custom table view source and assign it to the `Source` property on a table view in the `ViewDidLoad()` method of your view controller, before you call `InitializeBindings()`.
 
+##### Adding New Data-Bindable iOS View Types #####
+Out of the box QuickCross has default data binding support for these view types:
+> Note: in 2.0 beta these are very minimal, more will be added in 2.0 final release. Don't let this discourage you to try out the beta; it is really simple to add view types on the fly when you need them.
+
+One-Way binding:
+
+- `UILabel`
+
+Two-way binding:
+
+- `UITextField`
+- `UITextView`
+- `UITableView` and derived types
+
+Command binding:
+
+- `UIButton`
+- `UITableView` and derived types
+
+To make more control types data bindable, you can simply add a case to the appropriate switch statements in the `QuickCross\ViewDataBindings.UI.cs` file in your application project, as indicated by the `// TODO: ` comments. E.g.:
+
+```csharp
+public static void UpdateView(View view, object value)
+{
+    if (view != null)
+    {
+        string viewTypeName = view.GetType().FullName;
+        switch (viewTypeName)
+        {
+            // TODO: Add cases here for specialized view types, as needed
+            case "Macaw.UIComponents.MultiImageView":
+                {
+                    if (value is Uri) value = ((Uri)value).AbsoluteUri;
+                    var multiImageView = (Macaw.UIComponents.MultiImageView)view;
+                    multiImageView.LoadImageList(value == null ? null : new[] { (string)value });
+                }
+                break;
+			...
+		}
+	}
+}
+```
+To prevent memory leaks, be sure that if you register an event handler on a view in `AddCommandHandler()` or `AddTwoWayHandler()`, you also unregister that handler in `RemoveCommandHandler()` resp. `RemoveTwoWayHandler()`.
+
+##### Adding New iOS View Base Classes #####
+If you need to derive your view controllers from other classes besides `UIViewController` and `UITableViewController`, you can simply copy the existing `QuickCross\ViewBase.cs` or `QuickCross\TableViewBase.cs` class and change the class that it derives from to the one that you need.
+
+E.g. to support data bindable classes derived from `UIPageViewController`, you would copy ViewBase.cs to PageViewBase.cs and just change "UIViewController" to "UIPageViewController" in these lines:
+
+```csharp
+public class PageViewBase : UIPageViewController, ViewDataBindings.ViewExtensionPoints
+{
+    public PageViewBase() { }
+    public PageViewBase(string nibName, NSBundle bundle) : base(nibName, bundle) { }
+    public PageViewBase(IntPtr handle) : base(handle) { }
+
+    ...
+}
+```
+And then you can add some new constructor overloads to pass parameters to the base class constructor. Now you can use the new base class in your view:
+
+```csharp
+public partial class ProductView : PageViewBase
+{
+	...
+}
+```
+It should take no more than a minute. To complete this, you could also [add a custom view template](#customizing-and-extending-command-templates) for this new view type.
+
+### iOS View Lifecycle Support ###
+To prevent memory leaks, you should remove and re-add any handlers in your view controller code that you register for external events. External means: events that are not defined on the view controller itself (or on contained objects that are only referenced in the view controller such as a `UIButton`). E.g. an event handler for a viewmodel event or a service event needs to be removed and re-added like this. The QuickCross view controller base classes do this removing and re-adding automatically at the `ViewWillAppear()` and `ViewDidDisappear()` view lifecycle events. To have your own external event handlers added, removed and re-added at the appropriate times, you only need to override the `AddHandlers()` and `RemoveHandlers()` methods and add/remove your handlers there. E.g.:
+
+```csharp
+protected override void AddHandlers()
+{
+    base.AddHandlers();
+    SomeExternalService.SomeEvent += SomeExternalService_SomeEvent;
+}
+
+protected override void RemoveHandlers()
+{
+    SomeExternalService.SomeEvent -= SomeExternalService_SomeEvent;
+    base.RemoveHandlers();
+}
+```
+Note: Be sure to always call the base class method as well!
+
+You should not call `AddHandlers()` yourself - that would mess up the base class tracking of added handlers. `AddHandlers()` is initially called by the view controller base class in the `InitializeBindings()` method, which you call in your view controller code in the `ViewDidLoad()` method.
