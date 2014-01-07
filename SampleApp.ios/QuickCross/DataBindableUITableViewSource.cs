@@ -94,7 +94,7 @@ namespace QuickCross
 		}
 
 		/// <summary>
-		/// Override this method in a derived adapter class to register additional event handlers for your adapter. Always call base.AddHandlers() in your override.
+		/// Override this method in a derived table view source class to register additional event handlers for your table view source. Always call base.AddHandlers() in your override.
 		/// </summary>
 		public virtual void AddHandlers() 
 		{ 
@@ -103,7 +103,7 @@ namespace QuickCross
 		}
 
 		/// <summary>
-		/// Override this method in a derived adapter class to unregister additional event handlers for your adapter. Always call base.AddHandlers() in your override.
+		/// Override this method in a derived table view source class to unregister additional event handlers for your table view source. Always call base.AddHandlers() in your override.
 		/// </summary>
 		public virtual void RemoveHandlers() 
 		{ 
@@ -112,7 +112,7 @@ namespace QuickCross
 		}
 
 		/// <summary>
-		/// Override this method in a derived adapter class to react to changes in a list if it implements INotifyCollectionChanged (e.g. an ObservableCollection)
+		/// Override this method in a derived table view source class to react to changes in a list if it implements INotifyCollectionChanged (e.g. an ObservableCollection)
 		/// </summary>
 		/// <param name="sender">The ObservableCollection that was changed</param>
 		/// <param name="e">See http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html for details</param>
@@ -120,7 +120,7 @@ namespace QuickCross
 		{
 			if (!ignoreCollectionChanged)
 			{
-				tableView.ReloadData(); // MQC TODO: Check if this should & can be optimized, see for details documentation at http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html
+				tableView.ReloadData(); // QC TODO: Check if this should & can be optimized, see for details documentation at http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html
 			}
 			if (viewExtensionPoints != null) viewExtensionPoints.OnCollectionChanged(sender, e);
 		}
@@ -292,7 +292,7 @@ namespace QuickCross
 		}
 
 		/// <summary>
-		/// Override this method in a derived tableviewsource class to change how a data-bound value is set for specific views
+		/// Override this method in a derived table view source class to change how a data-bound value is set for specific views
 		/// </summary>
 		/// <param name="view"></param>
 		/// <param name="value"></param>
@@ -345,7 +345,6 @@ namespace QuickCross
 				}
 				else if (editingStyle == UITableViewCellEditingStyle.Insert)
 				{
-					// TODO: check if the indexpath is relevant here? E.g. is it the insert position or the previous/next item?
 					if (ExecuteCommand(insertRowCommandName, GetItem(indexPath)))
 					{
 						if (!listIsObservable) tableView.InsertRows(new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Automatic);

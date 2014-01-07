@@ -12,6 +12,8 @@
  * 7 Delete this _VIEWNAME_View.TODO.cs file.
 
 using System;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 using QuickCross;
 using QuickCross.Templates;
 using QuickCrossLibrary.Templates;
