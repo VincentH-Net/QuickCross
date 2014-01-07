@@ -7,11 +7,11 @@ Most of [the existing documentation for MvvmQuickCross](https://github.com/Macaw
 
 - Minor change in shared code: `navigationContext` parameter was moved from the `Application` to the `Navigator` for more flexibility when using multiple navigation contexts. For existing code this means you need to pass the navigationContext parameter to the Navigator constructor instead of the Application constructor. The Navigator now manages navigation context instances and decides when to use/create which context (if more than one is needed).
 
-- [iOS data binding](#ios-data-binding), with support for **coded views, Xib views and StoryBoard views**. When providing data binding parameters in markup, the parameter syntax is similar to the android data binding syntax, with these notable differences:
+- [iOS data binding](#ios-data-binding), with support for **coded views, Xib views and StoryBoard views**:
 
 	- See the [QCTest1 app source](https://github.com/MacawNL/QuickCross/tree/master/Examples/QCTest1) in this repository for an example of a coded view, a Xib view, and a StoryBoard view with a UITableView, including navigation.
 
-	- The `New-View` command in the VS package manager console now has support for these view types in iOS: `Code`, `Xib`, `StoryBoard` and `StoryBoardTable`. When you add these views, the generated view class contains inline comments on how to complete the view in xCode, if needed. More view types will be added in the final 2.0 release.
+	- The `New-View` command in the VS Package Manager Console now has support for these view types in iOS: `Code`, `Xib`, `StoryBoard` and `StoryBoardTable`. When you add these views, the generated view class contains inline comments on how to complete the view in xCode, if needed. More view types will be added in the final 2.0 release.
 
 Please feel free to run and inspect the two iOS example apps and provide feedback on what you think of the approach for iOS data bindings. Thanks and NJoy!
 
