@@ -1,7 +1,7 @@
 **QuickCross** is a lightweight (no binaries) cross-platform MVVM pattern to quickly build native Xamarin.iOS, Xamarin.Android, Windows Phone and Windows Store Apps with shared C# code.QuickCross provides data binding for Android and for iOS. It accelerates development with scaffolders and code snippets, also for a single platform app. For cross-platform apps QuickCross increases code sharing with an Application-Navigator pattern.QuickCross aims to leave you in full control; it does not get in the way if you want to do some things differently, and you can simply extend or modify it.
-> **NOTE:** This version (2.0) of QuickCross is in **beta** now; the iOS data bindings are working but they are currently documented at a minimum level. **This release only supports the iOS platform**; the other platforms and more elaborate iOS example documentation will be re-added before the 2.0 final release.> The purpose of this beta release is to gain feedback on the iOS data bindings implementation; if you are building a production application or if you are targeting other platforms than iOS, it is recommended to keep using the previous version until the QuickCross release version is published.Versions before 2.0 were published under the name **MvvmQuickCross**. They will continue to be supported at the [existing MvvmQuickCross GitHub repository](https://github.com/MacawNL/MvvmQuickCross), and [the existing MvvmQuickCross NuGet packages](http://nuget.org/packages/mvvmquickcross) will remain available.Upgrading from MvvmQuickCross to QuickCross is quick (pun intended); instructions will be documented here (TODO URL).## News ##**Jan 3, 2014**: QuickCross release: 2.0 beta is out. Adds simple iOS data binding and an iOS example app.**Coming up**: Documentation. Next planned QuickCross release: 2.0 final, which will add more iOS data bindings, the other platforms (besides iOS), and full documentation and examples. ETA Jan 15.## NuGet package - PRERELEASE ##[QuickCross NuGet packages](http://nuget.org/packages/quickcross)## Preliminary Documentation ##
+> **NOTE:** This version (2.0) of QuickCross is in **beta** now; iOS data bindings are working and documented but the documentation on creating an app from scratch is under construction. **This release only supports the iOS platform**; the other platforms and more elaborate iOS example documentation will be re-added before the 2.0 final release.> The purpose of this beta release is to gain feedback on the iOS data bindings implementation; if you are building a production application or if you are targeting other platforms than iOS, it is recommended to keep using the previous version until the QuickCross release version is published.Versions before 2.0 were published under the name **MvvmQuickCross**. They will continue to be supported at the [existing MvvmQuickCross GitHub repository](https://github.com/MacawNL/MvvmQuickCross), and [the existing MvvmQuickCross NuGet packages](http://nuget.org/packages/mvvmquickcross) will remain available.Upgrading from MvvmQuickCross to QuickCross is quick (pun intended); instructions will be documented here (TODO URL).## News ##**Jan 3, 2014**: QuickCross release: 2.0 beta is out. Adds simple iOS data binding and an iOS example app.**Coming up**: Documentation. Next planned QuickCross release: 2.0 final, which will add more iOS data bindings, the other platforms (besides iOS), and full documentation and examples. ETA Jan 15.## NuGet package - PRERELEASE ##[QuickCross NuGet packages](http://nuget.org/packages/quickcross)## Preliminary Documentation ##
 
-The changes in version 2.0 are:
+Most of [the existing documentation for MvvmQuickCross](https://github.com/MacawNL/MvvmQuickCross) applies for QuickCross 2.0 as well; the MvvmQuickCross documentation will be copied here and updated soon. Until then, these are the key changes in QuickCross 2.0:
 
 - Name change from MVVMQuickCross to QuickCross
 
@@ -74,6 +74,18 @@ The items in an ItemsSource viewmodel collection property can be:
 ##### List ItemTemplate #####
 Specifies the reuse identifier of the `UITableViewCell` that represents a list item. E.g. the value "TweetListItem" corresponds to the UITableViewCell with reuse identifier TweetListItem. You can specify the reuse identifier in XCode by selecting the UITableViewCell and then specifying the **indentifier** field in the **Attributes Inspector**. The default value of the ItemTemplate binding parameter is the value of `ItemsSource` + "**Item**".
 
+##### List AddCommand #####
+Specifies the name of the viewmodel command (e.g. AddProductCommand) that must be executed when the user selects the [Insertion control in table editing mode](https://developer.apple.com/library/ios/documentation/userexperience/conceptual/tableview_iphone/ManageInsertDeleteRow/ManageInsertDeleteRow.html). The command parameter will be the list item object at the insert position, if any. If this binding parameter is not specified, no command will be executed.
+
+##### List RemoveCommand #####
+Specifies the name of the viewmodel command (e.g. RemoveProductCommand) that must be executed when the user selects the [Deletion control in table editing mode](https://developer.apple.com/library/ios/documentation/userexperience/conceptual/tableview_iphone/ManageInsertDeleteRow/ManageInsertDeleteRow.html). The command parameter will be the list item object to be deleted. If this binding parameter is not specified, no command will be executed.
+
+##### List CanEdit #####
+Specifies whether list items can be edited in table view editing mode. The value `true` or `false` enables resp. disables editing for all items in the list. You can also enable or disable editing per item by adding a boolean property or field to each list item and then specifying the name of that property or field, e.g. `CanEdit=ProductIsEditable`. The default value of the CanEdit binding parameter is `false`.
+
+##### List CanMove #####
+Specifies whether list items can be moved in table view editing mode. The value `true` or `false` enables resp. disables moving for all items in the list. You can also enable or disable moving per item by adding a boolean property or field to each list item and then specifying the name of that property or field, e.g. `CanMove=ProductCanBeReordered`. The default value of the CanMove binding parameter is `false`.
+
 ##### Binding a Storyboard Segue to a Command #####
 You can bind a Storyboard Segue to a Command in XCode by selecting the Segue and then setting the **Storyboard Segue identifier** field to the name of the command, e.g. ShowDetail. When preparing for the segue, the controller base class will call it's `GetCommandParameter()` method, which you can override in your controller class to provide a parameter for the command, and then the base class will execute the command (if a command with the same name as the Segue identifier exists in the viewmodel).
 
@@ -113,8 +125,7 @@ protected override void OnPropertyChanged(string propertyName)
     switch (propertyName)
     {
         case OrderViewModel.PROPERTYNAME_DeliveryLocationListHasItems:
-            var hasItems = ViewModel.GetPropertyValue<bool>(
-							  OrderViewModel.PROPERTYNAME_DeliveryLocationListHasItems);
+            var hasItems = ViewModel.GetPropertyValue<bool>(OrderViewModel.PROPERTYNAME_DeliveryLocationListHasItems);
             DeliveryLocationPicker.Hidden = !hasItems;
             break;
         default:
@@ -183,4 +194,12 @@ public override object GetCommandParameter(string commandName, object parameter 
 
 > Note that `GetCommandParameter()` is also called for **commands in all list items that are viewmodels** for all data-bound lists in your view. This makes it possible to customize command parameter handling within list items with code in a normal view controller, instead of writing a custom data bindable table view source to put that customization code in.
 
- 
+##### Adding New Data-Bindable iOS Table View Sources #####
+The built-in QuickCross `DataBindableUITableViewSource` class supports a simple list with one section, that can be data-bound to collections that implement the standard .NET interfaces `IList` and optionally `INotifyCollectionChanged`, such as `ObservableCollection<T>`. The collection items can be viewmodels or they can be simple .NET objects with properties and/or fields. If you implement `ToString()` on the list item object, you can also bind to `.` to display the value of an entire list item as text.
+
+The `DataBindableUITableViewSource` class also supports using the native iOS table view editing mode to add, remove, edit and move items within a table view.
+
+You can create specialized table view sources (e.g. if you want to display a table with multiple sections), by implementing a class derived from `DataBindableUITableViewSource` and then overriding methods from `DataBindableUITableViewSource` and/or the underlying `UITableViewSource` class. The inline documentation on the virtual methods (e.g. `AddHandlers`, `RemoveHandlers`, `OnCollectionChanged` and `UpdateView`) in the `DataBindableUITableViewSource` [source](https://github.com/MacawNL/QuickCross/blob/master/SampleApp.ios/QuickCross/DataBindableUITableViewSource.cs) provides guidance on this.
+
+As [described](#ios-binding-parameters-in-code) above, you can create an instance of your custom table view source and assign it to the `Source` property on a table view in the `ViewDidLoad()` method of your view controller, before you call `InitializeBindings()`.
+
