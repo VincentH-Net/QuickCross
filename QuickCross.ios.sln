@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.ios", "SampleApp.ios\SampleApp.ios.csproj", "{09DFD300-738B-43EF-90FE-60B1548405C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.Shared.ios", "SampleApp.Shared\SampleApp.Shared.ios.csproj", "{A9BDBA29-96B5-4CAF-B030-16766BFAC75C}"
@@ -43,6 +45,7 @@ Global
 		{09DFD300-738B-43EF-90FE-60B1548405C7}.AppStore|iPhoneSimulator.Build.0 = AppStore|iPhoneSimulator
 		{09DFD300-738B-43EF-90FE-60B1548405C7}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{09DFD300-738B-43EF-90FE-60B1548405C7}.Debug|iPhone.Build.0 = Debug|iPhone
+		{09DFD300-738B-43EF-90FE-60B1548405C7}.Debug|iPhone.Deploy.0 = Debug|iPhone
 		{09DFD300-738B-43EF-90FE-60B1548405C7}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
 		{09DFD300-738B-43EF-90FE-60B1548405C7}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
 		{09DFD300-738B-43EF-90FE-60B1548405C7}.Release|iPhone.ActiveCfg = Release|iPhone
