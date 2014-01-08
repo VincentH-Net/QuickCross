@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Twitter.Shared</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>Twitter.Shared</AssemblyName>
+    <AssemblyName>Twitter.Shared.ios</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ITwitterNavigator.cs" />
+    <Compile Include="Models\Tweet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuickCross\ApplicationBase.cs" />
     <Compile Include="QuickCross\RelayCommand.cs" />
