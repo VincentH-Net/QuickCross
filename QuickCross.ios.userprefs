@@ -1,18 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/QuickCross/Templates/_VIEWNAME_View.cs">
-    <Files>
-      <File FileName="SampleApp.ios/QuickCross/Templates/_VIEWNAME_View.cs" Line="8" Column="37" />
-      <File FileName="SampleApp.ios/AppDelegate.cs" Line="7" Column="1" />
-      <File FileName="SampleApp.ios/_VIEWNAME3_View.designer.cs" Line="1" Column="1" />
-      <File FileName="SampleApp.ios/_VIEWNAME3_View.cs" Line="13" Column="49" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.SampleApp.ios>
-    <MonoDevelop.MacDev.AppleDevelopmentTeam DeveloperId="QB8PCNGG2C" TeamId="GEUG29A389" />
-  </MonoDevelop.Ide.ItemProperties.SampleApp.ios>
 </Properties>
