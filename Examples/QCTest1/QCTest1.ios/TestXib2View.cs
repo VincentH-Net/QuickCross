@@ -12,7 +12,6 @@ namespace QCTest1
     {
         private TestXib2ViewModel ViewModel { get { return QCTest1Application.Instance.TestXib2ViewModel; } }
 
-        // TODO: Add a new Xib file named TestXib2View
         public TestXib2View() : base("TestXib2View", null) { }
 
 		public override void ViewDidLoad()
