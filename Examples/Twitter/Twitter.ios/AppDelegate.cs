@@ -29,7 +29,9 @@ namespace Twitter
             window = new UIWindow(UIScreen.MainScreen.Bounds);
 
             // If you have defined a view, add it here:
-            // window.RootViewController  = navigationController;
+            if (window.RootViewController == null) window.RootViewController = new UINavigationController();
+            var navigator = new TwitterNavigator((UINavigationController)window.RootViewController);
+            EnsureTwitterApplication(navigator).ContinueToMain();
 
             // make the window visible
             window.MakeKeyAndVisible();

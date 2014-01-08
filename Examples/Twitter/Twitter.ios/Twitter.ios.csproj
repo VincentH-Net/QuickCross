@@ -77,6 +77,23 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="MainView.cs" />
+    <Compile Include="QuickCross\AppDelegate.cs" />
+    <Compile Include="QuickCross\DataBindableUITableViewSource.cs" />
+    <Compile Include="QuickCross\ObjcMagic.cs" />
+    <Compile Include="QuickCross\TableViewBase.cs" />
+    <Compile Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_CodeView.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_StoryBoardTableView.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_StoryBoardView.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_XibView.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_XibView.designer.cs">
+      <DependentUpon>_VIEWNAME_XibView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuickCross\ViewBase.cs" />
+    <Compile Include="QuickCross\ViewDataBindings.cs" />
+    <Compile Include="QuickCross\ViewDataBindings.UI.cs" />
+    <Compile Include="TwitterNavigator.cs" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

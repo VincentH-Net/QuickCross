@@ -34,9 +34,19 @@
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ITwitterNavigator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuickCross\ApplicationBase.cs" />
+    <Compile Include="QuickCross\RelayCommand.cs" />
+    <Compile Include="QuickCross\Templates\I_APPNAME_Navigator.cs" />
+    <Compile Include="QuickCross\Templates\_APPNAME_Application.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_ViewModel.cs" />
+    <Compile Include="QuickCross\ViewModelBase.cs" />
+    <Compile Include="TwitterApplication.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="QuickCross\Templates\QuickCross.snippet" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
