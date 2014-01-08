@@ -1,3 +1,4 @@
+using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using QuickCrossLibrary.Templates;
 
@@ -14,7 +15,8 @@ namespace QuickCross.Templates
     // TODO: In Application.Main(), add the following code before the call to UIApplication.Main():
     //    QuickCross.ViewDataBindings.RegisterBindKey();
 
-    // TODO: Add the following code to FinishedLaunching after Window.RootViewController has been set:
-	// 	  var navigator = new _APPNAME_Navigator((UINavigationController)Window.RootViewController);
+    // TODO: Add the following code to FinishedLaunching before the call to window.MakeKeyAndVisible():
+    //    if (window.RootViewController == null) window.RootViewController = new UINavigationController();
+	// 	  var navigator = new _APPNAME_Navigator((UINavigationController)window.RootViewController);
 	//    Ensure_APPNAME_Application(navigator).ContinueToMain();
 }
