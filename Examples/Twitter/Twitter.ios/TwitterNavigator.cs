@@ -105,7 +105,7 @@ namespace Twitter
 
         public void NavigateToMainView()
         {
-            Navigate(typeof(MainView));
+			Navigate("MainView", typeof(MainView));
         }
 
 		/* TODO: For each view, add a method to navigate to that view like this:
