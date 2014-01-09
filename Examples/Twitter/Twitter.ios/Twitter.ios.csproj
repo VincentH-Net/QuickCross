@@ -95,10 +95,6 @@
     <Compile Include="TwitterNavigator.cs" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MainView.cs" />
-    <Compile Include="MainView.designer.cs">
-      <DependentUpon>MainView.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
