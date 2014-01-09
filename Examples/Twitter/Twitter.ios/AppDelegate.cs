@@ -13,8 +13,7 @@ namespace Twitter
     [Register("AppDelegate")]
     public partial class AppDelegate : UIApplicationDelegate
     {
-        // class-level declarations
-        UIWindow window;
+		public override UIWindow Window { get; set; }
 
         //
         // This method is invoked when the application has loaded and is ready to run. In this 
@@ -25,16 +24,18 @@ namespace Twitter
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            // create a new window instance based on the screen size
-            window = new UIWindow(UIScreen.MainScreen.Bounds);
-
-            // If you have defined a view, add it here:
-            if (window.RootViewController == null) window.RootViewController = new UINavigationController();
-            var navigator = new TwitterNavigator((UINavigationController)window.RootViewController);
+			if (Window == null) Window = new UIWindow(UIScreen.MainScreen.Bounds);
+			var navigationContext = Window.RootViewController as UINavigationController;
+			if (navigationContext == null) {
+				navigationContext = new UINavigationController();
+				if (Window.RootViewController != null) navigationContext.ViewControllers = new UIViewController[] { Window.RootViewController };
+				Window.RootViewController = navigationContext;
+			}
+			var navigator = new TwitterNavigator(navigationContext);
             EnsureTwitterApplication(navigator).ContinueToMain();
 
             // make the window visible
-            window.MakeKeyAndVisible();
+			Window.MakeKeyAndVisible();
 
             return true;
         }

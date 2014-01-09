@@ -20,7 +20,7 @@
 	<string>QuickCross.Examples.Twitter</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
-	<key>NSMainNibFile</key>
-	<string></string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
 </dict>
 </plist>

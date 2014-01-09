@@ -27,31 +27,31 @@ namespace Twitter
 		/// </summary>
 		/// <param name="viewController"></param>
 		/// <param name="animated"></param>
-        private void Navigate(UIViewController viewController, bool animated = false)
+		private void Navigate(UIViewController viewController, bool animated = false)
 		{
 			if (Object.ReferenceEquals(navigationContext.TopViewController, viewController)) return;
-            if (navigationContext.ViewControllers != null)
-            {
-                foreach (var stackViewController in navigationContext.ViewControllers)
-                {
-                    if (Object.ReferenceEquals(stackViewController, viewController))
-                    {
-                        navigationContext.PopToViewController(viewController, animated);
-                        return;
-                    }
-                }
-            }
+			if (navigationContext.ViewControllers != null)
+			{
+				foreach (var stackViewController in navigationContext.ViewControllers)
+				{
+					if (Object.ReferenceEquals(stackViewController, viewController))
+					{
+						navigationContext.PopToViewController(viewController, animated);
+						return;
+					}
+				}
+			}
 			navigationContext.PushViewController(viewController, animated);
 		}
 
 		/// <summary>
 		/// Navigate to a view based on a storyboard identifier and/or a view controller type.
-        /// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
+		/// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
 		/// </summary>
 		/// <param name="viewControllerIdentifier">The storyboard identifier for a storyboard view controller; otherwise null.</param>
 		/// <param name="viewControllerType">The view controller type. Specify for automatically navigating back to an existing instance if that exists on the navigation stack. Also specify to create non-storyboard view controller if none exists in the navigation stack.</param>
-        /// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
-        private void Navigate(string viewControllerIdentifier, Type viewControllerType = null, bool animated = false)
+		/// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
+		private void Navigate(string viewControllerIdentifier, Type viewControllerType = null, bool animated = false, UIStoryboard storyBoard = null)
 		{
 			if (viewControllerType != null)
 			{
@@ -69,22 +69,24 @@ namespace Twitter
 				}
 			}
 
-            var viewController = (viewControllerIdentifier != null && navigationContext.Storyboard != null) ?
-                (UIViewController)navigationContext.Storyboard.InstantiateViewController(viewControllerIdentifier) :
-                (UIViewController)Activator.CreateInstance(viewControllerType);
+			if (storyBoard == null) storyBoard = navigationContext.Storyboard;
+
+			var viewController = (viewControllerIdentifier != null && storyBoard != null) ?
+			                     (UIViewController)storyBoard.InstantiateViewController(viewControllerIdentifier) :
+			                     (UIViewController)Activator.CreateInstance(viewControllerType);
 			navigationContext.PushViewController(viewController, animated);
 		}
 
 		/// <summary>
 		/// Navigate to a view based on a view controller type.
-        /// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
+		/// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
 		/// </summary>
 		/// <param name="viewControllerType">The view controller type</param>
 		/// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
-        private void Navigate(Type viewControllerType, bool animated = false)
-        {
-            Navigate(null, viewControllerType, animated);
-        }
+		private void Navigate(Type viewControllerType, bool animated = false)
+		{
+			Navigate(null, viewControllerType, animated);
+		}
 
 		private void NavigateBack(bool animated = false)
 		{
@@ -100,7 +102,7 @@ namespace Twitter
 			}
 		}
 
-        #endregion Generic navigation helpers
+		#endregion Generic navigation helpers
 
 
         public void NavigateToMainView()
