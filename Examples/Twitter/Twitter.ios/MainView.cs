@@ -18,8 +18,6 @@ namespace Twitter
 		{
 			base.ViewDidLoad();
 			InitializeBindings(View, ViewModel);
-
-			Text.ShouldReturn += (textField) => { textField.ResignFirstResponder(); return true; };
 		}
 	}
 }

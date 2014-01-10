@@ -24,20 +24,25 @@ namespace Twitter
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-			if (Window == null) Window = new UIWindow(UIScreen.MainScreen.Bounds);
-			var navigationContext = Window.RootViewController as UINavigationController;
-			if (navigationContext == null) {
-				navigationContext = new UINavigationController();
-				if (Window.RootViewController != null) navigationContext.ViewControllers = new UIViewController[] { Window.RootViewController };
-				Window.RootViewController = navigationContext;
-			}
-			var navigator = new TwitterNavigator(navigationContext);
+			var navigator = new TwitterNavigator(InitializeNavigationContext());
             EnsureTwitterApplication(navigator).ContinueToMain();
 
-            // make the window visible
+			Window.AddGestureRecognizer(new KeyboardDismissGestureRecognizer());
 			Window.MakeKeyAndVisible();
 
             return true;
         }
+
+		class KeyboardDismissGestureRecognizer : UITapGestureRecognizer
+		{
+			public KeyboardDismissGestureRecognizer() : base(() => { }) { CancelsTouchesInView = false; }
+
+			public override void TouchesBegan(NSSet touches, UIEvent evt)
+			{
+				base.TouchesBegan(touches, evt);
+				var touch = evt.AllTouches.AnyObject as UITouch;
+				if (touch != null && touch.View != null && !(touch.View.CanBecomeFirstResponder) && View != null) View.EndEditing(true);
+			}
+		}
     }
 }

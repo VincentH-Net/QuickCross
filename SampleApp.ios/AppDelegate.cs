@@ -11,16 +11,11 @@ namespace SampleApp
     [Register("AppDelegate")]
     public partial class AppDelegate : UIApplicationDelegate
     {
-        public override UIWindow Window
-        {
-            get;
-            set;
-        }
+		public override UIWindow Window { get; set; }
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             // Override point for customization after application launch.
-			SampleAppNavigator navigator;
             if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
             {
                 var splitViewController = (UISplitViewController)Window.RootViewController;
@@ -37,14 +32,13 @@ namespace SampleApp
                 // Set the DetailViewController as the UISplitViewController Delegate.
                 splitViewController.WeakDelegate = detailViewController;
 
-				navigator = new SampleAppNavigator(masterNavigationController, detailNavigationController);
+				var navigator = new SampleAppNavigator(masterNavigationController, detailNavigationController);
 				EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
 				SampleAppApplication.Instance.ContinueToSampleItem();
 			} else {
-				navigator = new SampleAppNavigator((UINavigationController)Window.RootViewController);
+				var navigator = new SampleAppNavigator(InitializeNavigationContext());
 				EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
 			}
-
             return true;
         }
         //

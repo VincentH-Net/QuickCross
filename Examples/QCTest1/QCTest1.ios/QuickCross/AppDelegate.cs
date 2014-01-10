@@ -9,6 +9,18 @@ namespace QCTest1
 		{
             return QCTest1Application.Instance ?? new QCTest1Application(navigator);
 		}
+
+		private UINavigationController InitializeNavigationContext()
+		{
+			if (Window == null ) Window = new UIWindow(UIScreen.MainScreen.Bounds);
+			var navigationContext = Window.RootViewController as UINavigationController;
+			if (navigationContext == null) {
+				navigationContext = new UINavigationController();
+				if (Window.RootViewController != null) navigationContext.ViewControllers = new UIViewController[] { Window.RootViewController };
+				Window.RootViewController = navigationContext;
+			}
+			return navigationContext;
+		}
     }
 
     // TODO: In Application.Main(), add the following code before the call to UIApplication.Main():

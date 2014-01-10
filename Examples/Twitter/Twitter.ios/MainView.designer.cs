@@ -12,15 +12,8 @@ namespace Twitter
 	[Register ("MainView")]
 	partial class MainView
 	{
-		[Outlet]
-		MonoTouch.UIKit.UITextField Text { get; set; }
-		
 		void ReleaseDesignerOutlets ()
 		{
-			if (Text != null) {
-				Text.Dispose ();
-				Text = null;
-			}
 		}
 	}
 }
