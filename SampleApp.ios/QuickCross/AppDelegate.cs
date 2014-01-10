@@ -10,13 +10,26 @@ namespace QuickCross.Templates
 		{
             return _APPNAME_Application.Instance ?? new _APPNAME_Application(navigator);
 		}
+
+		private UINavigationController InitializeNavigationContext()
+		{
+			if (Window == null ) Window = new UIWindow(UIScreen.MainScreen.Bounds);
+			var navigationContext = Window.RootViewController as UINavigationController;
+			if (navigationContext == null) {
+				navigationContext = new UINavigationController();
+				if (Window.RootViewController != null) navigationContext.ViewControllers = new UIViewController[] { Window.RootViewController };
+				Window.RootViewController = navigationContext;
+			}
+			return navigationContext;
+		}
     }
 
     // TODO: In Application.Main(), add the following code before the call to UIApplication.Main():
     //    QuickCross.ViewDataBindings.RegisterBindKey();
 
-    // TODO: Add the following code to FinishedLaunching before the call to window.MakeKeyAndVisible():
-    //    if (window.RootViewController == null) window.RootViewController = new UINavigationController();
-	// 	  var navigator = new _APPNAME_Navigator((UINavigationController)window.RootViewController);
+	// TODO: Ensure that you override the Window property in AppDelegate like this:
+	//    public override UIWindow Window { get; set; }
+	// and then add the following code to FinishedLaunching before the call to Window.MakeKeyAndVisible():
+	// 	  var navigator = new _APPNAME_Navigator(InitializeNavigationContext());
 	//    Ensure_APPNAME_Application(navigator).ContinueToMain();
 }

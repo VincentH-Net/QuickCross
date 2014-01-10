@@ -65,13 +65,13 @@ namespace Twitter.Shared.ViewModels.Design
             var now = DateTime.Now;
             TweetList.Insert(0, new Tweet
             {
-                Text = "Creating a simple Twitter app for Android with MvvmQuickCross",
+                Text = "Creating a simple Twitter app with QuickCross",
                 UserName = "Me",
                 CreatedAt = now.AddSeconds(-115)
             });
             TweetList.Insert(0, new Tweet
             {
-                Text = "Created an Android solution with an application and a library project",
+                Text = "Created an solution with an application and a library project",
                 UserName = "Me",
                 CreatedAt = now.AddSeconds(-63)
             });

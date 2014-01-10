@@ -13,8 +13,7 @@ namespace Twitter
     [Register("AppDelegate")]
     public partial class AppDelegate : UIApplicationDelegate
     {
-        // class-level declarations
-        UIWindow window;
+		public override UIWindow Window { get; set; }
 
         //
         // This method is invoked when the application has loaded and is ready to run. In this 
@@ -25,18 +24,25 @@ namespace Twitter
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            // create a new window instance based on the screen size
-            window = new UIWindow(UIScreen.MainScreen.Bounds);
-
-            // If you have defined a view, add it here:
-            if (window.RootViewController == null) window.RootViewController = new UINavigationController();
-            var navigator = new TwitterNavigator((UINavigationController)window.RootViewController);
+			var navigator = new TwitterNavigator(InitializeNavigationContext());
             EnsureTwitterApplication(navigator).ContinueToMain();
 
-            // make the window visible
-            window.MakeKeyAndVisible();
+			Window.AddGestureRecognizer(new KeyboardDismissGestureRecognizer());
+			Window.MakeKeyAndVisible();
 
             return true;
         }
+
+		class KeyboardDismissGestureRecognizer : UITapGestureRecognizer
+		{
+			public KeyboardDismissGestureRecognizer() : base(() => { }) { CancelsTouchesInView = false; }
+
+			public override void TouchesBegan(NSSet touches, UIEvent evt)
+			{
+				base.TouchesBegan(touches, evt);
+				var touch = evt.AllTouches.AnyObject as UITouch;
+				if (touch != null && touch.View != null && !(touch.View.CanBecomeFirstResponder) && View != null) View.EndEditing(true);
+			}
+		}
     }
 }

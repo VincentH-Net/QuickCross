@@ -1,6 +1,12 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/AppDelegate.QC.cs">
+    <Files>
+      <File FileName="SampleApp.ios/AppDelegate.QC.cs" Line="4" Column="20" />
+      <File FileName="SampleApp.ios/QuickCross/AppDelegate.cs" Line="33" Column="1" />
+      <File FileName="SampleApp.ios/AppDelegate.cs" Line="39" Column="73" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

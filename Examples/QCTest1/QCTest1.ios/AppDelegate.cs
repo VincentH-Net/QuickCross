@@ -14,8 +14,7 @@ namespace QCTest1
     public partial class AppDelegate : UIApplicationDelegate
     {
         // class-level declarations
-        UIWindow window;
-
+		public override UIWindow Window { get; set; }
         //
         // This method is invoked when the application has loaded and is ready to run. In this 
         // method you should instantiate the window, load the UI into it and then make the window
@@ -25,19 +24,9 @@ namespace QCTest1
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            // create a new window instance based on the screen size
-            window = new UIWindow(UIScreen.MainScreen.Bounds);
-            var rootNavigationController = new UINavigationController();
-            rootNavigationController.PushViewController(new MainView(), false);
-
-            // If you have defined a view, add it here:
-            window.RootViewController = rootNavigationController; // *** HERE: add a code navigationcontoller that contains the mainview
-            var navigator = new QCTest1Navigator(rootNavigationController);
+			var navigator = new QCTest1Navigator(InitializeNavigationContext());
             EnsureQCTest1Application(navigator).ContinueToMain();
-
-            // make the window visible
-            window.MakeKeyAndVisible();
-
+			Window.MakeKeyAndVisible();
             return true;
         }
     }
