@@ -1,15 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Twitter.ios/TwitterNavigator.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Twitter.ios/AppDelegate.cs">
     <Files>
-      <File FileName="Twitter.ios/MainView.cs" Line="21" Column="1" />
-      <File FileName="Twitter.ios/AppDelegate.cs" Line="33" Column="1" />
+      <File FileName="Twitter.ios/MainView.cs" Line="1" Column="1" />
       <File FileName="Twitter.ios/Main.cs" Line="1" Column="1" />
       <File FileName="Twitter.Shared/ViewModels/MainViewModel.cs" Line="1" Column="1" />
-      <File FileName="Twitter.ios/MainView.designer.cs" Line="17" Column="1" />
+      <File FileName="Twitter.ios/MainView.designer.cs" Line="1" Column="1" />
       <File FileName="Twitter.ios/Info.plist" />
       <File FileName="Twitter.ios/QuickCross/AppDelegate.cs" Line="19" Column="1" />
-      <File FileName="Twitter.ios/TwitterNavigator.cs" Line="1" Column="1" />
+      <File FileName="Twitter.ios/TwitterNavigator.cs" Line="11" Column="52" />
+      <File FileName="Twitter.ios/AppDelegate.cs" Line="30" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
