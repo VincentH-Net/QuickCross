@@ -33,6 +33,11 @@ namespace Twitter
             return true;
         }
 
+        /// <summary>
+        /// To automatically dismiss the onscreen keyboard in iOS when a user taps outside an editable view,
+        /// add a KeyboardDismissGestureRecognizer to your application's main window in FinishedLaunching,
+        ///     Window.AddGestureRecognizer(new KeyboardDismissGestureRecognizer());
+        /// </summary>
 		class KeyboardDismissGestureRecognizer : UITapGestureRecognizer
 		{
 			public KeyboardDismissGestureRecognizer() : base(() => { }) { CancelsTouchesInView = false; }
