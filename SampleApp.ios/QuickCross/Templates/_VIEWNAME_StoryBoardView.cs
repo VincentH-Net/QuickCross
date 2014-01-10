@@ -21,17 +21,17 @@ using QuickCrossLibrary.Templates.ViewModels;
 
 namespace QuickCross.Templates
 {
-	public partial class _VIEWNAME_View : ViewBase
+    public partial class _VIEWNAME_View : ViewBase
     {
-		private _VIEWNAME_ViewModel ViewModel { get { return _APPNAME_Application.Instance._VIEWNAME_ViewModel; } }
+        private _VIEWNAME_ViewModel ViewModel { get { return _APPNAME_Application.Instance._VIEWNAME_ViewModel; } }
 
-		public _VIEWNAME_View(IntPtr handle) : base(handle) { }
+        public _VIEWNAME_View(IntPtr handle) : base(handle) { }
 
-		public override void ViewDidLoad()
-		{
-			base.ViewDidLoad();
-			InitializeBindings(View, ViewModel);
-		}
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+            InitializeBindings(View, ViewModel);
+        }
     }
 }
 

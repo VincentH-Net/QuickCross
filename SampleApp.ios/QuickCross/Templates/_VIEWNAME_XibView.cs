@@ -24,18 +24,18 @@ using QuickCrossLibrary.Templates.ViewModels;
 
 namespace QuickCross.Templates
 {
-	public partial class _VIEWNAME_View : ViewBase
+    public partial class _VIEWNAME_View : ViewBase
     {
         private _VIEWNAME_ViewModel ViewModel { get { return _APPNAME_Application.Instance._VIEWNAME_ViewModel; } }
 
         public _VIEWNAME_View() : base("_VIEWNAME_View", null) { }
 
         public override void ViewDidLoad()
-		{
-			base.ViewDidLoad();
-			Title = "_VIEWNAME_View";
+        {
+            base.ViewDidLoad();
+            Title = "_VIEWNAME_View";
             InitializeBindings(View, ViewModel);
-		}
+        }
     }
 }
 #endif // TEMPLATE

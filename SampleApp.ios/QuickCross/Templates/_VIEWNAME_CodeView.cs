@@ -9,13 +9,13 @@ using QuickCrossLibrary.Templates.ViewModels;
 
 namespace QuickCross.Templates
 {
-	public partial class _VIEWNAME_View : ViewBase
+    public partial class _VIEWNAME_View : ViewBase
     {
         private _VIEWNAME_ViewModel ViewModel { get { return _APPNAME_Application.Instance._VIEWNAME_ViewModel; } }
 
-		public override void ViewDidLoad()
-		{
-			base.ViewDidLoad();
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
             Title = "_VIEWNAME_";
             View.Frame = UIScreen.MainScreen.Bounds;
             View.BackgroundColor = UIColor.White;
@@ -38,7 +38,7 @@ namespace QuickCross.Templates
             #endregion Bind to example property and command
 
             InitializeBindings(View, ViewModel, bindingsParameters);
-		}
+        }
     }
 }
 #endif // TEMPLATE
