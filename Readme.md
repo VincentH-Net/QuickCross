@@ -224,7 +224,7 @@ Here is how to create an iOS Twitter app that demonstrates simple data binding:
 
 This is what the Twitter app will look like in iOS:
 
-![Twitter example on iPhone](https://raw.github.com/MacawNL/QuickCross/master/assets/twitter_ios.png)
+![Twitter example on iPhone](https://raw.github.com/MacawNL/QuickCross/master/Examples/Twitter/assets/twitter_ios.png)
 
 So let's get started.
 
