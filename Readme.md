@@ -1,5 +1,5 @@
 **QuickCross** is a lightweight (no binaries) cross-platform MVVM pattern to quickly build native Xamarin.iOS, Xamarin.Android, Windows Phone and Windows Store Apps with shared C# code.QuickCross provides data binding for Android and for iOS. It accelerates development with scaffolders and code snippets, also for a single platform app. For cross-platform apps QuickCross increases code sharing with an Application-Navigator pattern.QuickCross aims to leave you in full control; it does not get in the way if you want to do some things differently, and you can simply extend or modify it.
-> **NOTE:** This version (2.0) of QuickCross is in **beta** now; iOS data bindings are working and documented but the documentation on creating an app from scratch is under construction. **This release only supports the iOS platform**; the other platforms and more elaborate iOS example documentation will be re-added before the 2.0 final release.> The purpose of this beta release is to gain feedback on the iOS data bindings implementation; if you are building a production application or if you are targeting other platforms than iOS, it is recommended to keep using the previous version until the QuickCross release version is published.Versions before 2.0 were published under the name **MvvmQuickCross**. They will continue to be supported at the [existing MvvmQuickCross GitHub repository](https://github.com/MacawNL/MvvmQuickCross), and [the existing MvvmQuickCross NuGet packages](http://nuget.org/packages/mvvmquickcross) will remain available.Upgrading from MvvmQuickCross to QuickCross is quick (pun intended); instructions will be documented here (TODO URL).## News ##**Jan 3, 2014**: QuickCross release: 2.0 beta is out. Adds simple iOS data binding and an iOS example app.**Coming up**: Documentation. Next planned QuickCross release: 2.0 final, which will add more iOS data bindings, the other platforms (besides iOS), and full documentation and examples. ETA Jan 15.## NuGet package - PRERELEASE ##[QuickCross NuGet packages](http://nuget.org/packages/quickcross)## Preliminary Documentation ##
+> **NOTE:** This version (2.0) of QuickCross is in **beta** now; iOS data bindings are working and documented, including how to creating an app from scratch. However **this release only supports the iOS platform**; the other platforms and more elaborate iOS example documentation will be re-added before the 2.0 final release.> The purpose of this beta release is to gain feedback on the iOS data bindings implementation; if you are building a production application or if you are targeting other platforms than iOS, it is recommended to keep using the previous version until the QuickCross release version is published.Versions before 2.0 were published under the name **MvvmQuickCross**. They will continue to be supported at the [existing MvvmQuickCross GitHub repository](https://github.com/MacawNL/MvvmQuickCross), and [the existing MvvmQuickCross NuGet packages](http://nuget.org/packages/mvvmquickcross) will remain available.Upgrading from MvvmQuickCross to QuickCross is quick (pun intended); instructions will be documented here (TODO URL).## News ##**Jan 3, 2014**: QuickCross release: 2.0 beta is out. Adds simple iOS data binding and an iOS example app.**Coming up**: Documentation. Next planned QuickCross release: 2.0 final, which will add more iOS data bindings, the other platforms (besides iOS), and full documentation and examples. ETA Jan 15.## NuGet package - PRERELEASE ##[QuickCross NuGet packages](http://nuget.org/packages/quickcross)## Preliminary Documentation ##
 
 Most of [the existing documentation for MvvmQuickCross](https://github.com/MacawNL/MvvmQuickCross) applies for QuickCross 2.0 as well; the MvvmQuickCross documentation will be copied here and updated soon. Until then, these are the key changes in QuickCross 2.0:
 
@@ -220,9 +220,6 @@ Below is an overview of using QuickCross with Xamarin.iOS.
 
 ### Create an iOS App ###
 Here is how to create an iOS Twitter app that demonstrates simple data binding:
-> Note: this documentation topic is under construction
-
-HERE***
 > Note that the complete source for this Twitter app example is available in this repository, [here](http://github.com/MacawNL/QuickCross/tree/master/Examples/Twitter).
 
 This is what the Twitter app will look like in iOS:
@@ -346,10 +343,10 @@ So let's get started.
         Text = "Text for a new tweet";
         var now = DateTime.Now;
         TweetList.Insert(0, new Tweet { 
-			Text = "Creating a simple Twitter app for iOS with QuickCross", 
+			Text = "Creating a simple Twitter app with QuickCross", 
 			UserName = "Me", CreatedAt = now.AddSeconds(-115) });
         TweetList.Insert(0, new Tweet { 
-			Text = "Created an iOS solution with an application and a library project", 
+			Text = "Created a solution with an application and a library project", 
 			UserName = "Me", CreatedAt = now.AddSeconds(-63) });
         TweetList.Insert(0, new Tweet { 
 			Text = "Added Tweet model class", 
@@ -363,7 +360,7 @@ So let's get started.
     }
 	```
 
-9.  We are going to replace the **MainView**, which was generated with view type **Code**, with a Storyboard view. First delete the file `MainView.cs` in the application project, and then enter this command in the Package Manager Console:
+9.  We are going to replace the **MainView**, which was generated as a **Code** view, with a **Storyboard** view. First delete the file `MainView.cs` in the application project, and then enter this command in the Package Manager Console:
 
 	```posh
 	New-View Main -ViewType StoryBoard
@@ -373,14 +370,37 @@ So let's get started.
 
 10. Make your source accessible from your build Mac (e.g. on a network share, via source control or just copy it with a USB stick), and open your solution on the Mac in Xamarin Studio.
 
-11. In Xamarin Studio, set the build configuration for the application project to Debug | iPhoneSimulator or Debug | iPhone, and set the application project as the startup project.
+11. In Xamarin Studio, set the build configuration for the application project to **Debug | iPhoneSimulator** or **Debug | iPhone**, and set the application project as the startup project.
 
-12. Now download this [Main.storyboard file](https://github.com/MacawNL/QuickCross/blob/48df6d0842c3f35e3f7129106a690a005f18179f/Examples/Twitter/Twitter.ios/Main.storyboard) add it to the project in Xamarin studio. This storyboard contains only the Twitter UI, without any custom classes or bindings.
+12. In Xamarin Studio, add an **Empty iPhone Storyboard** and name it `Main` (could be any name). Open the storyboard with the **Source Code Editor** and then replace its contents by copy+pasting the contents from this [Main.storyboard file](https://github.com/MacawNL/QuickCross/blob/master/Examples/Twitter/assets/Main.storyboard). Save the storyboard and close its editor window. The storyboard now contains only the Twitter UI, without any custom classes or bindings.
 
 	You could create this file yourself by adding an **Empty iPhone Storyboard** project item named `Main` (this could be any name) in Xamarin Studio, double-clicking to open it in XCode and then adding a view controller, with a view at the bottom containing a text field, label and two buttons. Then add a table view with a table cell and add three labels in the cell content.
 
-13. In Xamarin Studio, double click the Main.storyboard file to open it in XCode.    
+13. Now follow the guidance in the **MainView.TODO.cs** comments to create the **MainView.cs** and **MainView.designer.cs** (you can skip adding your view in XCode since it is already in the downloaded storyboard).
 
+14. Open the **Info.plist** file in Xamarin Studio, and set the **Main Interface** to the **Main** storyboard.
+
+15. To dismiss the onscreen keyboard when you tap outside the edit view, add a [KeyboardDismissGestureRecognizer](https://gist.github.com/VincentH-Net/8352290) to your main window in FinishedLaunching. Now you can run the app - the Twitter UI should display (without data, because we still need to add bindings).
+
+16. Now let's add the data binding parameters in XCode to complete the app. In XCode, add the **Bind** custom runtime attribute to these controls (see [how](#ios-binding-parameters-in-xcode)) and set it's value as indicated:
+	
+	<table>
+		<tr><td><b>View</b></td><td><b>Bind value</b></td></tr>
+		<tr><td>Round Style Text Field - What's up?</td><td>Text, Mode=TwoWay</td></tr>
+		<tr><td>Label - 140</td><td>CharactersLeft</td></tr>
+		<tr><td>Button - Send</td><td>SendCommand, Mode=Command</td></tr>
+		<tr><td>Button - Delete</td><td>DeleteCommand, Mode=Command</td></tr>
+		<tr><td>Table View</td><td>Tweet, Mode=TwoWay {List ItemsSource=TweetList}</td></tr>
+		<tr><td>Label - Me</td><td>UserName</td></tr>
+		<tr><td>Label - 10/25/2013 1:28:25 PM</td><td>CreatedAt</td></tr>
+		<tr><td>Label - My tweet text</td><td>Text</td></tr>
+	</table>
+
+	As described [here](#list-itemtemplate), the default value for the List ItemTemplate binding parameter for our table view is TweetListItem (because we specified TweetList for the ItemsSource). Now set the (reuse) **Identifier** of the **Table View Cell** to to match the List ItemTemplate value: `TweetListItem`. Now the QuickCross `DataBindableUITableViewSource` can load the prototype cell that should be used for the tweet list items.
+
+17. **Save** the storyboard, switch back to Xamarin Studio and run the app. Test the MainView. Notice how the Send and Delete buttons are enabled and disabled based on the text length and selected item state, and how the characters remaining count is updated as you type. Also note how the selected list item is highlighted both from the UI when tapped, and from code when adding a new tweet.
+
+You have created a working app with QuickCross. Note that the only code that you needed to write is in the viewmodel; no view controller or table view controller code is needed. To get data binding working, the markup specifies some binding parameters in the Bind.
 
 ### iOS Data Binding ###
 An iOS data binding is a one-on-one binding between an iOS `UIView`, such as a `UITextField` or `UIButton`, and a viewmodel property or command. You can specify bindings with (a combination of):
