@@ -54,7 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
+    <Compile Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
     <Compile Include="QuickCross\CheckableLayouts.cs" />
     <Compile Include="QuickCross\Templates\_VIEWNAME_FragmentView.cs" />
     <Compile Include="QuickCross\Templates\_VIEWNAME_ActivityView.cs" />
