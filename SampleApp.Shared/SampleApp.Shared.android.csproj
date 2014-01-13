@@ -47,20 +47,20 @@
   <ItemGroup>
     <Compile Include="ISampleAppNavigator.cs" />
     <Compile Include="Models\SampleItem.cs" />
-    <Compile Include="MvvmQuickCross\ApplicationBase.cs" />
-    <Compile Include="MvvmQuickCross\RelayCommand.cs" />
-    <Compile Include="MvvmQuickCross\Templates\I_APPNAME_Navigator.cs" />
-    <Compile Include="MvvmQuickCross\Templates\_APPNAME_Application.cs" />
-    <Compile Include="MvvmQuickCross\Templates\_VIEWNAME_ViewModel.cs" />
-    <Compile Include="MvvmQuickCross\ViewModelBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuickCross\ApplicationBase.cs" />
+    <Compile Include="QuickCross\RelayCommand.cs" />
+    <Compile Include="QuickCross\Templates\I_APPNAME_Navigator.cs" />
+    <Compile Include="QuickCross\Templates\_APPNAME_Application.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_ViewModel.cs" />
+    <Compile Include="QuickCross\ViewModelBase.cs" />
     <Compile Include="SampleAppApplication.cs" />
     <Compile Include="Services\SampleItemService.cs" />
     <Compile Include="ViewModels\SampleItemListViewModel.cs" />
     <Compile Include="ViewModels\SampleItemViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MvvmQuickCross\Templates\MvvmQuickCross.snippet" />
+    <None Include="QuickCross\Templates\QuickCross.snippet" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

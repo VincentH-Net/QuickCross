@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="1"
+    android:id="@+id/SampleItemView">
+    <TableRow
+        android:id="@+id/tableRow1">
+        <TextView
+            android:text="Title:"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <EditText
+            android:text="Title *"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/SampleItemView_Title"
+            android:tag="{Binding Mode=TwoWay}" />
+    </TableRow>
+    <TableRow
+        android:id="@+id/tableRow2">
+        <TextView
+            android:text="Description:"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <EditText
+            android:text="Description *"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/SampleItemView_Description"
+            android:tag="{Binding Mode=TwoWay}" />
+    </TableRow>
+    <TableRow>
+        <Button
+            android:text="Save"
+            android:layout_column="1"
+            android:id="@+id/SampleItemView_SaveCommand" />
+    </TableRow>
+</TableLayout>

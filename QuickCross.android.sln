@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.Shared.android", "SampleApp.Shared\SampleApp.Shared.android.csproj", "{C579819D-5EF6-4AC4-8D2A-A5F1DB742090}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp.android\SampleApp.csproj", "{6A0F0E75-05A1-4247-BF29-C961DCAB4365}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{DDAD6F61-D68E-4CD8-A822-3338AE97B3CC}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{EE6DBFB8-A27E-4396-861C-091D7F4AA857}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet\CreatePackage.cmd = NuGet\CreatePackage.cmd
+		NuGet\Init.ps1 = NuGet\Init.ps1
+		NuGet\MvvmQuickCross.nuspec = NuGet\MvvmQuickCross.nuspec
+		NuGet\MvvmQuickCross.psm1 = NuGet\MvvmQuickCross.psm1
+		NuGet\NuGet.exe = NuGet\NuGet.exe
+		NuGet\PublishToPublicNuGet.cmd = NuGet\PublishToPublicNuGet.cmd
+		NuGet\readme.txt = NuGet\readme.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C579819D-5EF6-4AC4-8D2A-A5F1DB742090}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C579819D-5EF6-4AC4-8D2A-A5F1DB742090}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C579819D-5EF6-4AC4-8D2A-A5F1DB742090}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C579819D-5EF6-4AC4-8D2A-A5F1DB742090}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0F0E75-05A1-4247-BF29-C961DCAB4365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A0F0E75-05A1-4247-BF29-C961DCAB4365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A0F0E75-05A1-4247-BF29-C961DCAB4365}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6A0F0E75-05A1-4247-BF29-C961DCAB4365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A0F0E75-05A1-4247-BF29-C961DCAB4365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0F0E75-05A1-4247-BF29-C961DCAB4365}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
