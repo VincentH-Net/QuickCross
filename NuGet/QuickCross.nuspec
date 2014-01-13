@@ -41,8 +41,8 @@
     <!-- iOS application project files -->
     <file src="..\SampleApp.ios\QuickCross\**\*.*"     target="tools\app.ios\QuickCross\" />
 
-    <!-- Android application project files TODO
-    <file src="..\SampleApp.android\QuickCross\**\*.*" target="tools\app.android\QuickCross\" /> -->
+    <!-- Android application project files -->
+    <file src="..\SampleApp.android\QuickCross\**\*.*" target="tools\app.android\QuickCross\" />
 
     <!-- Windows Phone application project files TODO
     <file src="..\SampleApp.wp\QuickCross\**\*.*"      target="tools\app.wp\QuickCross\" />  -->

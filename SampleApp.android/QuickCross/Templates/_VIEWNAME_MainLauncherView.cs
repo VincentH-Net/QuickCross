@@ -13,7 +13,7 @@ namespace QuickCross.Templates
     {
         private _APPNAME_Application EnsureApplication()
         {
-            return _APPNAME_Application.Instance ?? new _APPNAME_Application(new _APPNAME_Navigator());
+            return _APPNAME_Application.Instance ?? new _APPNAME_Application(_APPNAME_Navigator.Instance);
         }
 
         protected override void OnCreate(Bundle bundle)
@@ -22,7 +22,8 @@ namespace QuickCross.Templates
             SetContentView(Resource.Layout._VIEWNAME_View);
             AndroidHelpers.Initialize(typeof(Resource));
             EnsureApplication();
-            _APPNAME_Application.Instance.ContinueTo_VIEWNAME_(skipNavigation: true);
+            _APPNAME_Navigator.Instance.NavigationContext = this;
+            _APPNAME_Application.Instance.ContinueTo_VIEWNAME_();
             Initialize(FindViewById(Resource.Id._VIEWNAME_View), _APPNAME_Application.Instance._VIEWNAME_ViewModel);
         }
     }

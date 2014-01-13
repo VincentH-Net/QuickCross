@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.Shared.android", "SampleApp.Shared\SampleApp.Shared.android.csproj", "{C579819D-5EF6-4AC4-8D2A-A5F1DB742090}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp.android\SampleApp.csproj", "{6A0F0E75-05A1-4247-BF29-C961DCAB4365}"
@@ -12,12 +14,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{DDAD6F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{EE6DBFB8-A27E-4396-861C-091D7F4AA857}"
 	ProjectSection(SolutionItems) = preProject
+		NuGet\about_QuickCross.help.txt = NuGet\about_QuickCross.help.txt
 		NuGet\CreatePackage.cmd = NuGet\CreatePackage.cmd
 		NuGet\Init.ps1 = NuGet\Init.ps1
-		NuGet\MvvmQuickCross.nuspec = NuGet\MvvmQuickCross.nuspec
-		NuGet\MvvmQuickCross.psm1 = NuGet\MvvmQuickCross.psm1
-		NuGet\NuGet.exe = NuGet\NuGet.exe
 		NuGet\PublishToPublicNuGet.cmd = NuGet\PublishToPublicNuGet.cmd
+		NuGet\QuickCross.nuspec = NuGet\QuickCross.nuspec
+		NuGet\QuickCross.psm1 = NuGet\QuickCross.psm1
 		NuGet\readme.txt = NuGet\readme.txt
 	EndProjectSection
 EndProject
