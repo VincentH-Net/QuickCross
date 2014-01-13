@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<quickcross.CheckableLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TweetListItem"
+    android:orientation="vertical"
+    android:background="@drawable/CustomSelector"
+    android:addStatesFromChildren="true"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/TweetListItem_UserName"
+            android:text="Me*"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/TweetListItem_CreatedAt"
+            android:text="friday october 11, 2013 14:08:2*"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:gravity="right"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/TweetListItem_Text"
+        android:text="Some example text*"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</quickcross.CheckableLinearLayout>
