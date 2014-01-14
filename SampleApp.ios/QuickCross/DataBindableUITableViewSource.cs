@@ -178,7 +178,7 @@ namespace QuickCross
 				{
 					if (itemObject is ViewModelBase)
 					{
-						EnsureViewDataBindingsHolder(cell, (ViewModelBase)itemObject); // TODO: rename to Update... put ensure in submethod?
+						EnsureViewDataBindingsHolder(cell, (ViewModelBase)itemObject);
 					}
 					else
 					{
@@ -225,7 +225,7 @@ namespace QuickCross
 			ViewDataBindingsHolder holder;
 			if (!viewDataBindingsHolders.TryGetValue(rootView.Handle, out holder))
 			{
-				holder = new ViewDataBindingsHolder(rootView, viewModel, "TODO:", viewExtensionPoints); // TODO: do we need a prefix?
+				holder = new ViewDataBindingsHolder(rootView, viewModel, "TODO:", viewExtensionPoints); 
 				viewDataBindingsHolders.Add(rootView.Handle, holder);
 			}
 			else

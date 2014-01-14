@@ -1,22 +1,48 @@
-**QuickCross** is a lightweight (no binaries) cross-platform MVVM pattern to quickly build native Xamarin.iOS, Xamarin.Android, Windows Phone and Windows Store Apps with shared C# code.QuickCross provides data binding for Android and for iOS. It accelerates development with scaffolders and code snippets, also for a single platform app. For cross-platform apps QuickCross increases code sharing with an Application-Navigator pattern.QuickCross aims to leave you in full control; it does not get in the way if you want to do some things differently, and you can simply extend or modify it.
-> **NOTE:** This version (2.0) of QuickCross is in **beta** now; iOS data bindings are working and documented, including how to creating an app from scratch. However **this release only supports the iOS, Android ans Windows Store platforms**; the Windows Phone platform will be re-added before the 2.0 final release.> The purpose of this beta release is to gain feedback on the iOS data bindings implementation; if you are building a production application or if you are targeting other platforms than iOS, it is recommended to keep using the previous version until the QuickCross release version is published.Versions before 2.0 were published under the name **MvvmQuickCross**. They will continue to be supported at the [existing MvvmQuickCross GitHub repository](https://github.com/MacawNL/MvvmQuickCross), and [the existing MvvmQuickCross NuGet packages](http://nuget.org/packages/mvvmquickcross) will remain available.Upgrading from MvvmQuickCross to QuickCross is quick (pun intended); instructions will be documented here (TODO URL).## News ##**Jan 3, 2014**: QuickCross release: 2.0 beta is out. Adds simple iOS data binding and an iOS example app.**Coming up**: Documentation. Next planned QuickCross release: 2.0 final, which will add more iOS data bindings, the other platforms (besides iOS), and full documentation and examples. ETA Jan 15.## NuGet package - PRERELEASE ##[QuickCross NuGet packages](http://nuget.org/packages/quickcross)## Preliminary Documentation ##
+NuGet package: [http://nuget.org/packages/QuickCross](http://nuget.org/packages/quickcross)> NOTE: This readme describes version 2.0, which is the current NuGet release.# QuickCross #Quickly build cross-platform apps in C# with the MVVM pattern and [Xamarin](http://xamarin.com/).![QuickCross for Android](https://raw.github.com/MacawNL/MvvmQuickCross/master/assets/MvvmQuickCross.gif)## Summary ##**QuickCross** is a lightweight (no binaries) cross-platform MVVM pattern to quickly build native Xamarin.iOS, Xamarin.Android, Windows Phone and Windows Store Apps with shared C# code.QuickCross provides data binding for Android and for iOS. It accelerates development with scaffolders and code snippets, also for a single platform app. For cross-platform apps QuickCross increases code sharing with an Application-Navigator pattern.QuickCross aims to leave you in full control; it does not get in the way if you want to do some things differently, and you can simply extend or modify it.
 
-Most of [the existing documentation for MvvmQuickCross](https://github.com/MacawNL/MvvmQuickCross) applies for QuickCross 2.0 as well; the MvvmQuickCross documentation will be copied here and updated soon. Until then, these are the key changes in QuickCross 2.0:
+> Versions before 2.0 were published under the name **MvvmQuickCross**. They will continue to be supported at the [existing MvvmQuickCross GitHub repository](https://github.com/MacawNL/MvvmQuickCross), and [the existing MvvmQuickCross NuGet packages](http://nuget.org/packages/mvvmquickcross) will remain available.Upgrading from MvvmQuickCross to QuickCross is simple; see [here](#how-to-upgrade-from-mvvmquickcross-to-quickCross) how.## Why another cross-platform Mvvm framework? ##We developed QuickCross after trying [MvvmCross](http://github.com/mvvmcross). We were looking for an Mvvm framework to let us maximize code sharing across Windows Store, Windows Phone, Xamarin.iOS and Xamarin.Android platforms, and MvvmCross was the most promising option for us. In our opinion MvvmCross is a mature framework that offers a lot of functionality and has an impressive architecture. However, MvvmCross is also binary based (you use it as dlls in your app) and we found it to be too heavily engineered for our needs. It has lots of nuget packages and dlls, a plugin system, uses IoC, has many internal layers etc. It's a *lot* to take in - there are over 40(!) [video's](http://www.youtube.com/playlist?list=PLR6WI6W1JdeYSXLbm58jwAKYT7RQR31-W) on it.If we were to build an app with MvvmCross and we would run across something - anything, either big or small - that is not supported (yet) out of the box, we would either need to wait for someone else to add it, or take on an additional - potentially complex - project to create a new plugin for the framework or even a modified version of existing framework component(s). We did not want to put ourselves in this situation. Not finding a suitable alternative, we set out to create a **lightweight**, pragmatic framework with a focus on **productivity** and **simple customization**: *QuickCross*.QuickCross is not based on or derived from MvvmCross; it solves some of the same problems but is quite different. QuickCross supports most common data binding scenario's out of the box and lets you implement other scenario's by adding a few lines of code in your app project. It is simple in both usage and internal implementation; it is distributed in a single NuGet package, included as source in your app projects, and this single readme page contains the complete reference plus an example app tutorial.While QuickCross has some unique [features](#features) (e.g. customizable code templates and scaffolder commands to quickly generate views, viewmodels and navigation code), MvvmCross has been around longer and offers more functionality, e.g. value converters and WPF and Mac platform support. If you are looking for a cross-platform Mvvm framework, we do encourage you to check out all options and decide for yourself which is best for your needs and capabilities. Happy app building!## News ##**Jan 14, 2014**: QuickCross release 2.0 final is published!**Jan 3, 2014**: QuickCross release 2.0 beta is published. Adds simple iOS data binding and an iOS example app.## Features ##
 
-- Name change from MVVMQuickCross to QuickCross
+### Lightweight and easy to modify ###
+No binaries, only adds a code snippets file and C# source files to your projects.
 
-- Minor change in shared code: `navigationContext` parameter was moved from the `Application` to the `Navigator` for more flexibility when using multiple navigation contexts. For existing code this means you need to pass the navigationContext parameter to the Navigator constructor instead of the Application constructor. The Navigator now manages navigation context instances and decides when to use/create which context (if more than one is needed).
+### Scaffolders ###
+Quickly add viewmodels and views from within the Visual Studio package manager console with the New-ViewModel and New-View [commands](#commands).
 
-- [iOS data binding](#ios-data-binding), with support for **coded views, Xib views and StoryBoard views**:
+### Viewmodel code snippets ###
+Quickly add data-bindable properties and commands to viewmodels with [code snippets](#code-snippets).
 
-	- See the [QCTest1 app source](https://github.com/MacawNL/QuickCross/tree/master/Examples/QCTest1) in this repository for an example of a coded view, a Xib view, and a StoryBoard view with a UITableView, including navigation.
+### Application-Navigator pattern ###
+Maximize code sharing, including navigation logic, across platforms.
+![QuickCross Pattern](https://raw.github.com/MacawNL/MvvmQuickCross/master/assets/mvvmquickcross_pattern.png)
 
-	- The `New-View` command in the VS Package Manager Console now has support for these view types in iOS: `Code`, `Xib`, `StoryBoard` and `StoryBoardTable`. When you add these views, the generated view class contains inline comments on how to complete the view in xCode, if needed. More view types will be added in the final 2.0 release.
+See [these slides](http://www.slideshare.net/VincentHoogendoorn/mvvm-quickcross-windows-phone-devday-2013) for an overview of the QuickCross pattern.
 
-Please feel free to run and inspect the two iOS example apps and provide feedback on what you think of the approach for iOS data bindings. Thanks and NJoy!
+### Simple iOS data binding ###
+Specify [data bindings in iOS](#ios-data-binding) with a custom runtime attribute in XCode, or in C# code. Supports coded views, Xib views and StoryBoard views. Create performant data-bound table views without writing a table view source.
+
+Override virtual methods in your view controller to handle specific property change events with custom code instead of with data binding. Or customize how the data binding sets a value to a specific control. Add a few lines of code to make new view types data bindable.
+
+### iOS lifecycle management ###
+Prevent memory leaks by [automatically removing and re-adding event handlers](#ios-view-lifecycle-support) during the iOS view life-cycle.
+
+### Simple Android data binding ###
+Specify [data bindings in Android](#android-data-binding) by using naming conventions, tag markup or code. Use observable collections. Create performant data-bound list views without writing an adapter.
+
+Override virtual methods in your activity or fragment to handle specific property change events with custom code instead of with data binding. Or customize how the data binding sets a value to a specific control. Add a few lines of code to make new view types data bindable.
+
+### Android lifecycle management ###
+Prevent [memory leaks in Xamarin](http://docs.xamarin.com/guides/android/application_fundamentals/activity_lifecycle) by [automatically removing and re-adding event handlers](#android-view-lifecycle-support) during the Android activity life-cycle.
+
+## Documentation and Examples ##
+The remainder of this Readme describes:
+
+-  **Getting Started** steps
+-  The complete **QuickCross reference**
+-  How to build a simple **Twitter example app**
 
 ## Getting Started ##
 To create an app with QuickCross, follow these steps:
+> Note: for how to upgrade an app to a newer version of QuickCross, see [here](#how-to-upgrade-to-a later-version-of-quickcross).
 
 1. In Visual Studio, create a new solution with an application project for the **platform** (Windows Store, Windows Phone, Android, iOS) that you are most productive with. Add a class library project **for the same platform** to the solution. Reference the class library from the application project.
 
@@ -98,6 +124,7 @@ The specified `ViewName` will be suffixed with "View", and the specified `ViewMo
 - On Windows Phone or Windows Store, the `ViewType` can be `Page` (default) or `UserControl`. 
 - On Android, it can be `MainLauncher`, `Activity` (default) or `Fragment`.
 - On iOS, it can be `Code` (default), `Xib`, `StoryBoard` or `StoryBoardTable`.
+	> See the [QCTest1 app source](https://github.com/MacawNL/QuickCross/tree/master/Examples/QCTest1) in this repository for an example of a coded view, a Xib view, and a StoryBoard view with a UITableView, including navigation.
 
 The specified view type determines which view templates are used. You can find these templates in the QuickCross\Templates folder of your application project. You can simply modify these templates or add your own (which is better) by adding similar named files there.
 
@@ -1291,3 +1318,60 @@ In the `QuickCross\AndroidHelpers.cs` file in your application project, you will
 	var viewHolder = (ListDictionary)rootView.Tag;
 	```
 	Note that the Tag property of an Android View in Xamarin is a `Java.Lang.Object`. 
+
+## How to upgrade to a later version of QuickCross ##
+To upgrade QuickCross to a later version, follow these steps:
+
+1. For all your QuickCross solutions: open your solution, make sure that you have no editor windows open, and then enter these commands in the package manager console:
+
+	**Remove-Module QuickCross**
+	**Uninstall-Package QuickCross**
+
+3. Delete the QuickCross folders from your application project and your library project.
+
+	> Note: if you made any customizations to the QuickCross files, save those first and re-apply them to the new QuickCross files after you have upgraded.
+
+4. Install the latest QuickCross version by following **steps 2 through 4** in [Getting Started](#getting-started)
+
+	This will add the latest version of the QuickCross folders to your projects, but it will not overwrite any of your exiting code (Application, Navigator).
+
+Now your app is upgraded. NJoy QuickCross!
+
+## How to upgrade from MvvmQuickCross to QuickCross ##
+To upgrade from MvvmQuickCross 1.6 to QuickCross 2.0, follow these steps:
+
+1. For all your MvvmQuickCross solutions: open your solution, make sure that you have no editor windows open, and then enter these commands in the package manager console:
+
+	**Remove-Module MvvmQuickCross**
+	**Uninstall-Package MvvmQuickCross**
+
+2. Uninstall the MvvmQuickCross Visual Studio code snippets:
+	1. In Visual Studio Code Snippets Manager, select the folder where the MvvmQuickCross snippets are listed.
+	2. Copy the folder path from Location and open it in Windows Explorer
+	3. Delete the MvvmQuickCross file there
+	4. Close the Code snippets manager; the MvvmQuickCross snippets should be gone now
+
+3. Delete the MvvmQuickCross folders from your application project and your library project, and then rename MvvmQuickCross to QuickCross in **all files** in your solution.
+
+	> Note: if you made any customizations to the MvvmQuickCross files, save those first and re-apply them to the QuickCross files after you have upgraded.
+
+4. Install QuickCross by following **steps 2 through 4** in [Getting Started](#getting-started)
+
+	This will add the QuickCross folders to your projects, but it will not overwrite any of your exiting code (Application, Navigator).
+
+5. Build your solution; you will get errors from the code that creates your application and navigator instances. This is because the `navigationContext` parameter was moved from the `Application` to the `Navigator` for more flexibility when using multiple navigation contexts (e.g. in iOS Universal apps). The navigator now is a singleton, accessible through it's static `Instance` property. The navigator now also has a public `NavigationContext` property that you need to set to the navigation context.
+
+	Where the old code reads: `new MyAppNavigator()`, update it to:
+
+    	MyAppNavigator.Instance
+    
+	Where the old code reads: `new MyAppApplication(..., navigationContext)`, update it to:
+
+    	MyAppNavigator.Instance.NavigationContext = navigationContext;
+    	new MyAppApplication(...)
+	
+6. In your Android Activity views, in `OnCreate()` you need to add the following code before the call to one of the `MyAppApplication.Instance.ContinueTo...()` methods:
+
+	    MyAppNavigator.Instance.NavigationContext = this;
+
+Now your app is upgraded. NJoy QuickCross!

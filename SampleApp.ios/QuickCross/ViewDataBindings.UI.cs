@@ -41,44 +41,6 @@ namespace QuickCross
 			if (binding != null)
 			{
 				object parameter = null;
-				/* TODO
-				if (binding.CommandParameterListView != null)
-				{
-					var adapter = binding.CommandParameterListView.GetAdapter() as IDataBindableListAdapter;
-					if (adapter != null)
-					{
-						var adapterView = binding.CommandParameterListView;
-						if (adapterView is AbsListView)
-						{
-							var absListView = (AbsListView)adapterView;
-							switch (absListView.ChoiceMode)
-							{
-								case ChoiceMode.Single:
-									parameter = adapter.GetItemAsObject(absListView.CheckedItemPosition);
-									break;
-								case ChoiceMode.Multiple:
-									{
-										var checkedItems = new ArrayList();
-										var positions = absListView.CheckedItemPositions;
-										for (int i = 0; i < positions.Size(); i++)
-										{
-											if (positions.ValueAt(i))
-											{
-												int position = positions.KeyAt(i);
-												checkedItems.Add(adapter.GetItemAsObject(position));
-											}
-										}
-										if (checkedItems.Count > 0) parameter = checkedItems;
-									}
-									break;
-							}
-						}
-						else
-						{
-							parameter = adapter.GetItemAsObject(adapterView.SelectedItemPosition);
-						}
-					}
-				} */
 				ExecuteCommand(binding, parameter);
 			}
         }

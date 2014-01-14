@@ -29,7 +29,6 @@ namespace QuickCross
 		public string ListRemoveItemCommandName;
 		public string ListCanEditItem;
 		public string ListCanMoveItem;
-		// TODO: public AdapterView CommandParameterSelectedItemAdapterView;
 	}
 	
 	public partial class ViewDataBindings
@@ -113,9 +112,6 @@ namespace QuickCross
 			public PropertyInfo ViewModelListPropertyInfo;
 			public DataBindableUITableViewSource TableViewSource;
 
-			// TODO: public int? CommandParameterListId;
-			// TODO: public AdapterView CommandParameterListView;
-
 			public void Command_CanExecuteChanged(object sender, EventArgs e)
 			{
 				var control = View as UIControl;
@@ -126,7 +122,6 @@ namespace QuickCross
 		private readonly UIView rootView;
 		private readonly ViewExtensionPoints rootViewExtensionPoints;
 		private ViewModelBase viewModel;
-		// TODO: private readonly LayoutInflater layoutInflater;
 		private readonly string idPrefix;
 
 		private Dictionary<string, DataBinding> dataBindings = new Dictionary<string, DataBinding>();
@@ -235,7 +230,7 @@ namespace QuickCross
 				{
 					if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
 					if (dataBindings.ContainsKey(IdName(bp.PropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.PropertyName));
-					AddBinding(bp); // TODO: , bp.CommandParameterSelectedItemAdapterView);
+					AddBinding(bp); 
 				}
 			}
 		}
@@ -278,11 +273,6 @@ namespace QuickCross
 										case "RemoveCommand": bp.ListRemoveItemCommandName = value; break;
 										case "CanEdit": bp.ListCanEditItem = value; break;
 										case "CanMove": bp.ListCanMoveItem = value; break;
-										// TODO: case "ItemValueId": itemValueId = value; break;
-										// TODO: case "ListId":
-											// commandParameterListId = AndroidHelpers.FindResourceId(value);
-											// if (commandParameterSelectedItemAdapterView == null && commandParameterListId.HasValue) commandParameterSelectedItemAdapterView = rootView.FindViewById<AdapterView>(commandParameterListId.Value);
-											// break;
 										default: throw new ArgumentException("Unknown tag binding parameter: " + name);
 									}
 								}
@@ -303,7 +293,6 @@ namespace QuickCross
 			var mode = bp.Mode;
 			var listPropertyName = bp.ListPropertyName;
 			var itemTemplateName = bp.ListItemTemplateName;
-			 // TODO: , AdapterView commandParameterSelectedItemAdapterView = null
 
 			var idName = IdName(propertyName);
 
@@ -311,9 +300,7 @@ namespace QuickCross
 			{
 				View = view,
 				Mode = mode,
-				ViewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName) // TODO,
-				// CommandParameterListId = commandParameterListId,
-				// CommandParameterListView = commandParameterSelectedItemAdapterView
+				ViewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName)
 			};
 
 			if (binding.View is UITableView)
@@ -416,11 +403,7 @@ namespace QuickCross
 			if (binding.ViewModelListPropertyInfo != null && binding.TableViewSource != null)
 			{
 				var list = (IList)binding.ViewModelListPropertyInfo.GetValue(viewModel);
-				if (binding.TableViewSource.SetList(list))
-				{
-					// TODO: not needed with iOS lists? var listView = binding.View;
-					// if (listView is AbsListView) ((AbsListView)listView).ClearChoices(); // Apparently, calling BaseAdapter.NotifyDataSetChanged() does not clear the choices, so we do that here.
-				}
+                binding.TableViewSource.SetList(list);
 			}
 		}
 

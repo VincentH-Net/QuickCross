@@ -74,7 +74,6 @@ namespace QuickCross
 			EnsureHandlersAreAdded();
 
 			Bindings.AddBindings(bindingsParameters); // First add any bindings that were specified in code
-			// TODO: Bindings.EnsureCommandBindings();  // Then add any command bindings that were not specified in code (based on the Id naming convention)
 
 			List<BindingParameters> bindingParametersList;
 			if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
