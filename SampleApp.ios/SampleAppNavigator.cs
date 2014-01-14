@@ -7,72 +7,103 @@ namespace SampleApp
 {
 	public class SampleAppNavigator : NSObject, ISampleAppNavigator
     {
-		private UINavigationController navigationContext, detailNavigationController;
+        private static readonly Lazy<SampleAppNavigator> lazy = new Lazy<SampleAppNavigator>(() => new SampleAppNavigator());
 
-		public SampleAppNavigator(UINavigationController navigationContext, UINavigationController detailNavigationController = null)
-		{
-			this.navigationContext = navigationContext;
-			this.detailNavigationController = detailNavigationController;
-		}
+        public static SampleAppNavigator Instance { get { return lazy.Value; } }
 
-		#region Generic navigation helpers
+        private SampleAppNavigator() { }
+            // If your app requires multiple navigation contexts, add additional constructor parameters or public properties
+            // to pass them in, and then let the navigator manage when which context should be used.
+            // E.g. you could use this in a universal app running in PAD mode when you have a master view and a detail view on the same screen.
 
-		private static bool IsPhone { get { return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone; } }
+        public UINavigationController NavigationContext { get; set; }
+        public UINavigationController DetailNavigationController { get; set; }
 
-		private void Navigate(UIViewController viewController, bool animated = false)
-		{
-			if (Object.ReferenceEquals(navigationContext.TopViewController, viewController)) return;
-			foreach (var stackViewController in navigationContext.ViewControllers)
-			{
-				if (Object.ReferenceEquals(stackViewController, viewController))
-				{
-					navigationContext.PopToViewController(viewController, animated);
-					return;
-				}
-			}
-			navigationContext.PushViewController(viewController, animated);
-		}
+        #region Generic navigation helpers
 
-		private void Navigate(string viewControllerIdentifier = null, Type viewControllerType = null, bool animated = false)
-		{
-			if (viewControllerType != null)
-			{
-				if (navigationContext.TopViewController != null && viewControllerType == navigationContext.TopViewController.GetType()) return;
-				if (navigationContext.ViewControllers != null)
-				{
-					foreach (var stackViewController in navigationContext.ViewControllers)
-					{
-						if (stackViewController.GetType() == viewControllerType)
-						{
-							navigationContext.PopToViewController(stackViewController, animated);
-							return;
-						}
-					}
-				}
-			}
+        private static bool IsPhone { get { return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone; } }
 
-			if (viewControllerIdentifier != null)
-			{
-				var viewController = (UIViewController)navigationContext.Storyboard.InstantiateViewController(viewControllerIdentifier);
-				navigationContext.PushViewController(viewController, animated);
-			}
-		}
+        /// <summary>
+        /// Navigate to a view controller instance.
+        /// </summary>
+        /// <param name="viewController"></param>
+        /// <param name="animated"></param>
+        private void Navigate(UIViewController viewController, bool animated = false)
+        {
+            if (Object.ReferenceEquals(NavigationContext.TopViewController, viewController)) return;
+            if (NavigationContext.ViewControllers != null)
+            {
+                foreach (var stackViewController in NavigationContext.ViewControllers)
+                {
+                    if (Object.ReferenceEquals(stackViewController, viewController))
+                    {
+                        NavigationContext.PopToViewController(viewController, animated);
+                        return;
+                    }
+                }
+            }
+            NavigationContext.PushViewController(viewController, animated);
+        }
 
-		private void NavigateBack(bool animated = false)
-		{
-			navigationContext.PopViewControllerAnimated(animated);
-		}
+        /// <summary>
+        /// Navigate to a view based on a storyboard identifier and/or a view controller type.
+        /// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
+        /// </summary>
+        /// <param name="viewControllerIdentifier">The storyboard identifier for a storyboard view controller; otherwise null.</param>
+        /// <param name="viewControllerType">The view controller type. Specify for automatically navigating back to an existing instance if that exists on the navigation stack. Also specify to create non-storyboard view controller if none exists in the navigation stack.</param>
+        /// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
+        private void Navigate(string viewControllerIdentifier, Type viewControllerType = null, bool animated = false, UIStoryboard storyBoard = null)
+        {
+            if (viewControllerType != null)
+            {
+                if (NavigationContext.TopViewController != null && viewControllerType == NavigationContext.TopViewController.GetType()) return;
+                if (NavigationContext.ViewControllers != null)
+                {
+                    foreach (var stackViewController in NavigationContext.ViewControllers)
+                    {
+                        if (stackViewController.GetType() == viewControllerType)
+                        {
+                            NavigationContext.PopToViewController(stackViewController, animated);
+                            return;
+                        }
+                    }
+                }
+            }
 
-		private void NavigateSegue(string segueIdentifier, Type viewControllerType = null)
-		{
-			if (navigationContext.TopViewController != null)
-			{
-				if (viewControllerType != null && viewControllerType == navigationContext.TopViewController.GetType()) return;
-				navigationContext.TopViewController.PerformSegue(segueIdentifier, this);
-			}
-		}
+            if (storyBoard == null) storyBoard = NavigationContext.Storyboard;
 
-		#endregion Generic navigation helpers
+            var viewController = (viewControllerIdentifier != null && storyBoard != null) ?
+                                 (UIViewController)storyBoard.InstantiateViewController(viewControllerIdentifier) :
+                                 (UIViewController)Activator.CreateInstance(viewControllerType);
+            NavigationContext.PushViewController(viewController, animated);
+        }
+
+        /// <summary>
+        /// Navigate to a view based on a view controller type.
+        /// Assumes that no more than one instance of the specified controller type should exist in the navigation stack.
+        /// </summary>
+        /// <param name="viewControllerType">The view controller type</param>
+        /// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
+        private void Navigate(Type viewControllerType, bool animated = false)
+        {
+            Navigate(null, viewControllerType, animated);
+        }
+
+        private void NavigateBack(bool animated = false)
+        {
+            NavigationContext.PopViewControllerAnimated(animated);
+        }
+
+        private void NavigateSegue(string segueIdentifier, Type viewControllerType = null)
+        {
+            if (NavigationContext.TopViewController != null)
+            {
+                if (viewControllerType != null && viewControllerType == NavigationContext.TopViewController.GetType()) return;
+                NavigationContext.TopViewController.PerformSegue(segueIdentifier, this);
+            }
+        }
+
+        #endregion Generic navigation helpers
 
 		public void NavigateToSampleItemListView()
 		{
@@ -86,7 +117,7 @@ namespace SampleApp
 				NavigateSegue("showDetail", typeof(DetailView)); // Navigate with a segue
 				// Navigate("DetailView", typeof(DetailView), true); // Navigate without a segue
 			} else {
-				var detailViewController = (DetailView)detailNavigationController.TopViewController;
+				var detailViewController = (DetailView)DetailNavigationController.TopViewController;
 				detailViewController.DismissMasterPopoverController();
 			}
 		}

@@ -1,0 +1,70 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.Shared.wp", "SampleApp.Shared\SampleApp.Shared.wp.csproj", "{1F59E643-1066-4177-BC2F-1CD0E9224263}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp.wp\SampleApp.csproj", "{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{68625B97-38C7-43FF-A199-DD82E24896A9}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{FB6691B4-E603-4030-8387-4699B9BF1783}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet\about_QuickCross.help.txt = NuGet\about_QuickCross.help.txt
+		NuGet\CreatePackage.cmd = NuGet\CreatePackage.cmd
+		NuGet\Init.ps1 = NuGet\Init.ps1
+		NuGet\PublishToPublicNuGet.cmd = NuGet\PublishToPublicNuGet.cmd
+		NuGet\QuickCross.nuspec = NuGet\QuickCross.nuspec
+		NuGet\QuickCross.psm1 = NuGet\QuickCross.psm1
+		NuGet\readme.txt = NuGet\readme.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Debug|ARM.ActiveCfg = Debug|ARM
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Debug|ARM.Build.0 = Debug|ARM
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Debug|x86.ActiveCfg = Debug|x86
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Debug|x86.Build.0 = Debug|x86
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Release|ARM.ActiveCfg = Release|ARM
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Release|ARM.Build.0 = Release|ARM
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Release|x86.ActiveCfg = Release|x86
+		{1F59E643-1066-4177-BC2F-1CD0E9224263}.Release|x86.Build.0 = Release|x86
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|ARM.ActiveCfg = Debug|ARM
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|ARM.Build.0 = Debug|ARM
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|ARM.Deploy.0 = Debug|ARM
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|x86.ActiveCfg = Debug|x86
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|x86.Build.0 = Debug|x86
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Debug|x86.Deploy.0 = Debug|x86
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|ARM.ActiveCfg = Release|ARM
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|ARM.Build.0 = Release|ARM
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|ARM.Deploy.0 = Release|ARM
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|x86.ActiveCfg = Release|x86
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|x86.Build.0 = Release|x86
+		{F0B4BFA6-FBD7-45C6-8380-1D1732F5A65C}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

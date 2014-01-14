@@ -32,12 +32,13 @@ namespace SampleApp
                 // Set the DetailViewController as the UISplitViewController Delegate.
                 splitViewController.WeakDelegate = detailViewController;
 
-				var navigator = new SampleAppNavigator(masterNavigationController, detailNavigationController);
-				EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
+                SampleAppNavigator.Instance.NavigationContext = masterNavigationController;
+                SampleAppNavigator.Instance.DetailNavigationController = detailNavigationController;
+                EnsureSampleAppApplication(SampleAppNavigator.Instance).ContinueToSampleItemList();
 				SampleAppApplication.Instance.ContinueToSampleItem();
 			} else {
-				var navigator = new SampleAppNavigator(InitializeNavigationContext());
-				EnsureSampleAppApplication(navigator).ContinueToSampleItemList();
+				SampleAppNavigator.Instance.NavigationContext = InitializeNavigationContext();
+                EnsureSampleAppApplication(SampleAppNavigator.Instance).ContinueToSampleItemList();
 			}
             return true;
         }

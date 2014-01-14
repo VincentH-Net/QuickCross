@@ -30,6 +30,6 @@ namespace QuickCross.Templates
 	// TODO: Ensure that you override the Window property in AppDelegate like this:
 	//    public override UIWindow Window { get; set; }
 	// and then add the following code to FinishedLaunching before the call to Window.MakeKeyAndVisible():
-	// 	  var navigator = new _APPNAME_Navigator(InitializeNavigationContext());
-	//    Ensure_APPNAME_Application(navigator).ContinueToMain();
+    //    _APPNAME_Navigator.Instance.NavigationContext = InitializeNavigationContext();
+    //    Ensure_APPNAME_Application(_APPNAME_Navigator.Instance).ContinueToMain();
 }
