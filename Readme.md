@@ -50,7 +50,7 @@ Although it is built with MvvmQuickCross, which is **the predecessor of QuickCro
 
 ## Getting Started ##
 To create an app with QuickCross, follow these steps:
-> Note: for how to upgrade an app to a newer version of QuickCross, see [here](#how-to-upgrade-to-a later-version-of-quickcross).
+> Note: for how to upgrade an app to a newer version of QuickCross, see [here](#how-to-upgrade-to-a-later-version-of-quickcross).
 
 1. In Visual Studio, create a new solution with an application project for the **platform** (Windows Store, Windows Phone, Android, iOS) that you are most productive with. Add a class library project **for the same platform** to the solution. Reference the class library from the application project.
 
@@ -1333,8 +1333,10 @@ To upgrade QuickCross to a later version, follow these steps:
 
 1. For all your QuickCross solutions: open your solution, make sure that you have no editor windows open, and then enter these commands in the package manager console:
 
-	**Remove-Module QuickCross**
-	**Uninstall-Package QuickCross**
+	```posh
+	Remove-Module QuickCross
+	Uninstall-Package QuickCross
+	```
 
 3. Delete the QuickCross folders from your application project and your library project.
 
@@ -1351,8 +1353,10 @@ To upgrade from MvvmQuickCross 1.6 to QuickCross 2.0, follow these steps:
 
 1. For all your MvvmQuickCross solutions: open your solution, make sure that you have no editor windows open, and then enter these commands in the package manager console:
 
-	**Remove-Module MvvmQuickCross**
-	**Uninstall-Package MvvmQuickCross**
+	```posh
+	Remove-Module MvvmQuickCross
+	Uninstall-Package MvvmQuickCross
+	```
 
 2. Uninstall the MvvmQuickCross Visual Studio code snippets:
 	1. In Visual Studio Code Snippets Manager, select the folder where the MvvmQuickCross snippets are listed.
