@@ -25,7 +25,8 @@ namespace SampleApp
 
         public static SampleAppApplication EnsureSampleAppApplication(Frame navigationContext)
         {
-            return SampleAppApplication.Instance ?? new SampleAppApplication(new SampleAppNavigator(), navigationContext);
+            SampleAppNavigator.Instance.NavigationContext = navigationContext;
+            return SampleAppApplication.Instance ?? new SampleAppApplication(SampleAppNavigator.Instance);
         }
 
         /// <summary>

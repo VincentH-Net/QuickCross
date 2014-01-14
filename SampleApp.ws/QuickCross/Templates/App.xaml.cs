@@ -9,7 +9,8 @@ namespace QuickCross.Templates
     {
         public static _APPNAME_Application Ensure_APPNAME_Application(Frame navigationContext)
         {
-            return _APPNAME_Application.Instance ?? new _APPNAME_Application(new _APPNAME_Navigator(), navigationContext);
+            _APPNAME_Navigator.Instance.NavigationContext = navigationContext;
+            return _APPNAME_Application.Instance ?? new _APPNAME_Application(_APPNAME_Navigator.Instance);
         }
 
         // TODO: Replace the if (rootFrame.Content == null) { ... } code in OnLaunched() with this:

@@ -7,16 +7,25 @@ namespace QuickCross.Templates
 {
     class _APPNAME_Navigator : I_APPNAME_Navigator
     {
-        private void Navigate(object navigationContext, Type sourcePageType)
+        private static readonly Lazy<_APPNAME_Navigator> lazy = new Lazy<_APPNAME_Navigator>(() => new _APPNAME_Navigator());
+
+        public static _APPNAME_Navigator Instance { get { return lazy.Value; } }
+
+        private _APPNAME_Navigator() { }
+
+        public Frame NavigationContext { get; set; }
+
+        private void Navigate(Type sourcePageType)
         {
-            ((Frame)navigationContext).Navigate(sourcePageType);
+            if (NavigationContext == null || NavigationContext.CurrentSourcePageType == sourcePageType) return;
+            NavigationContext.Navigate(sourcePageType);
         }
 
         /* TODO: For each view, add a method to navigate to that view like this:
 
-        public void NavigateTo_VIEWNAME_View(object navigationContext)
+        public void NavigateTo_VIEWNAME_View()
         {
-            Navigate(navigationContext, typeof(_VIEWNAME_View));
+            Navigate(typeof(_VIEWNAME_View));
         }
          * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
