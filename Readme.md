@@ -1368,17 +1368,17 @@ To upgrade from MvvmQuickCross 1.6 to QuickCross 2.0, follow these steps:
 
 	> Note: if you made any customizations to the MvvmQuickCross files, save those first and re-apply them to the QuickCross files after you have upgraded.
 
-4. Rename your existing *YourAppName*Navigator.cs, *IYourAppName*Navigator.cs and *YourAppName*Application.cs source files to end on **.old.cs** and set their **Build Action** property to **None**.
+4. Rename your existing *MyApp*Navigator.cs, *IMyApp*Navigator.cs and *MyApp*Application.cs source files to end on **.old.cs** and set their **Build Action** property to **None**.
 
 5. Install QuickCross by following **steps 2 through 4** in [Getting Started](#getting-started)
 
-	This will add the QuickCross folders to your projects and generate a new *YourAppName*Navigator, *IYourAppName*Navigator and *YourAppName*Application, but it will not overwrite any of your existing code.
+	This will add the QuickCross folders to your projects and generate a new *MyApp*Navigator, *IMyApp*Navigator and *MyApp*Application, but it will not overwrite any of your existing code.
 
-6. Copy your `NavigateTo...()` method signatures from *IYourAppName*Navigator.old.cs to *IYourAppName*Navigator.cs, and remove the `navigationContext` parameter.
+6. Copy your `NavigateTo...()` method signatures from *IMyApp*Navigator.old.cs to *IMyApp*Navigator.cs, and remove the `navigationContext` parameter.
 
-7. Copy your `NavigateTo...()` method implementations from *YourAppName*Navigator.old.cs to *YourAppName*Navigator.cs, and remove the `navigationContext` parameter there as well.
+7. Copy your `NavigateTo...()` method implementations from *MyApp*Navigator.old.cs to *MyApp*Navigator.cs, and remove the `navigationContext` parameter there as well.
 
-8. Copy your `...ViewModel` properties, your `ContinueTo...()` methods and any code you added manually from *YourAppName*Application.old.cs to *YourAppName*Application.cs. Remove the `skipNavigation` parameter from the `ContinueTo...()` methods; it is now safe to always call the `NavigateTo...()` methods because the Navigator now checks if navigation should be skipped. Finally, remove the `navigationContext` parameter from the `NavigateTo...()` method invocations.
+8. Copy your `...ViewModel` properties, your `ContinueTo...()` methods and any code you added manually from *MyApp*Application.old.cs to *MyApp*Application.cs. Remove the `skipNavigation` parameter from the `ContinueTo...()` methods; it is now safe to always call the `NavigateTo...()` methods because the Navigator now checks if navigation should be skipped. Finally, remove the `navigationContext` parameter from the `NavigateTo...()` method invocations.
 
 9. Build your solution; you will get errors from the code that creates your application and navigator instances. This is because the `navigationContext` parameter was moved from the `Application` to the `Navigator` for more flexibility when using multiple navigation contexts (e.g. in iOS Universal apps). The navigator now is a singleton, accessible through it's static `Instance` property. The navigator now also has a public `NavigationContext` property that you need to set to the navigation context. To fix this:
 
@@ -1395,7 +1395,7 @@ To upgrade from MvvmQuickCross 1.6 to QuickCross 2.0, follow these steps:
 
 	    MyAppNavigator.Instance.NavigationContext = this;
 
-11. Once your app compiles and runs, remove the *YourAppName*Navigator.old.cs, *IYourAppName*Navigator.old.cs and *YourAppName*Application.old.cs 
+11. Once your app compiles and runs, remove the *MyApp*Navigator.old.cs, *IMyApp*Navigator.old.cs and *MyApp*Application.old.cs 
 
 
 Now your app is upgraded. NJoy QuickCross!
