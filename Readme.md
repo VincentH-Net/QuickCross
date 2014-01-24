@@ -43,10 +43,12 @@ The remainder of this Readme describes:
 -  How to build a simple **Twitter example app** for [Android](#android) and [iOS](#ios) using data binding
 -  Upgrade [instructions](#how-to-upgrade-to-a-later-version-of-quickcross)
 
-Although it is built with MvvmQuickCross, which is **the predecessor of QuickCross**, this more elaborate [Cloud Auction example app](https://github.com/MacawNL/MvvmQuickCross/tree/master/Examples/CloudAuction) still can be useful to see how you can use QuickCross. Time permitting, these apps will be updated to QuickCross, as well as these blog posts that describe the full steps and explanation on how to build this app:
+See this more elaborate [Cloud Auction example app](https://github.com/MacawNL/QuickCross/tree/master/Examples/CloudAuction) for how you can use QuickCross. These blog posts describe the full steps and explanation on how to build this app:
 
 - [Creating a Cross-Platform Native App Using MvvmQuickCross and Xamarin, Part 1: Cross-Platform Code and Windows 8 App](http://vincenth.net/blog/archive/2013/08/30/creating-a-cross-platform-native-app-using-mvvmquickcross-and-xamarin-part-1-cross-platform-code-and-windows-8-app.aspx)<br />
 - [Creating a Cross-Platform Native App Using MvvmQuickCross and Xamarin, Part 2: Android App](http://vincenth.net/blog/archive/2013/10/23/creating-a-cross-platform-native-app-using-mvvmquickcross-and-xamarin-part-2-android-app.aspx)
+> Note that these blog posts were written for MvvmQuickCross, which is the predecessor to QuickCross. However, except for the name change and some minor details the posts content is also valid for QuickCross. Time permitting, these blog posts will be updated to match the updated example source.
+
 
 ## Getting Started ##
 To create an app with QuickCross, follow these steps:
