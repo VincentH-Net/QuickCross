@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<component format="1" id="MultiImageView">
+  <name>MultiImageView</name>
+  <publisher>Sander Egberink</publisher>
+  <publisher-url>http://www.macaw.nl</publisher-url>
+  <version>1.1</version>
+  <summary>An ImageView capable of loading multiple images from URLs or Bitmaps.</summary>
+  <samples>
+    <sample id="TestingMultiView">
+      <name>Android Sample.</name>
+      <summary>Demonstrates MultiImageView on Android</summary>
+    </sample>
+  </samples>
+</component>

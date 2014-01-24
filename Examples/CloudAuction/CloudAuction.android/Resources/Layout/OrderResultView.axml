@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/OrderResultView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <TextView
+            android:text="Congratulations!"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp" />
+        <ImageView
+            android:src="@drawable/Checkmark"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView1" />
+        <TextView
+            android:text="Congratulations with your purchase: PANASONIC DMC-TZ25E*. You will receive an email with delivery or pickup details. Enyoy your Brand purchase!"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/OrderResultView_Message"
+            android:layout_weight="1"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
+        <Button
+            android:text="Done"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/OrderResultView_DoneCommand"
+            android:layout_gravity="bottom" />
+    </LinearLayout>
+</ScrollView>

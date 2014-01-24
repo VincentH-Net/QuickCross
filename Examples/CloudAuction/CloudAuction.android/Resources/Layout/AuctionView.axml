@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/AuctionView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <TextView
+            android:text="PANASONIC DMC-TZ25E*"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/AuctionView_Name" />
+        <TextView
+            android:text="Versatile, with 32x intelligent..*"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:id="@+id/AuctionView_Intro" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp">
+            <Macaw.UIComponents.MultiImageView
+                android:src="@android:drawable/ic_menu_gallery"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="fill_parent"
+                android:paddingRight="5dp"
+                android:layout_gravity="top"
+                android:gravity="top"
+                android:id="@+id/AuctionView_Image" />
+            <TextView
+                android:text="This compact and powerful camera has an amazing 32x intelligent zoom and 16x optical zoom. Combine this huge zoom reach with the 24mm ultra wide angle and you have a camera that you can use fo*"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:gravity="top"
+                android:layout_gravity="top"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:id="@+id/AuctionView_Description" />
+        </LinearLayout>
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="Auction price:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:text="$ 148,0*"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/AuctionView_CurrentPrice" />
+        </RelativeLayout>
+        <ProgressBar
+            android:progress="50"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:paddingBottom="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/AuctionView_TimePercentageRemaining" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="List price"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingRight="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:text="Number"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingRight="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:text="Condition"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingRight="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:text="Time Rem."
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="$ 348,0*"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingRight="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/AuctionView_ListPrice" />
+            <TextView
+                android:text="4*"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingRight="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/AuctionView_AvailableCount" />
+            <TextView
+                android:text="Damage*"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingRight="5dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/AuctionView_Condition" />
+            <TextView
+                android:text="00:01:1*"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/AuctionView_TimeRemaining" />
+        </LinearLayout>
+        <Button
+            android:text="Place Bid Now"
+            android:id="@+id/AuctionView_PlaceBidCommand"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,25 @@
+﻿<Page
+    x:Class="CloudAuction._VIEWNAME_View"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CloudAuction"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:vm="using:CloudAuction.Shared.ViewModels.Design"
+    d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=vm:_VIEWNAME_ViewModelDesign}">
+
+  <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+    <!-- Example markup, TODO: Remove -->
+    <StackPanel>
+      <TextBlock Text="CloudAuction" Style="{StaticResource HeaderTextBlockStyle}" />
+      <TextBlock Text="_VIEWNAME_" Style="{StaticResource SubheaderTextBlockStyle}" />
+      <StackPanel Orientation="Horizontal" >
+        <Button Content="Click Me!" Command="{Binding IncreaseCountCommand}" FontSize="24" />
+        <TextBlock Text="Clicked:" FontSize="24" Margin="10,14,0,0" />
+        <TextBlock Text="{Binding Count}" FontSize="24" Margin="10,14,0,0" />
+      </StackPanel>
+    </StackPanel>
+    <!-- End of example markup -->
+  </Grid>
+</Page>

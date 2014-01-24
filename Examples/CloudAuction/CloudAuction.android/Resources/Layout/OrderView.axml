@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/OrderView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true">
+    <TableLayout
+        android:stretchColumns="1,2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <TableRow
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:text="Deliver"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/OrderView_DeliveryLocation"
+                android:tag="{Binding Mode=TwoWay} {List ItemIsValue=true, ItemTemplate=TextListItem}" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="Title"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/OrderView_Title"
+                android:tag="{Binding Mode=TwoWay} {List ItemIsValue=true, ItemTemplate=TextListItem}" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="Name"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:text="First name*"
+                android:layout_span="2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="First name"
+                android:id="@+id/OrderView_FirstName"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <EditText
+                android:text="Middle name*"
+                android:layout_column="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Middle name"
+                android:id="@+id/OrderView_MiddleName"
+                android:tag="{Binding Mode=TwoWay}" />
+            <EditText
+                android:text="Last name*"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Last name"
+                android:id="@+id/OrderView_LastName"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="Address"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:text="Street*"
+                android:layout_span="2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Street"
+                android:id="@+id/OrderView_Street"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <EditText
+                android:text="Zip*"
+                android:layout_column="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Zip"
+                android:id="@+id/OrderView_Zip"
+                android:tag="{Binding Mode=TwoWay}" />
+            <EditText
+                android:text="City*"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="City"
+                android:id="@+id/OrderView_City"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <EditText
+                android:text="Country*"
+                android:layout_column="1"
+                android:layout_span="2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Country"
+                android:id="@+id/OrderView_Country"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="Email"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:text="Email*"
+                android:layout_span="2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Email"
+                android:id="@+id/OrderView_Email"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="Mobile"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:text="Mobile*"
+                android:layout_span="2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Mobile"
+                android:id="@+id/OrderView_Mobile"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:text="Phone"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:text="Phone*"
+                android:layout_span="2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:label="Phone"
+                android:id="@+id/OrderView_Phone"
+                android:tag="{Binding Mode=TwoWay}" />
+        </TableRow>
+        <TableRow>
+            <Button
+                android:text="Confirm"
+                android:layout_span="3"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/OrderView_ConfirmCommand" />
+        </TableRow>
+    </TableLayout>
+</ScrollView>

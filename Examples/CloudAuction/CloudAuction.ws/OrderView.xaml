@@ -1,0 +1,66 @@
+﻿<Page
+    x:Class="CloudAuction.OrderView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CloudAuction"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:CloudAuction.Shared.ViewModels.Design"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance IsDesignTimeCreatable=True, Type=vm:OrderViewModelDesign}"
+    Width="480" FontSize="24" Background="Gray">
+
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}" Width="460">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+            <RowDefinition Height="44" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="115" />
+            <ColumnDefinition Width="115" />
+            <ColumnDefinition Width="115" />
+            <ColumnDefinition Width="115" />
+        </Grid.ColumnDefinitions>
+
+        <Button Content="Cancel" Command="{Binding CancelCommand}" Grid.Row="0" Grid.Column="0" FontSize="18"/>
+        <Button Content="Confirm" Command="{Binding ConfirmCommand}" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Right" FontSize="18"/>
+
+        <TextBlock Text="Deliver" Grid.Row="1" VerticalAlignment="Center"  />
+        <ComboBox ItemsSource="{Binding DeliveryLocationList}" 
+                  SelectedItem="{Binding DeliveryLocation, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" FontSize="24" />
+
+        <TextBlock Text="Title" Grid.Row="3" VerticalAlignment="Center" Margin="0,6,0,0" />
+        <ComboBox ItemsSource="{Binding TitleList}" 
+                  SelectedItem="{Binding Title, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"  FontSize="24" />
+
+        <TextBlock Text="Name" Grid.Row="4" VerticalAlignment="Center" Margin="0,6,0,0" />
+        <TextBox Text="{Binding FirstName, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" FontSize="24" />
+        <TextBox Text="{Binding MiddleName, Mode=TwoWay}" Grid.Row="5" Grid.Column="1" FontSize="24" />
+        <TextBox Text="{Binding LastName, Mode=TwoWay}" Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" FontSize="24" />
+
+        <TextBlock Text="Address" Grid.Row="6" VerticalAlignment="Center" Margin="0,6,0,0" />
+        <TextBox Text="{Binding Street, Mode=TwoWay}" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" FontSize="24" />
+        <TextBox Text="{Binding Zip, Mode=TwoWay}" Grid.Row="7" Grid.Column="1" FontSize="24" />
+        <TextBox Text="{Binding City, Mode=TwoWay}" Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="2" FontSize="24" />
+        <TextBox Text="{Binding Country, Mode=TwoWay}" Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" FontSize="24" />
+
+        <TextBlock Text="Email" Grid.Row="9" VerticalAlignment="Center" Margin="0,6,0,0" />
+        <TextBox Text="{Binding Email, Mode=TwoWay}" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" FontSize="24" />
+
+        <TextBlock Text="Mobile" Grid.Row="10" VerticalAlignment="Center" Margin="0,6,0,0" />
+        <TextBox Text="{Binding Mobile, Mode=TwoWay}" Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="3" FontSize="24" />
+
+        <TextBlock Text="Phone" Grid.Row="11" VerticalAlignment="Center" Margin="0,6,0,0" />
+        <TextBox Text="{Binding Phone, Mode=TwoWay}" Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="3" FontSize="24" />
+    </Grid>
+</Page>

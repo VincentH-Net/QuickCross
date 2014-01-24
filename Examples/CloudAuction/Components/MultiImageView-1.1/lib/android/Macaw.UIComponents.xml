@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Macaw.UIComponents</name>
+    </assembly>
+    <members>
+        <member name="M:Macaw.UIComponents.MultiImageView.SetSliderIconDimensions(System.Int32,System.Int32)">
+            <summary>
+            Sets the dimensions of the slider icons, both active and non active
+            </summary>
+            <param name="height">Determines the icons' height in pixels.</param>
+            <param name="width">Determines the icons' width in pixels</param>
+        </member>
+        <member name="M:Macaw.UIComponents.MultiImageView.SetMagnifyIconDimensions(System.Int32,System.Int32)">
+            <summary>
+            Sets the dimensions of the magnify icon, both active and non active
+            </summary>
+            <param name="height">Determines the icons' height in pixels.</param>
+            <param name="width">Determines the icons' width in pixels</param>
+        </member>
+        <member name="M:Macaw.UIComponents.MultiImageView.LoadImageList(System.String[])">
+            <summary>
+            Downloads and caches a list of images that are set through URLs and fires the "ImagesLoaded" event whenever an image has successfully been downloaded. Does not automatically display the images downloaded in the active View, that should be handled on reaction of the ImagesLoaded event. For downloaded the images at a scaled resolution look at setting the DownloadedImageSampleSize property.
+            </summary>
+            <param name="imageUrls">A list of URLs with images that will be downloaded.</param>
+        </member>
+        <member name="M:Macaw.UIComponents.MultiImageView.LoadImageList(Android.Graphics.Bitmap[])">
+            <summary>
+            Loads and caches a list of given Bitmap objects. Fires the ImagesLoaded event whenever an image is loaded into the list.
+            </summary>
+            <param name="images">A list of Bitmaps to be saved and cycled through</param>
+        </member>
+        <member name="M:Macaw.UIComponents.MultiImageView.ClearImageCache">
+            <summary>
+            Clears the entire ImageView of all images as well as clearing the cache.
+            </summary>
+        </member>
+        <member name="M:Macaw.UIComponents.MultiImageView.LoadImage">
+            <summary>
+            Loads the first image in the list.
+            </summary>
+        </member>
+        <member name="M:Macaw.UIComponents.MultiImageView.LoadNextImage">
+            <summary>
+            Loads the next image in the list. Not recommended to use, the MultiImageView automatically calls this on a right swipe.
+            </summary>
+        </member>
+        <member name="M:Macaw.UIComponents.MultiImageView.LoadPreviousImage">
+            <summary>
+            Loads the previous image in the list. Not recommended to use, the MultiImageView automatically calls this on a left swipe.
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.MagnifyHeight">
+            <summary>
+            Returns the Height of the Magnify icon, to set this use SetMagnifyIconDimensions(height, width)
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.MagnifyWidth">
+            <summary>
+            Returns the Width of the Magnify icon, to set this use SetMagnifyIconDimensions(height, width)
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.SliderIconHeight">
+            <summary>
+            Returns the Height of the slider icons, to set this use SetSliderIconDimensions(height, width)
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.SliderIconWidth">
+            <summary>
+            Returns the Width of the slider icons, to set this use SetSliderIconDimensions(height, width)
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.DownloadedImageSampleSize">
+            <summary>
+            Decides the SampleSize at which images are downloaded when using LoadImageList(string[] urls). Default value is 1
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.MagnifyEnabled">
+            <summary>
+            Sets wether or not the Magnify event in the top left is enabled. When Enabled will draw a MagnifyIcon (if provided through its property) in the top left and fires a "ZoomImageEvent" when clicked within its boundaries. The boundaries can be set through SetMagnifyIconDimensions(height, width)
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.MagnifyIcon">
+            <summary>
+            Sets the icon used in the top left for the ZoomImageEvent. Only shows of MagnifyEnabled is true. Dimensions can be set through SetMagnifyIconDimensions(height, width)
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.SliderSelectedIcon">
+            <summary>
+            Sets the icon used for the active image. Slider icons only show if both SliderSelectedIcon and SliderUnselectedIcon are set.
+            </summary>
+        </member>
+        <member name="P:Macaw.UIComponents.MultiImageView.SliderUnselectedIcon">
+            <summary>
+            Sets the icon used for the non-active images. Slider icons only show if both SliderSelectedIcon and SliderUnselectedIcon are set.
+            </summary>
+        </member>
+        <member name="E:Macaw.UIComponents.MultiImageView.ZoomImageEvent">
+            <summary>
+            Fires on tap of the Magnify Icon if the MagnifyEnabled is true and a MagnifyIcon is set.
+            </summary>
+        </member>
+        <member name="E:Macaw.UIComponents.MultiImageView.ImagesLoaded">
+            <summary>
+            Event that fires whenever an image is successfully loaded into the cache.
+            </summary>
+        </member>
+    </members>
+</doc>
