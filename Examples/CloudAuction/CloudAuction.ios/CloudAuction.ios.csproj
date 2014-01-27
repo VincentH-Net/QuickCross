@@ -99,7 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CloudAuction.Shared\CloudAuction.Shared.csproj">
-      <Project>{7fc7ecb7-efc9-4a63-8c68-a3a1f39a393b}</Project>
+      <Project>{7FC7ECB7-EFC9-4A63-8C68-A3A1F39A393B}</Project>
       <Name>CloudAuction.Shared</Name>
     </ProjectReference>
   </ItemGroup>
@@ -112,4 +112,7 @@
     <Reference Include="monotouch" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
+  <ItemGroup>
+    <InterfaceDefinition Include="CloudAuction.storyboard" />
+  </ItemGroup>
 </Project>
