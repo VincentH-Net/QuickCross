@@ -19,7 +19,7 @@ namespace CloudAuction
 
         public UINavigationController NavigationContext { get; set; }
 
-#region Generic navigation helpers
+        #region Generic navigation helpers
 
         private static bool IsPhone { get { return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone; } }
 
@@ -103,10 +103,11 @@ namespace CloudAuction
             }
         }
 
-#endregion Generic navigation helpers
+        #endregion Generic navigation helpers
+
         public void NavigateToMainView(Shared.ViewModels.MainViewModel.SubView? subView)
         {
-            Navigate(typeof(MainView));
+            Navigate("MainView", typeof(MainView));
         }
 
         public void NavigateToProductView()

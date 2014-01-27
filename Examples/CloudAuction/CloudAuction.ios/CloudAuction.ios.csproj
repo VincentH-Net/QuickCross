@@ -78,7 +78,9 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="CloudAuctionNavigator.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="MainView.cs" />
+    <Compile Include="MainView.TODO.cs" />
+    <Compile Include="OrderResultView.TODO.cs" />
+    <Compile Include="OrderView.TODO.cs" />
     <Compile Include="QuickCross\AppDelegate.cs" />
     <Compile Include="QuickCross\DataBindableUITableViewSource.cs" />
     <Compile Include="QuickCross\ObjcMagic.cs" />

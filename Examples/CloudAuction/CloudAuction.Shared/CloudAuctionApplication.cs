@@ -63,7 +63,7 @@ namespace CloudAuction.Shared
             RunOnUIThread(() => _navigator.NavigateToOrderView());
         }
 
-        public void ContinueToOrderResult(Bid bid, bool skipNavigation = false)
+        public void ContinueToOrderResult(Bid bid)
         {
             if (OrderResultViewModel == null) OrderResultViewModel = new OrderResultViewModel();
             OrderResultViewModel.Initialize(bid);
