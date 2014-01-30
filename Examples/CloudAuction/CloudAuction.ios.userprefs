@@ -1,0 +1,15 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="CloudAuction.Shared/QuickCross/ViewModelBase.cs">
+    <Files>
+      <File FileName="CloudAuction.ios/MainView.cs" Line="38" Column="54" />
+      <File FileName="CloudAuction.ios/QuickCross/ViewDataBindings.cs" Line="174" Column="1" />
+      <File FileName="CloudAuction.ios/QuickCross/ViewDataBindings.UI.cs" Line="183" Column="1" />
+      <File FileName="CloudAuction.Shared/QuickCross/ViewModelBase.cs" Line="7" Column="40" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

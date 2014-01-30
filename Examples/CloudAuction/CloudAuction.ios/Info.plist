@@ -20,7 +20,7 @@
 	<string>macaw.examples.cloudauction</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
-	<key>NSMainNibFile</key>
-	<string></string>
+	<key>UIMainStoryboardFile</key>
+	<string>CloudAuction</string>
 </dict>
 </plist>
