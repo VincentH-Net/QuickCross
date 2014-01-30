@@ -84,6 +84,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="AuctionView.TODO.cs" />
     <Compile Include="CloudAuctionNavigator.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MainView.TODO.cs" />
@@ -119,6 +120,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -130,7 +132,5 @@
   <ItemGroup>
     <InterfaceDefinition Include="CloudAuction.storyboard" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>
