@@ -4,6 +4,7 @@ using System.Linq;
 
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using CloudAuction.Shared.ViewModels;
 
 namespace CloudAuction
 {
@@ -25,7 +26,7 @@ namespace CloudAuction
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             CloudAuctionNavigator.Instance.NavigationContext = InitializeNavigationContext();
-            EnsureCloudAuctionApplication(CloudAuctionNavigator.Instance).ContinueToMain();
+			EnsureCloudAuctionApplication(CloudAuctionNavigator.Instance).ContinueToMain(MainViewModel.SubView.Auction);
 
             // make the window visible
             Window.MakeKeyAndVisible();

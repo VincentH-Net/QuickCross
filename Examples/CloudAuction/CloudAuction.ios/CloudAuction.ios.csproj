@@ -112,6 +112,18 @@
       <DependentUpon>MainView.cs</DependentUpon>
     </Compile>
     <Compile Include="QuickCross\TabBarViewBase.cs" />
+    <Compile Include="AuctionView.cs" />
+    <Compile Include="AuctionView.designer.cs">
+      <DependentUpon>AuctionView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrderResultView.cs" />
+    <Compile Include="OrderResultView.designer.cs">
+      <DependentUpon>OrderResultView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrderView.cs" />
+    <Compile Include="OrderView.designer.cs">
+      <DependentUpon>OrderView.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CloudAuction.Shared\CloudAuction.Shared.csproj">
