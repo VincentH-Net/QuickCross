@@ -216,7 +216,7 @@ namespace QuickCross
             ViewDataBindingsHolder holder = (Wrapper<ViewDataBindingsHolder>)rootView.Tag;
             if (holder == null)
             {
-                holder = new ViewDataBindingsHolder(rootView, viewModel, layoutInflater, idPrefix);
+                holder = new ViewDataBindingsHolder(rootView, viewModel, layoutInflater, idPrefix, viewExtensionPoints);
                 viewDataBindingsHolders.Add(holder);
                 rootView.Tag = (Wrapper<ViewDataBindingsHolder>)holder;
             }
@@ -231,10 +231,10 @@ namespace QuickCross
             private ViewModelBase viewModel;
             private readonly ViewDataBindings bindings;
 
-            public ViewDataBindingsHolder(View rootView, ViewModelBase viewModel, LayoutInflater layoutInflater, string idPrefix)
+			public ViewDataBindingsHolder(View rootView, ViewModelBase viewModel, LayoutInflater layoutInflater, string idPrefix, ViewDataBindings.ViewExtensionPoints viewExtensionPoints)
             {
                 this.viewModel = viewModel;
-                bindings = new ViewDataBindings(rootView, viewModel, layoutInflater, idPrefix);
+                bindings = new ViewDataBindings(rootView, viewModel, layoutInflater, idPrefix, viewExtensionPoints);
                 bindings.EnsureCommandBindings();  // Then add any command bindings that were not specified in code (based on the Id naming convention)
                 AddHandlers();
                 viewModel.RaisePropertiesChanged();
