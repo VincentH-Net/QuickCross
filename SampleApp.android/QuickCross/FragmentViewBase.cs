@@ -1,4 +1,4 @@
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 
 using Android.App;
 using Android.Views;
@@ -77,7 +77,7 @@ namespace QuickCross
         /// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
         protected void Initialize(View rootView, ViewModelType viewModel, LayoutInflater layoutInflater, BindingParameters[] bindingsParameters = null, string idPrefix = null)
         {
-            Bindings = new ViewDataBindings(rootView, viewModel, layoutInflater, idPrefix ?? this.GetType().Name + "_");
+            Bindings = new ViewDataBindings(rootView, viewModel, layoutInflater, idPrefix ?? this.GetType().Name + "_", this);
             ViewModel = viewModel;
             base.Initialize();
             Bindings.AddBindings(bindingsParameters); // First add any bindings that were specified in code 

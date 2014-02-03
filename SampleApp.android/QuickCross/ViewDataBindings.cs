@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -58,13 +58,13 @@ namespace QuickCross
             void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
         }
 
-        public ViewDataBindings(View rootView, ViewModelBase viewModel, LayoutInflater layoutInflater, string idPrefix)
+		public ViewDataBindings(View rootView, ViewModelBase viewModel, LayoutInflater layoutInflater, string idPrefix, ViewExtensionPoints viewExtensionPoints)
         {
             if (rootView == null) throw new ArgumentNullException("rootView");
             if (viewModel == null) throw new ArgumentNullException("viewModel");
             if (layoutInflater == null) throw new ArgumentNullException("layoutInflater");
             this.rootView = rootView;
-            this.rootViewExtensionPoints = rootView as ViewExtensionPoints;
+            this.rootViewExtensionPoints = viewExtensionPoints;
             this.viewModel = viewModel;
             this.layoutInflater = layoutInflater;
             this.idPrefix = idPrefix;
