@@ -20,11 +20,11 @@ namespace CloudAuction
 		{
 			base.ViewDidLoad();
 			InitializeBindings(View, ViewModel);
-			logoutBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Action, (s, e) => ViewModel.LogoutCommand.Execute(null)); // This event is internal to the view, no need to remove it later, so we can use a lambda expression.
-			logoutBarButtonItem.Title = "Logout";
-			logoutBarButtonItem.Enabled = ViewModel.LogoutCommand.IsEnabled;
-			//NavigationController.NavigationItem.SetRightBarButtonItem(logoutBarButtonItem, true);
-			TabBarController.NavigationItem.SetRightBarButtonItem(logoutBarButtonItem, true);
+//			logoutBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Action, (s, e) => ViewModel.LogoutCommand.Execute(null)); // This event is internal to the view, no need to remove it later, so we can use a lambda expression.
+//			logoutBarButtonItem.Title = "Logout";
+//			logoutBarButtonItem.Enabled = ViewModel.LogoutCommand.IsEnabled;
+//			NavigationItem.SetRightBarButtonItem(logoutBarButtonItem, true); // Works
+			CloudAuctionNavigator.Instance.NavigationContext = NavigationController;
 		}
 
 		protected override void AddHandlers()

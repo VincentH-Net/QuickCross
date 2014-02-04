@@ -3,6 +3,7 @@ using MonoTouch.Foundation;
 using CloudAuction;
 using CloudAuction.Shared;
 using MonoTouch.UIKit;
+using CloudAuction.Shared.ViewModels;
 
 namespace CloudAuction
 {
@@ -17,7 +18,8 @@ namespace CloudAuction
             // to pass them in, and then let the navigator manage when which context should be used.
             // E.g. you could use this in a universal app running in PAD mode when you have a master view and a detail view on the same screen.
 
-        public UINavigationController NavigationContext { get; set; }
+		public UINavigationController NavigationContext { get; set; }
+		public UITabBarController MainNavigationContext { get; set; }
 
         #region Generic navigation helpers
 
@@ -30,7 +32,7 @@ namespace CloudAuction
         /// <param name="animated"></param>
         private void Navigate(UIViewController viewController, bool animated = false)
         {
-            if (Object.ReferenceEquals(NavigationContext.TopViewController, viewController)) return;
+			if (NavigationContext == null || Object.ReferenceEquals(NavigationContext.TopViewController, viewController)) return;
             if (NavigationContext.ViewControllers != null)
             {
                 foreach (var stackViewController in NavigationContext.ViewControllers)
@@ -54,6 +56,7 @@ namespace CloudAuction
         /// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
         private void Navigate(string viewControllerIdentifier, Type viewControllerType = null, bool animated = false, UIStoryboard storyBoard = null)
         {
+			if (NavigationContext == null) return;
             if (viewControllerType != null)
             {
                 if (NavigationContext.TopViewController != null && viewControllerType == NavigationContext.TopViewController.GetType()) return;
@@ -91,11 +94,13 @@ namespace CloudAuction
 
         private void NavigateBack(bool animated = false)
         {
+			if (NavigationContext == null) return;
             NavigationContext.PopViewControllerAnimated(animated);
         }
 
         private void NavigateSegue(string segueIdentifier, Type viewControllerType = null)
         {
+			if (NavigationContext == null) return;
             if (NavigationContext.TopViewController != null)
             {
                 if (viewControllerType != null && viewControllerType == NavigationContext.TopViewController.GetType()) return;
@@ -105,9 +110,13 @@ namespace CloudAuction
 
         #endregion Generic navigation helpers
 
-        public void NavigateToMainView(Shared.ViewModels.MainViewModel.SubView? subView)
+        public void NavigateToMainView(MainViewModel.SubView? subView)
         {
-            Navigate("MainView", typeof(MainView));
+			if (subView.HasValue)
+			{
+				int tabIndex = (int)subView.Value;
+				if (MainNavigationContext.SelectedIndex != tabIndex) MainNavigationContext.SelectedIndex = tabIndex;
+			}
         }
 
         public void NavigateToProductView()
@@ -117,7 +126,7 @@ namespace CloudAuction
 
         public void NavigateToOrderView()
         {
-            throw new NotImplementedException();
+			Navigate("OrderView", typeof(OrderView));
         }
 
         public void NavigateToOrderResultView()

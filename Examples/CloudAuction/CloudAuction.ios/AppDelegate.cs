@@ -25,7 +25,7 @@ namespace CloudAuction
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            CloudAuctionNavigator.Instance.NavigationContext = InitializeNavigationContext();
+			CloudAuctionNavigator.Instance.MainNavigationContext = Window.RootViewController as UITabBarController;
 			EnsureCloudAuctionApplication(CloudAuctionNavigator.Instance).ContinueToMain(MainViewModel.SubView.Auction);
 
             // make the window visible
