@@ -24,21 +24,25 @@ namespace QuickCross.Templates
 
         new public static _APPNAME_Application Instance { get { return (_APPNAME_Application)ApplicationBase.Instance; } }
 
-
         /* TODO: For each viewmodel, add a public property with a private setter like this:
         public _VIEWNAME_ViewModel _VIEWNAME_ViewModel { get; private set; }
          * Note that the New-View and New-ViewModel commands add the above code automatically (see http://github.com/MacawNL/QuickCross#new-viewmodel). */
 
-        /* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
-         * and then navigate to the view using the navigator, like this:
+		public void ReturnToPreviousView()
+		{
+			RunOnUIThread(() => _navigator.NavigateToPreviousView());
+		}
 
-        public void ContinueTo_VIEWNAME_()
-        {
-            if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = new _VIEWNAME_ViewModelDesign(); // TODO: Once _VIEWNAME_ViewModel has runtime data, instantiate that instead of _VIEWNAME_ViewModelDesign
-            // Any actions to update the viewmodel go here
-            RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
-        }
-         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
+		/* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
+		 * and then navigate to the view using the navigator, like this:
+
+		public void ContinueTo_VIEWNAME_()
+		{
+			if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = new _VIEWNAME_ViewModelDesign(); // TODO: Once _VIEWNAME_ViewModel has runtime data, instantiate that instead of _VIEWNAME_ViewModelDesign
+			// Any actions to update the viewmodel go here
+			RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
+		}
+		 * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
 }
 

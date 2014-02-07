@@ -2,7 +2,8 @@
 {
     public interface ISampleAppNavigator
     {
-        void NavigateToSampleItemListView();
+		void NavigateToPreviousView();
+		void NavigateToSampleItemListView();
         void NavigateToSampleItemView();
 
 		/* TODO: For each view, add a method to navigate to that view with a signature like this:

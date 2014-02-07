@@ -21,9 +21,15 @@ namespace SampleApp
             NavigationContext.Navigate(source);
         }
 
-        public void NavigateToSampleItemListView()
+		public void NavigateToPreviousView()
+		{
+			if (NavigationContext == null || !NavigationContext.CanGoBack) return;
+			NavigationContext.GoBack();
+		}
+
+		public void NavigateToSampleItemListView()
         {
-            Navigate("/SampleItemListView.xaml");
+			Navigate("/SampleItemListView.xaml");
         }
 
         public void NavigateToSampleItemView()

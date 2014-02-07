@@ -24,10 +24,15 @@ namespace SampleApp
             NavigationContext.StartActivity(type);
         }
 
-        public void NavigateToSampleItemListView()
+		public void NavigateToPreviousView()
+		{
+			if (AndroidHelpers.CurrentActivity != null) AndroidHelpers.CurrentActivity.Finish();
+		}
+
+		public void NavigateToSampleItemListView()
         {
-            Navigate(typeof(SampleItemListView));
-        }
+			Navigate(typeof(SampleItemListView));
+		}
 
         public void NavigateToSampleItemView()
         {

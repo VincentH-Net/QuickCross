@@ -20,7 +20,7 @@ namespace QuickCross.Templates
 
         public UINavigationController NavigationContext { get; set; }
 
-#region Generic navigation helpers
+        #region Generic navigation helpers
 
         private static bool IsPhone { get { return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone; } }
 
@@ -90,11 +90,6 @@ namespace QuickCross.Templates
             Navigate(null, viewControllerType, animated);
         }
 
-        private void NavigateBack(bool animated = false)
-        {
-            NavigationContext.PopViewControllerAnimated(animated);
-        }
-
         private void NavigateSegue(string segueIdentifier, Type viewControllerType = null)
         {
             if (NavigationContext.TopViewController != null)
@@ -104,8 +99,13 @@ namespace QuickCross.Templates
             }
         }
 
-#endregion Generic navigation helpers
+        #endregion Generic navigation helpers
 
+		public void NavigateToPreviousView()
+		{
+			if (NavigationContext == null || NavigationContext.ViewControllers == null || NavigationContext.ViewControllers.Length < 2) return;
+			NavigationContext.PopViewControllerAnimated(true);
+		}
 
         /* TODO: For each view, add a method to navigate to that view like this:
 

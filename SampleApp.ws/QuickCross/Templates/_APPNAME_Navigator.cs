@@ -15,10 +15,20 @@ namespace QuickCross.Templates
 
         public Frame NavigationContext { get; set; }
 
+        #region Generic navigation helpers
+
         private void Navigate(Type sourcePageType)
         {
             if (NavigationContext == null || NavigationContext.CurrentSourcePageType == sourcePageType) return;
             NavigationContext.Navigate(sourcePageType);
+        }
+
+        #endregion Generic navigation helpers
+
+        public void NavigateToPreviousView()
+        {
+			if (NavigationContext == null || !NavigationContext.CanGoBack) return;
+			NavigationContext.GoBack();
         }
 
         /* TODO: For each view, add a method to navigate to that view like this:

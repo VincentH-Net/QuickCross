@@ -15,11 +15,21 @@ namespace QuickCross.Templates
 
         public Frame NavigationContext { get; set; }
 
+        #region Generic navigation helpers
+
         private void Navigate(string uri)
         {
             var source = new Uri(uri, UriKind.Relative);
             if (NavigationContext == null || NavigationContext.CurrentSource == source) return;
             NavigationContext.Navigate(source);
+        }
+
+        #endregion Generic navigation helpers
+
+        public void NavigateToPreviousView()
+        {
+			if (NavigationContext == null || !NavigationContext.CanGoBack) return;
+            NavigationContext.GoBack();
         }
 
         /* TODO: For each view, add a method to navigate to that view like this:
