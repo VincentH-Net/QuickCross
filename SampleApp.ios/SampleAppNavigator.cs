@@ -89,11 +89,6 @@ namespace SampleApp
             Navigate(null, viewControllerType, animated);
         }
 
-        private void NavigateBack(bool animated = false)
-        {
-            NavigationContext.PopViewControllerAnimated(animated);
-        }
-
         private void NavigateSegue(string segueIdentifier, Type viewControllerType = null)
         {
             if (NavigationContext.TopViewController != null)
@@ -102,6 +97,12 @@ namespace SampleApp
                 NavigationContext.TopViewController.PerformSegue(segueIdentifier, this);
             }
         }
+
+		public void NavigateToPreviousView()
+		{
+			if (NavigationContext == null || NavigationContext.ViewControllers == null || NavigationContext.ViewControllers.Length < 2) return;
+			NavigationContext.PopViewControllerAnimated(true);
+		}
 
         #endregion Generic navigation helpers
 

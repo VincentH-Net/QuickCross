@@ -33,7 +33,12 @@ namespace SampleApp.Shared
         public _VIEWNAME_ViewModel _VIEWNAME_ViewModel { get; private set; }
          * Note that the New-View and New-ViewModel commands add the above code automatically (see http://github.com/MacawNL/QuickCross#new-viewmodel). */
 
-        public void ContinueToSampleItemList()
+		public void ReturnToPreviousView()
+		{
+			RunOnUIThread(() => _navigator.NavigateToPreviousView());
+		}
+
+		public void ContinueToSampleItemList()
         {
             if (SampleItemListViewModel == null) SampleItemListViewModel = new SampleItemListViewModel(_itemService);
             SampleItemListViewModel.Refresh();

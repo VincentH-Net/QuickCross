@@ -4,24 +4,34 @@ using System;
 using Android.Content;
 using QuickCross;
 using QuickCrossLibrary.Templates;
+using System.Collections.Generic;
 
 namespace QuickCross.Templates
 {
     class _APPNAME_Navigator : I_APPNAME_Navigator
     {
         private static readonly Lazy<_APPNAME_Navigator> lazy = new Lazy<_APPNAME_Navigator>(() => new _APPNAME_Navigator());
-
+		
         public static _APPNAME_Navigator Instance { get { return lazy.Value; } }
 
         private _APPNAME_Navigator() { }
 
         public Context NavigationContext { get; set; }
 
+        #region Generic navigation helpers
+
         private void Navigate(Type type)
         {
             if (NavigationContext == null) return;
             if (AndroidHelpers.CurrentActivity != null && AndroidHelpers.CurrentActivity.GetType() == type) return;
-            NavigationContext.StartActivity(type);
+			NavigationContext.StartActivity(type);
+        }
+
+        #endregion Generic navigation helpers
+
+        public void NavigateToPreviousView()
+        {
+            if (AndroidHelpers.CurrentActivity != null) AndroidHelpers.CurrentActivity.Finish();
         }
 
         /* TODO: For each view, add a method to navigate to that view like this:

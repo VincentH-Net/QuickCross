@@ -20,14 +20,20 @@ namespace SampleApp
             NavigationContext.Navigate(sourcePageType);
         }
 
+		public void NavigateToPreviousView()
+		{
+			if (NavigationContext == null || !NavigationContext.CanGoBack) return;
+			NavigationContext.GoBack();
+		}
+
         public void NavigateToSampleItemListView()
         {
-            Navigate(typeof(SampleItemListView));
+			Navigate(typeof(SampleItemListView));
         }
 
         public void NavigateToSampleItemView()
         {
-            Navigate(typeof(SampleItemView));
+			Navigate(typeof(SampleItemView));
         }
 
         /* TODO: For each view, add a method to navigate to that view like this:
