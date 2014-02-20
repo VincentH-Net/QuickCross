@@ -1,6 +1,7 @@
 using System;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using MonoTouch.Dialog;
 using QuickCross;
 using CloudAuction;
 using CloudAuction.Shared;
@@ -8,18 +9,25 @@ using CloudAuction.Shared.ViewModels;
 
 namespace CloudAuction
 {
-	public partial class OrderView : ViewBase
+    public partial class OrderView : DialogViewBase
 	{
 		private OrderViewModel ViewModel { get { return CloudAuctionApplication.Instance.OrderViewModel; } }
 
-		public OrderView(IntPtr handle) : base(handle) { }
+        public OrderView(IntPtr handle) : base(handle)
+        {
+            Pushing = true;
+            Root = new RootElement ("Order") { 
+                new Section () {
+                    new EntryElement ("Email", "Enter Email", ViewModel.Email)
+                } 
+            };
+            // TODO: figure out how to do data binding with monotouch.dialog
+        }
 
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
 			InitializeBindings(View, ViewModel);
-
-            NavigationItem.Title = "Order";
 
             var cancelButton = new UIBarButtonItem("Cancel", UIBarButtonItemStyle.Done, (s, e) => ViewModel.CancelCommand.Execute(null));
 			cancelButton.Enabled = ViewModel.CancelCommand.IsEnabled;

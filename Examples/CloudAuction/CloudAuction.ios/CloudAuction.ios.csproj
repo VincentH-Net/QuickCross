@@ -93,7 +93,6 @@
     <Compile Include="QuickCross\AppDelegate.cs" />
     <Compile Include="QuickCross\DataBindableUITableViewSource.cs" />
     <Compile Include="QuickCross\ObjcMagic.cs" />
-    <Compile Include="QuickCross\TableViewBase.cs" />
     <Compile Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
     <Compile Include="QuickCross\Templates\_VIEWNAME_CodeView.cs" />
     <Compile Include="QuickCross\Templates\_VIEWNAME_StoryBoardTableView.cs" />
@@ -124,6 +123,8 @@
     <Compile Include="OrderView.designer.cs">
       <DependentUpon>OrderView.cs</DependentUpon>
     </Compile>
+    <Compile Include="QuickCross\DialogViewBase.cs" />
+    <Compile Include="QuickCross\TableViewBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CloudAuction.Shared\CloudAuction.Shared.csproj">
@@ -139,6 +140,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
+    <Reference Include="MonoTouch.Dialog-1" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <ItemGroup>
