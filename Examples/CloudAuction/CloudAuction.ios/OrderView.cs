@@ -18,13 +18,16 @@ namespace CloudAuction
 		{
 			base.ViewDidLoad();
 			InitializeBindings(View, ViewModel);
-			var cancelButton = new UIBarButtonItem("Cancel", UIBarButtonItemStyle.Done, (s, e) => ViewModel.CancelCommand.Execute(null));
+
+            NavigationItem.Title = "Order";
+
+            var cancelButton = new UIBarButtonItem("Cancel", UIBarButtonItemStyle.Done, (s, e) => ViewModel.CancelCommand.Execute(null));
 			cancelButton.Enabled = ViewModel.CancelCommand.IsEnabled;
 			NavigationItem.SetLeftBarButtonItem(cancelButton, true);
-//			NavigationController.NavigationItem.LeftBarButtonItem.Clicked += (s, e) => ViewModel.CancelCommand.Execute(null); // This event is internal to the view, no need to remove it later, so we can use a lambda expression.
-//			NavigationController.NavigationItem.LeftBarButtonItem.Enabled = ViewModel.CancelCommand.IsEnabled;
-//			NavigationItem.RightBarButtonItem.Clicked += (s, e) => ViewModel.ConfirmCommand.Execute(null); // This event is internal to the view, no need to remove it later, so we can use a lambda expression.
-//			NavigationItem.RightBarButtonItem.Enabled = ViewModel.ConfirmCommand.IsEnabled;
+
+            var confirmButton = new UIBarButtonItem("Confirm", UIBarButtonItemStyle.Done, (s, e) => ViewModel.ConfirmCommand.Execute(null));
+            confirmButton.Enabled = ViewModel.ConfirmCommand.IsEnabled;
+            NavigationItem.SetRightBarButtonItem(confirmButton, true);
 		}
 
 		protected override void AddHandlers()

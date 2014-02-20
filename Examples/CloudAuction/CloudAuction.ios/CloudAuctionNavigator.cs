@@ -110,9 +110,16 @@ namespace CloudAuction
 
         #endregion Generic navigation helpers
 
+        public void NavigateToPreviousView()
+        {
+            if (NavigationContext == null || NavigationContext.ViewControllers == null || NavigationContext.ViewControllers.Length < 2) return;
+            NavigationContext.PopViewControllerAnimated(true);
+        }
+
         public void NavigateToMainView(MainViewModel.SubView? subView)
         {
-			if (subView.HasValue)
+            Navigate("AuctionView", typeof(AuctionView)); // First return to the Auction view, if we pushed from that to another view
+            if (subView.HasValue) // Then select the specified tab, if any
 			{
 				int tabIndex = (int)subView.Value;
 				if (MainNavigationContext.SelectedIndex != tabIndex) MainNavigationContext.SelectedIndex = tabIndex;
@@ -131,7 +138,7 @@ namespace CloudAuction
 
         public void NavigateToOrderResultView()
         {
-            throw new NotImplementedException();
+            Navigate("OrderResultView", typeof(OrderResultView));
         }
 
 

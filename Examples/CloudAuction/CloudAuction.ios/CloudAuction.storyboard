@@ -43,7 +43,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mq8-Va-pUU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1123" y="241"/>
+            <point key="canvasLocation" x="989" y="121"/>
         </scene>
         <!--Order View - Order-->
         <scene sceneID="m9A-OH-gyX">
@@ -63,7 +63,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cfQ-tH-IF0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2070" y="240"/>
+            <point key="canvasLocation" x="1442" y="121"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="Ak3-CS-LeA">
@@ -155,17 +155,6 @@
                     <view key="view" contentMode="scaleToFill" id="xpw-Me-JX6">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Reh-Xq-d8H">
-                                <rect key="frame" x="0.0" y="24" width="320" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                <items>
-                                    <navigationItem title="Brand" id="uXl-LG-Zbr">
-                                        <barButtonItem key="rightBarButtonItem" title="Done" id="Mrl-P3-lgP"/>
-                                    </navigationItem>
-                                </items>
-                            </navigationBar>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <toolbarItems/>
@@ -174,7 +163,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WpT-SQ-hzj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2567" y="241"/>
+            <point key="canvasLocation" x="1903" y="121"/>
         </scene>
         <!--Navigation Controller - AuctionNav-->
         <scene sceneID="7GX-Lb-cmk">
@@ -199,7 +188,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cGq-hH-cr0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="597" y="241"/>
+            <point key="canvasLocation" x="525" y="121"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

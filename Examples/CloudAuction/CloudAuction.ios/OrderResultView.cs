@@ -18,8 +18,14 @@ namespace CloudAuction
 		{
 			base.ViewDidLoad();
 			InitializeBindings(View, ViewModel);
-			NavigationItem.RightBarButtonItem.Clicked += (s, e) => ViewModel.DoneCommand.Execute(null); // This event is internal to the view, no need to remove it later, so we can use a lambda expression.
-			NavigationItem.RightBarButtonItem.Enabled = ViewModel.DoneCommand.IsEnabled;
+
+            NavigationItem.Title = "Brand";
+
+            NavigationItem.HidesBackButton = true;
+
+            var doneButton = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, (s, e) => ViewModel.DoneCommand.Execute(null));
+            doneButton.Enabled = ViewModel.DoneCommand.IsEnabled;
+            NavigationItem.SetRightBarButtonItem(doneButton, true);
 		}
 
 		protected override void AddHandlers()

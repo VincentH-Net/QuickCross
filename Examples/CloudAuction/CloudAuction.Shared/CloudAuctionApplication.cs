@@ -35,6 +35,11 @@ namespace CloudAuction.Shared
         public _VIEWNAME_ViewModel _VIEWNAME_ViewModel { get; private set; }
          * Note that the New-View and New-ViewModel commands add the above code automatically (see http://github.com/MacawNL/QuickCross#new-viewmodel). */
 
+        public void ReturnToPreviousView()
+        {
+            RunOnUIThread(() => _navigator.NavigateToPreviousView());
+        }
+
         public void ContinueToMain(MainViewModel.SubView? subView = null)
         {
             if (MainViewModel == null) MainViewModel = new MainViewModel();

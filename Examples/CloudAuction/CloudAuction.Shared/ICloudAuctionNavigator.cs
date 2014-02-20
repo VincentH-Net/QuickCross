@@ -3,6 +3,7 @@ namespace CloudAuction.Shared
 {
     public interface ICloudAuctionNavigator
     {
+        void NavigateToPreviousView();
         void NavigateToMainView(MainViewModel.SubView? subView);
         void NavigateToProductView();
         void NavigateToOrderView();

@@ -44,7 +44,7 @@ namespace CloudAuction.Shared.ViewModels
 
         private void Cancel()
         {
-            CloudAuctionApplication.Instance.ContinueToMain();
+            CloudAuctionApplication.Instance.ReturnToPreviousView();
         }
 
         private void Confirm()
