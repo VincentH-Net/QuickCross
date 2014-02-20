@@ -48,7 +48,7 @@
         <!--Order View - Order-->
         <scene sceneID="m9A-OH-gyX">
             <objects>
-                <viewController storyboardIdentifier="OrderView" title="Order" useStoryboardIdentifierAsRestorationIdentifier="YES" id="49N-Q4-TCl" customClass="OrderView" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="OrderView" title="Order" hidesBottomBarWhenPushed="YES" useStoryboardIdentifierAsRestorationIdentifier="YES" id="49N-Q4-TCl" customClass="OrderView" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="YCi-Bg-5My"/>
                         <viewControllerLayoutGuide type="bottom" id="Mkg-bx-HTX"/>
@@ -58,11 +58,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" id="KAS-S0-FLr"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cfQ-tH-IF0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1544" y="240"/>
+            <point key="canvasLocation" x="2070" y="240"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="Ak3-CS-LeA">
@@ -70,7 +71,7 @@
                 <tabBarController storyboardIdentifier="MainView" definesPresentationContext="YES" useStoryboardIdentifierAsRestorationIdentifier="YES" id="bfi-c5-G00" sceneMemberID="viewController">
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <nil key="simulatedTopBarMetrics"/>
-                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" translucent="NO" id="kwL-mo-5W9">
                         <rect key="frame" x="129" y="330" width="163" height="49"/>
@@ -173,7 +174,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WpT-SQ-hzj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2041" y="241"/>
+            <point key="canvasLocation" x="2567" y="241"/>
         </scene>
         <!--Navigation Controller - AuctionNav-->
         <scene sceneID="7GX-Lb-cmk">

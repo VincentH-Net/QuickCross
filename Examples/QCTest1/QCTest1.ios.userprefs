@@ -5,7 +5,7 @@
       <File FileName="QCTest1.ios/MainView.cs" Line="1" Column="1" />
       <File FileName="QCTest1.ios/TestXib2View.cs" Line="1" Column="1" />
       <File FileName="QCTest1.ios/ProductListView.cs" Line="1" Column="1" />
-      <File FileName="QCTest1.ios/AppDelegate.cs" Line="28" Column="66" />
+      <File FileName="QCTest1.ios/AppDelegate.cs" Line="1" Column="1" />
       <File FileName="QCTest1.ios/QuickCross/AppDelegate.cs" Line="24" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>

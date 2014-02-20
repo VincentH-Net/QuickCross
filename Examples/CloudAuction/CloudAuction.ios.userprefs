@@ -1,11 +1,15 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhoneRetina.7.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CloudAuction.Shared/QuickCross/ViewModelBase.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../SampleApp.Shared/QuickCross/Templates/_APPNAME_Application.cs">
     <Files>
-      <File FileName="CloudAuction.ios/MainView.cs" Line="38" Column="54" />
-      <File FileName="CloudAuction.ios/QuickCross/ViewDataBindings.cs" Line="174" Column="1" />
-      <File FileName="CloudAuction.ios/QuickCross/ViewDataBindings.UI.cs" Line="183" Column="1" />
-      <File FileName="CloudAuction.Shared/QuickCross/ViewModelBase.cs" Line="7" Column="40" />
+      <File FileName="CloudAuction.ios/MainView.TODO.cs" Line="1" Column="1" />
+      <File FileName="CloudAuction.ios/MainView.cs" Line="1" Column="1" />
+      <File FileName="CloudAuction.ios/AuctionView.cs" Line="1" Column="1" />
+      <File FileName="CloudAuction.ios/OrderView.cs" Line="1" Column="1" />
+      <File FileName="CloudAuction.ios/CloudAuctionNavigator.cs" Line="1" Column="1" />
+      <File FileName="CloudAuction.Shared/ViewModels/OrderViewModel.cs" Line="1" Column="1" />
+      <File FileName="CloudAuction.Shared/CloudAuctionApplication.cs" Line="1" Column="1" />
+      <File FileName="../../SampleApp.Shared/QuickCross/Templates/_APPNAME_Application.cs" Line="14" Column="45" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -3,8 +3,8 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="SampleApp.ios/AppDelegate.QC.cs">
     <Files>
       <File FileName="SampleApp.ios/AppDelegate.QC.cs" Line="4" Column="20" />
-      <File FileName="SampleApp.ios/QuickCross/AppDelegate.cs" Line="33" Column="1" />
-      <File FileName="SampleApp.ios/AppDelegate.cs" Line="39" Column="73" />
+      <File FileName="SampleApp.ios/QuickCross/AppDelegate.cs" Line="1" Column="1" />
+      <File FileName="SampleApp.ios/AppDelegate.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
