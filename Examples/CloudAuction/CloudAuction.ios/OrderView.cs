@@ -9,6 +9,28 @@ using CloudAuction.Shared.ViewModels;
 
 namespace CloudAuction
 {
+    public class Expense
+    {
+        [Section("Expense Entry")]
+
+        [Entry("Enter expense name")]
+        public string Name { 
+            get { 
+                return CloudAuctionApplication.Instance.OrderViewModel.City; } 
+            set { 
+                CloudAuctionApplication.Instance.OrderViewModel.City = value; }
+        }
+
+        [Section("Expense Details")]
+
+        [Caption("Description")]
+        [Entry]
+        public string Details;
+
+        [Checkbox]
+        public bool IsApproved = true;
+    }
+
     public partial class OrderView : DialogViewBase
 	{
 		private OrderViewModel ViewModel { get { return CloudAuctionApplication.Instance.OrderViewModel; } }
@@ -16,12 +38,57 @@ namespace CloudAuction
         public OrderView(IntPtr handle) : base(handle)
         {
             Pushing = true;
-            Root = new RootElement ("Order") { 
-                new Section () {
-                    new EntryElement ("Email", "Enter Email", ViewModel.Email)
-                } 
-            };
-            // TODO: figure out how to do data binding with monotouch.dialog
+            var expense = new Expense ();
+            var bctx = new BindingContext (null, expense, "Create a task");
+            Root = bctx.Root;
+
+//            Root = new RootElement("Order") { 
+//                new Section() {
+//                    new EntryElement("Email", "Enter Email", ViewModel.Email)
+//                } 
+//            };
+
+            // TODO: figure out how to do data binding with monotouch.dialog -> choose the elements api, not the reflection api
+            // 0) How to find the element given a propertyname?
+            // 1) How to specify binding parameters for an element?
+            // 2) How to capture changes in element value? 
+
+            // Observations:
+            // - Elements have different value property names and types, different event names and delegate signatures
+            // - Not safe to bind to UIView that corresponds to an element, because that will conflict with the Mt.D built in binding mechanism
+            //   -> we need to bind to elements or to the annotated models.
+            // - bind to elements: 
+            //   - automatically: base type change from UIView to NSObject, support Element as well as UIView, lots of change
+            //     and also hard dependency on dialog (reference)
+            //   - manually: is effectively not having binding support at all.
+            // - bind to annotated model:
+            //   - 
+
+//            Section s;
+//            Element e;
+//            EntryElement ee;
+//            DialogViewController dvc;
+//            BooleanElement be;
+//            BooleanImageElement bie;
+//            CheckboxElement ce;
+//            DateElement de;
+//            DateTimeElement dte;
+//            FloatElement fe;
+//            ImageElement ie;
+//            RadioElement re;
+//            RootElement rte;
+//            StringElement se;
+//            StyledStringElement sse;
+//            TimeElement te;
+//            UIViewElement ue;
+
+            //ee.Changed
+            //be.ValueChanged
+            //bie.Tapped
+            //bie.ValueChanged
+            //ce.Tapped
+            //de.DateSelected
+
         }
 
 		public override void ViewDidLoad()
