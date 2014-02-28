@@ -1,6 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace QuickCross
 {
@@ -76,6 +78,14 @@ namespace QuickCross
 		}
 
         #endif
+
+		public static string GetMemberName<T>(Expression<Func<T>> expression)
+		{
+			var unaryX = expression.Body as UnaryExpression;
+			var memberX = (unaryX != null) ? unaryX.Operand as MemberExpression : expression.Body as MemberExpression;
+			if (memberX == null || memberX.Member == null) throw new ArgumentException("Invalid expression for MemberName:\n" + expression.ToString() + "\nValid expressions are:\n() => myProperty\n() => myField");
+			return memberX.Member.Name;
+		}
 
         public event PropertyChangedEventHandler PropertyChanged;
 

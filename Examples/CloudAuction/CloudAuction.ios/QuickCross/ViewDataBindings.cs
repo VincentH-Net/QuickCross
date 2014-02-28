@@ -22,7 +22,7 @@ namespace QuickCross
 	{
 		public string PropertyName;
 		public BindingMode Mode = BindingMode.OneWay;
-		public UIView View;
+		public object View;
 		public string ListPropertyName;
 		public string ListItemTemplateName;
 		public string ListAddItemCommandName;
@@ -106,7 +106,7 @@ namespace QuickCross
 		private class DataBinding
 		{
 			public BindingMode Mode;
-			public UIView View;
+			public object View;
 			public PropertyInfo ViewModelPropertyInfo;
 
 			public PropertyInfo ViewModelListPropertyInfo;
@@ -120,21 +120,21 @@ namespace QuickCross
 		}
 
 		private readonly UIView rootView;
-		private readonly ViewExtensionPoints rootViewExtensionPoints;
+		private readonly IViewExtensionPoints rootViewExtensionPoints;
 		private ViewModelBase viewModel;
 		private readonly string idPrefix;
 
 		private Dictionary<string, DataBinding> dataBindings = new Dictionary<string, DataBinding>();
 		// the string key is the idname which is a prefix + the name of the vm property
 
-		public interface ViewExtensionPoints  // Implement these methods as virtual in a view base class
+		public interface IViewExtensionPoints  // Implement these methods as virtual in a view base class
 		{
-			void UpdateView(UIView view, object value);
+			void UpdateView(object view, object value);
 			void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
 			object GetCommandParameter(string commandName, object parameter = null);
 		}
 
-		public ViewDataBindings(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewExtensionPoints rootViewExtensionPoints = null)
+		public ViewDataBindings(UIView rootView, ViewModelBase viewModel, string idPrefix, IViewExtensionPoints rootViewExtensionPoints = null)
 		{
 			if (rootView == null)
 				throw new ArgumentNullException("rootView");
@@ -144,7 +144,7 @@ namespace QuickCross
 			this.rootViewExtensionPoints = rootViewExtensionPoints;
 			this.viewModel = viewModel;
 			this.idPrefix = idPrefix; // Note that on iOS we may use idPrefix only for connecting outlet names to vm property names;
-			// The uiviews that have no outlets do noyt need a name or id; all info is in the Bind property
+			// The uiviews that have no outlets do not need a name or id; all info is in the Bind property
 		}
 
 		public void SetViewModel(ViewModelBase newViewModel)
@@ -334,40 +334,6 @@ namespace QuickCross
 				}
 			}
 
-			/*
-			if (binding.View is AdapterView)
-			{
-				if (listPropertyName == null) listPropertyName = propertyName + "List";
-				var pi = viewModel.GetType().GetProperty(listPropertyName);
-				if (pi == null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
-				{
-					listPropertyName = propertyName;
-					pi = binding.ViewModelPropertyInfo;
-					binding.ViewModelPropertyInfo = null;
-				}
-				binding.ViewModelListPropertyInfo = pi;
-
-				pi = binding.View.GetType().GetProperty("Adapter", BindingFlags.Public | BindingFlags.Instance);
-				if (pi != null)
-				{
-					var adapter = pi.GetValue(binding.View);
-					if (adapter == null)
-					{
-						if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
-						if (itemIsValue && itemValueId == null) itemValueId = itemTemplateName;
-						int? itemTemplateResourceId = AndroidHelpers.FindResourceId(itemTemplateName, AndroidHelpers.ResourceCategory.Layout);
-						int? itemValueResourceId = AndroidHelpers.FindResourceId(itemValueId);
-						if (itemTemplateResourceId.HasValue)
-						{
-							adapter = new DataBindableListAdapter<object>(layoutInflater, itemTemplateResourceId.Value, itemTemplateName + "_", itemValueResourceId, rootViewExtensionPoints);
-							pi.SetValue(binding.View, adapter);
-						}
-					}
-					binding.ListAdapter = adapter as IDataBindableListAdapter;
-				}
-			}
-			*/
-
 			switch (binding.Mode)
 			{
 				case BindingMode.TwoWay: AddTwoWayHandler(binding); break;
@@ -378,7 +344,7 @@ namespace QuickCross
 			return binding;
 		}
 
-		private DataBinding FindBindingForView(UIView view)
+		private DataBinding FindBindingForView(object view)
 		{
 			return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.View, view)).Value;
 		}

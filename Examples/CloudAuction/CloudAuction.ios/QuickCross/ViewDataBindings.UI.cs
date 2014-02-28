@@ -69,7 +69,7 @@ namespace QuickCross
 
         #region View types that support one-way data binding
 
-		public static void UpdateView(UIView view, object value)
+		public static void UpdateView(object view, object value)
         {
             if (view != null)
             {

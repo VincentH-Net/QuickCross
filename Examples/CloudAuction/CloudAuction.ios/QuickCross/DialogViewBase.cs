@@ -9,7 +9,7 @@ using CloudAuction.Shared;
 
 namespace QuickCross
 {
-    public class DialogViewBase : DialogViewController, ViewDataBindings.ViewExtensionPoints
+    public class DialogViewBase : DialogViewController, ViewDataBindings.IViewExtensionPoints
     {
         public DialogViewBase(IntPtr handle)    : base(handle) { }
         public DialogViewBase(RootElement root, bool pushing = false) : base(root, pushing) { }
@@ -121,7 +121,7 @@ namespace QuickCross
 		/// </summary>
 		/// <param name="view"></param>
 		/// <param name="value"></param>
-		public virtual void UpdateView(UIView view, object value)
+		public virtual void UpdateView(object view, object value)
 		{
 			ViewDataBindings.UpdateView(view, value);
 		}

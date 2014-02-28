@@ -8,7 +8,7 @@ using CloudAuction.Shared;
 
 namespace QuickCross
 {
-	public class TableViewBase : UITableViewController, ViewDataBindings.ViewExtensionPoints
+	public class TableViewBase : UITableViewController, ViewDataBindings.IViewExtensionPoints
     {
 		public TableViewBase(IntPtr handle) : base(handle) { }
 
@@ -119,7 +119,7 @@ namespace QuickCross
 		/// </summary>
 		/// <param name="view"></param>
 		/// <param name="value"></param>
-		public virtual void UpdateView(UIView view, object value)
+		public virtual void UpdateView(object view, object value)
 		{
 			ViewDataBindings.UpdateView(view, value);
 		}

@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudAuction.ios", "CloudAuction.ios\CloudAuction.ios.csproj", "{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudAuction.Shared", "CloudAuction.Shared\CloudAuction.Shared.csproj", "{7FC7ECB7-EFC9-4A63-8C68-A3A1F39A393B}"
@@ -46,6 +44,7 @@ Global
 		{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}.Debug|iPhone.Build.0 = Debug|iPhone
 		{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
 		{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}.Debug|iPhoneSimulator.Deploy.0 = Debug|iPhoneSimulator
 		{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}.Debug|Mixed Platforms.ActiveCfg = Debug|iPhone
 		{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}.Debug|Mixed Platforms.Build.0 = Debug|iPhone
 		{2A0FCCD6-CD98-48CC-9C6C-9885DCE290AE}.Release|Any CPU.ActiveCfg = Release|iPhone

@@ -14,7 +14,7 @@ namespace QuickCross
 		{
 			public readonly PropertyInfo ObjectPropertyInfo;
 			public readonly FieldInfo ObjectFieldInfo;
-			public readonly UIView View;
+			public readonly object View;
 
 			public string Name 
 			{ 
@@ -32,25 +32,25 @@ namespace QuickCross
 				return item;
 			}
 
-			public ItemDataBinding(PropertyInfo objectPropertyInfo, UIView view)
+			public ItemDataBinding(PropertyInfo objectPropertyInfo, object view)
 			{
 				this.ObjectPropertyInfo = objectPropertyInfo;
 				this.View = view;
 			}
 
-			public ItemDataBinding(FieldInfo objectFieldInfo, UIView view)
+			public ItemDataBinding(FieldInfo objectFieldInfo, object view)
 			{
 				this.ObjectFieldInfo = objectFieldInfo;
 				this.View = view;
 			}
 
-			public ItemDataBinding(UIView view)
+			public ItemDataBinding(object view)
 			{
 				this.View = view;
 			}
 		}
 
-		private readonly ViewDataBindings.ViewExtensionPoints viewExtensionPoints;
+		private readonly ViewDataBindings.IViewExtensionPoints viewExtensionPoints;
 
 		private IList list;
 		private bool listIsObservable, ignoreCollectionChanged;
@@ -62,7 +62,7 @@ namespace QuickCross
 		private readonly bool rowSelectedPropertyIsCommand;
 		private readonly ViewModelBase viewModel;
 
-		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedPropertyName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedPropertyName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.IViewExtensionPoints viewExtensionPoints = null)
         {
 			this.tableView = tableView;
 			this.cellIdentifier = new NSString(cellIdentifier);
@@ -239,7 +239,7 @@ namespace QuickCross
 			private ViewModelBase viewModel;
 			private readonly ViewDataBindings bindings;
 
-			public ViewDataBindingsHolder(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+			public ViewDataBindingsHolder(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewDataBindings.IViewExtensionPoints viewExtensionPoints = null)
 			{
 				this.viewModel = viewModel;
 				bindings = new ViewDataBindings(rootView, viewModel, idPrefix, viewExtensionPoints);
@@ -296,7 +296,7 @@ namespace QuickCross
 		/// </summary>
 		/// <param name="view"></param>
 		/// <param name="value"></param>
-		protected virtual void UpdateView(UIView view, object value)
+		protected virtual void UpdateView(object view, object value)
 		{
 			if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(view, value); else ViewDataBindings.UpdateView(view, value);
 		}
