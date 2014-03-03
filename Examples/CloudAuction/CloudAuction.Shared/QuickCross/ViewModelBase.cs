@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace QuickCross
 {
-	public class InstancePropertyOrField
+	public class InstanceProperty
 	{
 		private PropertyInfo propertyInfo;
 		private FieldInfo fieldInfo;
@@ -16,16 +16,22 @@ namespace QuickCross
 
 		public object Value
 		{
-			get { return propertyInfo != null ? propertyInfo.GetValue(Instance) : fieldInfo.GetValue(Instance); }
-			set { if (propertyInfo != null) propertyInfo.SetValue(Instance, value); else fieldInfo.SetValue(Instance, value); }
+			get { return propertyInfo != null ? propertyInfo.GetValue(Instance) : fieldInfo != null ? fieldInfo.GetValue(Instance) : Instance; }
+			set {
+                if (Value == value) return;
+                if (propertyInfo != null) propertyInfo.SetValue(Instance, value);
+                else if (fieldInfo != null) fieldInfo.SetValue(Instance, value);
+                else Instance = value;
+            }
 		}
 
-		public InstancePropertyOrField(object instance, string propertyOrFieldName)
+		public InstanceProperty(object instance, string propertyOrFieldName)
 		{
 			Instance = instance;
 			PropertyOrFieldName = propertyOrFieldName;
+            if (string.IsNullOrEmpty(PropertyOrFieldName)) return;
 
-			var type = Instance.GetType();
+            var type = Instance.GetType();
 			propertyInfo = type.GetProperty(PropertyOrFieldName);
 			if (propertyInfo == null)
 			{

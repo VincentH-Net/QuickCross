@@ -27,10 +27,10 @@ namespace QuickCross
 
 		public object View;
 		public string ViewMemberName;
-		public Expression<Func<object>> ViewMember { set { ViewMemberName = ViewModelBase.GetMemberName(value); } }
+        public Expression<Func<object>> ViewMember { set { ViewMemberName = ViewModelBase.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
 
 		public string ListPropertyName;
-		public Expression<Func<object>> ListProperty { set { ListPropertyName = ViewModelBase.GetMemberName(value); } }
+        public Expression<Func<object>> ListProperty { set { ListPropertyName = ViewModelBase.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
 
 		public string ListItemTemplateName;
 		public string ListAddItemCommandName;
@@ -114,7 +114,7 @@ namespace QuickCross
 		private class DataBinding
 		{
 			public BindingMode Mode;
-			public object View;
+			public InstanceProperty ViewProperty;
 			public PropertyInfo ViewModelPropertyInfo;
 			// TODO: store memberinfo for ViewMemberName
 
@@ -123,7 +123,7 @@ namespace QuickCross
 
 			public void Command_CanExecuteChanged(object sender, EventArgs e)
 			{
-				var control = View as UIControl;
+				var control = ViewProperty.Instance as UIControl;
 				if (control != null) control.Enabled = ((RelayCommand)sender).IsEnabled;
 			}
 		}
@@ -137,7 +137,7 @@ namespace QuickCross
 
 		public interface IViewExtensionPoints  // Implement these methods as virtual in a view base class
 		{
-			void UpdateView(object view, object value);
+            void UpdateView(InstanceProperty viewProperty, object value);
 			void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
 			object GetCommandParameter(string commandName, object parameter = null);
 		}
@@ -301,6 +301,14 @@ namespace QuickCross
 		{
 			var view = bp.View;
 			if (view == null) return null;
+            var viewMemberName = bp.ViewMemberName;
+            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && viewMemberName == null)
+            {
+                var typeName = view.GetType().FullName;
+                if (!ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
+                    throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", typeName), "ViewMemberName");
+            }
+
 			var propertyName = bp.ViewModelPropertyName;
 			var mode = bp.Mode;
 			var listPropertyName = bp.ListPropertyName;
@@ -310,12 +318,12 @@ namespace QuickCross
 
 			var binding = new DataBinding
 			{
-				View = view,
+                ViewProperty = new InstanceProperty(view, viewMemberName),
 				Mode = mode,
 				ViewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName)
 			};
 
-			if (binding.View is UITableView)
+			if (binding.ViewProperty.Instance is UITableView)
 			{
 				if (listPropertyName == null) listPropertyName = propertyName + "List";
 				var pi = viewModel.GetType().GetProperty(listPropertyName);
@@ -327,7 +335,7 @@ namespace QuickCross
 				}
 				binding.ViewModelListPropertyInfo = pi;
 
-				var tableView = (UITableView)binding.View;
+				var tableView = (UITableView)binding.ViewProperty.Instance;
 				if (tableView.Source == null)
 				{
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
@@ -358,7 +366,7 @@ namespace QuickCross
 
 		private DataBinding FindBindingForView(object view)
 		{
-			return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.View, view)).Value;
+			return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.ViewProperty.Instance, view)).Value;
 		}
 
 		private DataBinding FindBindingForListProperty(string propertyName)
@@ -368,9 +376,9 @@ namespace QuickCross
 
 		private void UpdateView(DataBinding binding)
 		{
-			if ((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay) && binding.View != null)
+            if (((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay)) && binding.ViewProperty != null && binding.ViewProperty.Instance != null)
 			{
-				var view = binding.View;
+				var view = binding.ViewProperty;
 				var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
 				if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(view, value); else UpdateView(view, value);
 			}
