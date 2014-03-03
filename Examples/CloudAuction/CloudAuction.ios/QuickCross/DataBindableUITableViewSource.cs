@@ -201,16 +201,16 @@ namespace QuickCross
 				itemDataBindings = new ItemDataBindingsHolder();
 				foreach (var bindingParameter in bindingParametersList)
 				{
-					if (bindingParameter.PropertyName == ".")
+					if (bindingParameter.ViewModelPropertyName == ".")
 					{
 						itemDataBindings.Add(new ItemDataBinding(bindingParameter.View));
 					} else {
-						var pi = itemType.GetProperty(bindingParameter.PropertyName);
+						var pi = itemType.GetProperty(bindingParameter.ViewModelPropertyName);
 						if (pi != null)
 						{
 							itemDataBindings.Add(new ItemDataBinding(pi, bindingParameter.View));
 						} else {
-							var fi = itemType.GetField(bindingParameter.PropertyName);
+							var fi = itemType.GetField(bindingParameter.ViewModelPropertyName);
 							if (fi != null) itemDataBindings.Add(new ItemDataBinding(fi, bindingParameter.View));
 						}
 					}
@@ -242,7 +242,7 @@ namespace QuickCross
 			public ViewDataBindingsHolder(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewDataBindings.IViewExtensionPoints viewExtensionPoints = null)
 			{
 				this.viewModel = viewModel;
-				bindings = new ViewDataBindings(rootView, viewModel, idPrefix, viewExtensionPoints);
+				bindings = new ViewDataBindings(viewModel, idPrefix, viewExtensionPoints);
 				List<BindingParameters> bindingParametersList;
 				if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
 				{

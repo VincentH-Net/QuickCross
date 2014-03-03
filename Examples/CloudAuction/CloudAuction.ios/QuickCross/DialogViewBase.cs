@@ -72,7 +72,7 @@ namespace QuickCross
 		/// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
 		protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
 		{
-			Bindings = new ViewDataBindings(rootView, viewModel, idPrefix ?? this.GetType().Name + "_", this);
+			Bindings = new ViewDataBindings(viewModel, idPrefix ?? this.GetType().Name + "_", this);
 			this.viewModel = viewModel;
 
 			EnsureHandlersAreAdded();

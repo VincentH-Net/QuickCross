@@ -6,7 +6,36 @@ using System.Linq.Expressions;
 
 namespace QuickCross
 {
-    public abstract class ViewModelBase : INotifyPropertyChanged
+	public class InstancePropertyOrField
+	{
+		private PropertyInfo propertyInfo;
+		private FieldInfo fieldInfo;
+
+		public object Instance { get; private set; }
+		public string PropertyOrFieldName { get; private set; }
+
+		public object Value
+		{
+			get { return propertyInfo != null ? propertyInfo.GetValue(Instance) : fieldInfo.GetValue(Instance); }
+			set { if (propertyInfo != null) propertyInfo.SetValue(Instance, value); else fieldInfo.SetValue(Instance, value); }
+		}
+
+		public InstancePropertyOrField(object instance, string propertyOrFieldName)
+		{
+			Instance = instance;
+			PropertyOrFieldName = propertyOrFieldName;
+
+			var type = Instance.GetType();
+			propertyInfo = type.GetProperty(PropertyOrFieldName);
+			if (propertyInfo == null)
+			{
+				fieldInfo = type.GetField(PropertyOrFieldName);
+				if (fieldInfo == null) throw new ArgumentException(string.Format("The type {0} does not have a property or field named '{1}'", type.FullName, PropertyOrFieldName), "propertyOrFieldName");
+			}
+		}
+	}
+	
+	public abstract class ViewModelBase : INotifyPropertyChanged
     {
         #if __ANDROID__ || __IOS__
         private List<string> propertyNames;
@@ -79,11 +108,11 @@ namespace QuickCross
 
         #endif
 
-		public static string GetMemberName<T>(Expression<Func<T>> expression)
+		public static string GetMemberName(Expression<Func<object>> expression)
 		{
 			var unaryX = expression.Body as UnaryExpression;
 			var memberX = (unaryX != null) ? unaryX.Operand as MemberExpression : expression.Body as MemberExpression;
-			if (memberX == null || memberX.Member == null) throw new ArgumentException("Invalid expression for MemberName:\n" + expression.ToString() + "\nValid expressions are:\n() => myProperty\n() => myField");
+			if (memberX == null || memberX.Member == null) throw new ArgumentException("Invalid expression for MemberName:\n" + expression.ToString() + "\nValid expressions are e.g.:\n() => obj.AProperty\n() => obj.AField");
 			return memberX.Member.Name;
 		}
 

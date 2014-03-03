@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Linq.Expressions;
 
 using MonoTouch.UIKit;
 using MonoTouch.ObjCRuntime;
 using MonoTouch.Foundation;
-
-using MonoMac;
-using System.Collections;
 using MonoTouch;
+using MonoMac;
 
 namespace QuickCross
 {
@@ -20,10 +20,18 @@ namespace QuickCross
 
 	public class BindingParameters
 	{
-		public string PropertyName;
+		public string ViewModelPropertyName;
+		public Expression<Func<object>> Property { set { ViewModelPropertyName = ViewModelBase.GetMemberName(value); } }
+
 		public BindingMode Mode = BindingMode.OneWay;
+
 		public object View;
+		public string ViewMemberName;
+		public Expression<Func<object>> ViewMember { set { ViewMemberName = ViewModelBase.GetMemberName(value); } }
+
 		public string ListPropertyName;
+		public Expression<Func<object>> ListProperty { set { ListPropertyName = ViewModelBase.GetMemberName(value); } }
+
 		public string ListItemTemplateName;
 		public string ListAddItemCommandName;
 		public string ListRemoveItemCommandName;
@@ -89,7 +97,7 @@ namespace QuickCross
 			var bp = ParseBindingParameters(bindingParameters);
 			if (bp == null)
 				throw new ArgumentException("Invalid data binding parameters: " + bindingParameters);
-			if (string.IsNullOrEmpty(bp.PropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
+			if (string.IsNullOrEmpty(bp.ViewModelPropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
 				throw new ArgumentException("At least one of PropertyName and ListPropertyName must be specified in data binding parameters: " + bindingParameters);
 			bp.View = view;
 
@@ -108,6 +116,7 @@ namespace QuickCross
 			public BindingMode Mode;
 			public object View;
 			public PropertyInfo ViewModelPropertyInfo;
+			// TODO: store memberinfo for ViewMemberName
 
 			public PropertyInfo ViewModelListPropertyInfo;
 			public DataBindableUITableViewSource TableViewSource;
@@ -119,7 +128,6 @@ namespace QuickCross
 			}
 		}
 
-		private readonly UIView rootView;
 		private readonly IViewExtensionPoints rootViewExtensionPoints;
 		private ViewModelBase viewModel;
 		private readonly string idPrefix;
@@ -134,13 +142,9 @@ namespace QuickCross
 			object GetCommandParameter(string commandName, object parameter = null);
 		}
 
-		public ViewDataBindings(UIView rootView, ViewModelBase viewModel, string idPrefix, IViewExtensionPoints rootViewExtensionPoints = null)
+		public ViewDataBindings(ViewModelBase viewModel, string idPrefix, IViewExtensionPoints rootViewExtensionPoints = null)
 		{
-			if (rootView == null)
-				throw new ArgumentNullException("rootView");
-			if (viewModel == null)
-				throw new ArgumentNullException("viewModel");
-			this.rootView = rootView;
+			if (viewModel == null) throw new ArgumentNullException("viewModel");
 			this.rootViewExtensionPoints = rootViewExtensionPoints;
 			this.viewModel = viewModel;
 			this.idPrefix = idPrefix; // Note that on iOS we may use idPrefix only for connecting outlet names to vm property names;
@@ -229,7 +233,7 @@ namespace QuickCross
 				foreach (var bp in bindingsParameters)
 				{
 					if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
-					if (dataBindings.ContainsKey(IdName(bp.PropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.PropertyName));
+					if (dataBindings.ContainsKey(IdName(bp.ViewModelPropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.ViewModelPropertyName));
 					AddBinding(bp); 
 				}
 			}
@@ -258,22 +262,30 @@ namespace QuickCross
 								if (assignmentElements.Length == 1)
 								{
 									string value = assignmentElements[0].Trim();
-									if (value != "") bp.PropertyName = value;
+									if (value != "") bp.ViewModelPropertyName = value;
 								}
 								else if (assignmentElements.Length == 2)
 								{
 									string name = assignmentElements[0].Trim();
 									string value = assignmentElements[1].Trim();
-									switch (name)
+									if (name.StartsWith("."))
 									{
-										case "Mode": Enum.TryParse<BindingMode>(value, true, out bp.Mode); break;
-										case "ItemsSource": bp.ListPropertyName = value; break;
-										case "ItemTemplate": bp.ListItemTemplateName = value; break;
-										case "AddCommand": bp.ListAddItemCommandName = value; break;
-										case "RemoveCommand": bp.ListRemoveItemCommandName = value; break;
-										case "CanEdit": bp.ListCanEditItem = value; break;
-										case "CanMove": bp.ListCanMoveItem = value; break;
-										default: throw new ArgumentException("Unknown tag binding parameter: " + name);
+										bp.ViewMemberName = name.Substring(1);
+										if (value != "") bp.ViewModelPropertyName = value;
+									}
+									else
+									{
+										switch (name)
+										{
+											case "Mode": Enum.TryParse<BindingMode>(value, true, out bp.Mode); break;
+											case "ItemsSource": bp.ListPropertyName = value; break;
+											case "ItemTemplate": bp.ListItemTemplateName = value; break;
+											case "AddCommand": bp.ListAddItemCommandName = value; break;
+											case "RemoveCommand": bp.ListRemoveItemCommandName = value; break;
+											case "CanEdit": bp.ListCanEditItem = value; break;
+											case "CanMove": bp.ListCanMoveItem = value; break;
+											default: throw new ArgumentException("Unknown tag binding parameter: " + name);
+										}
 									}
 								}
 							}
@@ -289,7 +301,7 @@ namespace QuickCross
 		{
 			var view = bp.View;
 			if (view == null) return null;
-			var propertyName = bp.PropertyName;
+			var propertyName = bp.ViewModelPropertyName;
 			var mode = bp.Mode;
 			var listPropertyName = bp.ListPropertyName;
 			var itemTemplateName = bp.ListItemTemplateName;
@@ -319,7 +331,7 @@ namespace QuickCross
 				if (tableView.Source == null)
 				{
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
-					string listItemSelectedPropertyName = (mode == BindingMode.Command || mode == BindingMode.TwoWay) ? bp.PropertyName : null;
+					string listItemSelectedPropertyName = (mode == BindingMode.Command || mode == BindingMode.TwoWay) ? bp.ViewModelPropertyName : null;
 					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(
 						tableView, 
 						itemTemplateName,

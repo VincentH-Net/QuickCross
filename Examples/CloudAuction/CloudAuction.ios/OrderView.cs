@@ -172,6 +172,11 @@ namespace CloudAuction
                 }
             };
 
+			var p = new BindingParameters[] {
+				new BindingParameters { Property = () => ViewModel.Email, Mode = BindingMode.TwoWay },
+				new BindingParameters { ViewModelPropertyName = OrderViewModel.PROPERTYNAME_Email, Mode = BindingMode.TwoWay }
+			};
+
             // TODO: figure out how to do data binding with monotouch.dialog -> choose the elements api, not the reflection api
             // 0) How to find the element given a propertyname?
             // 1) How to specify binding parameters for an element?
