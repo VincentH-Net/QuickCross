@@ -14,7 +14,7 @@ namespace QuickCross
 		{
 			public readonly PropertyInfo ObjectPropertyInfo;
 			public readonly FieldInfo ObjectFieldInfo;
-			public readonly InstanceProperty ViewProperty;
+			public readonly PropertyReference ViewProperty;
 
 			public string Name 
 			{ 
@@ -32,19 +32,19 @@ namespace QuickCross
 				return item;
 			}
 
-			public ItemDataBinding(PropertyInfo objectPropertyInfo, InstanceProperty viewProperty)
+			public ItemDataBinding(PropertyInfo objectPropertyInfo, PropertyReference viewProperty)
 			{
 				this.ObjectPropertyInfo = objectPropertyInfo;
                 this.ViewProperty = viewProperty;
 			}
 
-            public ItemDataBinding(FieldInfo objectFieldInfo, InstanceProperty viewProperty)
+            public ItemDataBinding(FieldInfo objectFieldInfo, PropertyReference viewProperty)
 			{
 				this.ObjectFieldInfo = objectFieldInfo;
                 this.ViewProperty = viewProperty;
 			}
 
-            public ItemDataBinding(InstanceProperty viewProperty)
+            public ItemDataBinding(PropertyReference viewProperty)
 			{
                 this.ViewProperty = viewProperty;
 			}
@@ -208,7 +208,7 @@ namespace QuickCross
                         if (!ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
                             throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", typeName), "ViewMemberName");
                     }
-                    var viewProperty = new InstanceProperty(bindingParameter.View, viewMemberName);
+                    var viewProperty = new PropertyReference(bindingParameter.View, viewMemberName);
 
                     if (bindingParameter.ViewModelPropertyName == ".")
 					{
@@ -305,7 +305,7 @@ namespace QuickCross
 		/// </summary>
         /// <param name="viewProperty"></param>
 		/// <param name="value"></param>
-        protected virtual void UpdateView(InstanceProperty viewProperty, object value)
+        protected virtual void UpdateView(PropertyReference viewProperty, object value)
 		{
             if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(viewProperty, value); else ViewDataBindings.UpdateView(viewProperty, value);
 		}

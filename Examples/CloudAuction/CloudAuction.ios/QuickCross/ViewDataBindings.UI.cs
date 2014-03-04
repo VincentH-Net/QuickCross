@@ -12,8 +12,8 @@ namespace QuickCross
 
         private void AddCommandHandler(DataBinding binding)
         {
-            if (binding.ViewProperty == null || binding.ViewProperty.Instance == null) return;
-            var view = binding.ViewProperty.Instance;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -48,8 +48,8 @@ namespace QuickCross
 
         private void RemoveCommandHandler(DataBinding binding)
         {
-            if (binding.ViewProperty == null || binding.ViewProperty.Instance == null) return;
-            var view = binding.ViewProperty.Instance;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -77,10 +77,10 @@ namespace QuickCross
             { "MonoTouch.UIKit.UITextView", "Text" }
         };
 
-        public static void UpdateView(InstanceProperty viewProperty, object value)
+        public static void UpdateView(PropertyReference viewProperty, object value)
         {
-            if (viewProperty == null || viewProperty.Instance == null) return;
-            var view = viewProperty.Instance;
+            if (viewProperty == null || viewProperty.ContainingObject == null) return;
+            var view = viewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -112,8 +112,8 @@ namespace QuickCross
 
 		private void AddTwoWayHandler(DataBinding binding)
         {
-            if (binding.ViewProperty == null || binding.ViewProperty.Instance == null) return;
-            var view = binding.ViewProperty.Instance;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -148,8 +148,8 @@ namespace QuickCross
 
         private void RemoveTwoWayHandler(DataBinding binding)
         {
-            if (binding.ViewProperty == null || binding.ViewProperty.Instance == null) return;
-            var view = binding.ViewProperty.Instance;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {

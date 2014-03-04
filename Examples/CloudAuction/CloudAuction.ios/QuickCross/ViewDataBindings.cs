@@ -21,16 +21,27 @@ namespace QuickCross
 	public class BindingParameters
 	{
 		public string ViewModelPropertyName;
-		public Expression<Func<object>> Property { set { ViewModelPropertyName = ViewModelBase.GetMemberName(value); } }
+		public Expression<Func<object>> Property { set { ViewModelPropertyName = PropertyReference.GetMemberName(value); } }
 
 		public BindingMode Mode = BindingMode.OneWay;
 
 		public object View;
 		public string ViewMemberName;
-        public Expression<Func<object>> ViewMember { set { ViewMemberName = ViewModelBase.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
+
+		/// <summary>
+		/// A Linq expression that specifies the name of the ViewMember in a typesafe manner
+		/// <example>() => view.AProperty</example>
+		/// <example>() => view.AField</example>
+		/// </summary>
+		public Expression<Func<object>> ViewMember { set { ViewMemberName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
 
 		public string ListPropertyName;
-        public Expression<Func<object>> ListProperty { set { ListPropertyName = ViewModelBase.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
+
+		/// <summary>
+		/// A Linq expression that specifies the name of the ListProperty in a typesafe manner
+		/// <example>() => ViewModel.AProperty</example>
+		/// </summary>
+		public Expression<Func<object>> ListProperty { set { ListPropertyName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
 
 		public string ListItemTemplateName;
 		public string ListAddItemCommandName;
@@ -114,7 +125,7 @@ namespace QuickCross
 		private class DataBinding
 		{
 			public BindingMode Mode;
-			public InstanceProperty ViewProperty;
+			public PropertyReference ViewProperty;
 			public PropertyInfo ViewModelPropertyInfo;
 			// TODO: store memberinfo for ViewMemberName
 
@@ -123,7 +134,7 @@ namespace QuickCross
 
 			public void Command_CanExecuteChanged(object sender, EventArgs e)
 			{
-				var control = ViewProperty.Instance as UIControl;
+				var control = ViewProperty.ContainingObject as UIControl;
 				if (control != null) control.Enabled = ((RelayCommand)sender).IsEnabled;
 			}
 		}
@@ -137,7 +148,7 @@ namespace QuickCross
 
 		public interface IViewExtensionPoints  // Implement these methods as virtual in a view base class
 		{
-            void UpdateView(InstanceProperty viewProperty, object value);
+            void UpdateView(PropertyReference viewProperty, object value);
 			void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
 			object GetCommandParameter(string commandName, object parameter = null);
 		}
@@ -318,12 +329,12 @@ namespace QuickCross
 
 			var binding = new DataBinding
 			{
-                ViewProperty = new InstanceProperty(view, viewMemberName),
+                ViewProperty = new PropertyReference(view, viewMemberName),
 				Mode = mode,
 				ViewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName)
 			};
 
-			if (binding.ViewProperty.Instance is UITableView)
+			if (binding.ViewProperty.ContainingObject is UITableView)
 			{
 				if (listPropertyName == null) listPropertyName = propertyName + "List";
 				var pi = viewModel.GetType().GetProperty(listPropertyName);
@@ -335,7 +346,7 @@ namespace QuickCross
 				}
 				binding.ViewModelListPropertyInfo = pi;
 
-				var tableView = (UITableView)binding.ViewProperty.Instance;
+				var tableView = (UITableView)binding.ViewProperty.ContainingObject;
 				if (tableView.Source == null)
 				{
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
@@ -366,7 +377,7 @@ namespace QuickCross
 
 		private DataBinding FindBindingForView(object view)
 		{
-			return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.ViewProperty.Instance, view)).Value;
+			return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.ViewProperty.ContainingObject, view)).Value;
 		}
 
 		private DataBinding FindBindingForListProperty(string propertyName)
@@ -376,11 +387,11 @@ namespace QuickCross
 
 		private void UpdateView(DataBinding binding)
 		{
-            if (((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay)) && binding.ViewProperty != null && binding.ViewProperty.Instance != null)
+            if (((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay)) && binding.ViewProperty != null && binding.ViewProperty.ContainingObject != null)
 			{
-				var view = binding.ViewProperty;
+				var viewProperty = binding.ViewProperty;
 				var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
-				if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(view, value); else UpdateView(view, value);
+				if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(viewProperty, value); else UpdateView(viewProperty, value);
 			}
 		}
 
@@ -398,6 +409,6 @@ namespace QuickCross
 			if (rootViewExtensionPoints != null) parameter = rootViewExtensionPoints.GetCommandParameter(binding.ViewModelPropertyInfo.Name, parameter);
 			var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
 			command.Execute(parameter);
-		}	
+		}
     }
 }

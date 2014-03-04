@@ -119,7 +119,7 @@ namespace QuickCross
 		/// </summary>
 		/// <param name="viewProperty"></param>
 		/// <param name="value"></param>
-		public virtual void UpdateView(InstanceProperty viewProperty, object value)
+		public virtual void UpdateView(PropertyReference viewProperty, object value)
 		{
 			ViewDataBindings.UpdateView(viewProperty, value);
 		}
