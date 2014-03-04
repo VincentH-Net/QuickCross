@@ -28,18 +28,18 @@ namespace QuickCross
 		public object View;
 		public string ViewMemberName;
 
-		/// <summary>
-		/// A Linq expression that specifies the name of the ViewMember in a typesafe manner
-		/// <example>() => view.AProperty</example>
-		/// <example>() => view.AField</example>
+		/// <summary>A Linq expression that specifies the name of the ViewMember in a typesafe manner, 
+        /// e.g.: <example>() => view.AProperty</example> or <example>() => view.AField</example>
 		/// </summary>
 		public Expression<Func<object>> ViewMember { set { ViewMemberName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
 
+        public Func<object, object> ConvertToView;
+        public Func<object, object> ConvertFromView;
+
 		public string ListPropertyName;
 
-		/// <summary>
-		/// A Linq expression that specifies the name of the ListProperty in a typesafe manner
-		/// <example>() => ViewModel.AProperty</example>
+		/// <summary>A Linq expression that specifies the name of the ListProperty in a typesafe manner, 
+        /// e.g.: <example>() => ViewModel.AProperty</example>
 		/// </summary>
 		public Expression<Func<object>> ListProperty { set { ListPropertyName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
 
@@ -326,12 +326,13 @@ namespace QuickCross
 			var itemTemplateName = bp.ListItemTemplateName;
 
 			var idName = IdName(propertyName);
+			var viewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName);
 
 			var binding = new DataBinding
 			{
-                ViewProperty = new PropertyReference(view, viewMemberName),
+                ViewProperty = new PropertyReference(view, viewMemberName, viewModelPropertyInfo != null ? viewModelPropertyInfo.PropertyType : null, bp.ConvertToView, bp.ConvertFromView),
 				Mode = mode,
-				ViewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName)
+				ViewModelPropertyInfo = viewModelPropertyInfo
 			};
 
 			if (binding.ViewProperty.ContainingObject is UITableView)

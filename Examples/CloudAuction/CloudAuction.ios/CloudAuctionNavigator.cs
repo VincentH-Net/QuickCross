@@ -53,7 +53,8 @@ namespace CloudAuction
         /// </summary>
         /// <param name="viewControllerIdentifier">The storyboard identifier for a storyboard view controller; otherwise null.</param>
         /// <param name="viewControllerType">The view controller type. Specify for automatically navigating back to an existing instance if that exists on the navigation stack. Also specify to create non-storyboard view controller if none exists in the navigation stack.</param>
-        /// <param name="animated">A boolean indicating whether the navigation transition should be animated</param>
+        /// <param name="animated">An optional boolean indicating whether the navigation transition should be animated</param>
+        /// <param name="storyBoard">An optional storyBoard instance for instantiating view controllers. If not specified, NavigationContext.Storyboard will be used if needed.</param>
         private void Navigate(string viewControllerIdentifier, Type viewControllerType = null, bool animated = false, UIStoryboard storyBoard = null)
         {
 			if (NavigationContext == null) return;
