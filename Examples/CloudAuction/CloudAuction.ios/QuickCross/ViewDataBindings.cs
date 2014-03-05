@@ -35,15 +35,15 @@ namespace QuickCross
 
         /// <summary>
         /// An optional action to update the view from the viewmodel, e.g. <example>() => myView.Color = ViewModel.MyBoolean ? UIColor.Green : UIColor.Red</example>
-        /// <remarks>You can use this action to convert value types, invoke methods on the view, combine multiple viewmodel properties etc.</remarks>
+        /// <remarks>You can use this action to convert values, invoke methods on the view, combine multiple viewmodel properties etc.</remarks>
         /// </summary>
-        public Action<PropertyReference> UpdateView; // TODO: verify if it makes most sense to omit the value parameter
+        public Action UpdateView;
 
         /// <summary>
         /// An optional action to update the viewmodel from the view for two-way bindings, e.g. <example>() => ViewModel.MyBoolean = myView.Color == UIColor.Green</example>
-        /// <remarks>You can use this action to convert value types, invoke methods on the view, set multiple viewmodel properties etc.</remarks>
+        /// <remarks>You can use this action to convert values, invoke methods on the view, set multiple viewmodel properties etc.</remarks>
         /// </summary>
-        public Action<PropertyReference> UpdateViewModel; // TODO: verify if it makes most sense to omit the viewmodel and viewmodelpropertyinfo parameters
+        public Action UpdateViewModel;
 
         public string ListPropertyName;
 
@@ -135,8 +135,8 @@ namespace QuickCross
 		{
 			public BindingMode Mode;
 			public PropertyReference ViewProperty;
-            public Action<PropertyReference> UpdateViewAction;
-            public Action<PropertyReference> UpdateViewModelAction;
+            public Action UpdateViewAction;
+            public Action UpdateViewModelAction;
             public PropertyInfo ViewModelPropertyInfo;
 
 			public PropertyInfo ViewModelListPropertyInfo;
@@ -145,7 +145,7 @@ namespace QuickCross
             public void UpdateViewModel(ViewModelBase viewModel, object value)
             {
                 if (UpdateViewModelAction != null) {
-                    UpdateViewModelAction(ViewProperty);
+                    UpdateViewModelAction();
                 } else {
                     ViewModelPropertyInfo.SetValue(viewModel, value);
                 }
@@ -413,7 +413,7 @@ namespace QuickCross
 			{
 				var viewProperty = binding.ViewProperty;
                 if (binding.UpdateViewAction != null) {
-                    binding.UpdateViewAction(viewProperty);
+                    binding.UpdateViewAction();
                 } else {
                     var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
                     if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(viewProperty, value); else UpdateView(viewProperty, value);

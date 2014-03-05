@@ -3,6 +3,9 @@ using System.Collections;
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using System.Collections.Generic;
+#if __DIALOG__
+using MonoTouch.Dialog;
+#endif
 
 namespace QuickCross
 {
@@ -18,7 +21,13 @@ namespace QuickCross
             switch (viewTypeName)
             {
                 // TODO: Add cases here for specialized view types, as needed
-				case "MonoTouch.UIKit.UIButton":
+#if __DIALOG__
+                case "MonoTouch.Dialog.StringElement":
+                case "MonoTouch.Dialog.StyledStringElement":
+                    ((StringElement)view).Tapped += () => ExecuteCommand(binding);
+                    break;
+#endif
+                case "MonoTouch.UIKit.UIButton":
 					{
 						var button = (UIButton)view;
 						button.TouchUpInside += HandleTouchUpInside;
@@ -72,9 +81,24 @@ namespace QuickCross
 
         public static Dictionary<string, string> ViewDefaultPropertyOrFieldName = new Dictionary<string, string>
         { // Key: full type name of view, Value: name of a property or field on the view
-            { "MonoTouch.UIKit.UILabel", "Text" },
-            { "MonoTouch.UIKit.UITextField", "Text" },
-            { "MonoTouch.UIKit.UITextView", "Text" }
+            { "MonoTouch.UIKit.UILabel"             , "Text" },
+            { "MonoTouch.UIKit.UITextField"         , "Text" },
+            { "MonoTouch.UIKit.UITextView"          , "Text" },
+#if __DIALOG__
+            { "MonoTouch.Dialog.EntryElement"       , "Value" },
+            { "MonoTouch.Dialog.BooleanElement"     , "Value" },
+            { "MonoTouch.Dialog.BooleanImageElement", "Value" },
+            { "MonoTouch.Dialog.CheckboxElement"    , "Value" },
+            { "MonoTouch.Dialog.DateElement"        , "DateValue" },
+            { "MonoTouch.Dialog.DateTimeElement"    , "DateValue" },
+            { "MonoTouch.Dialog.FloatElement"       , "Value" },
+            { "MonoTouch.Dialog.ImageElement"       , "Value" },
+            { "MonoTouch.Dialog.RadioElement"       , "Value" },
+            { "MonoTouch.Dialog.RootElement"        , "RadioSelected" },
+            { "MonoTouch.Dialog.StringElement"      , "Value" },
+            { "MonoTouch.Dialog.StyledStringElement", "Value" },
+            { "MonoTouch.Dialog.TimeElement"        , "DateValue" }
+#endif
         };
 
         public static void UpdateView(PropertyReference viewProperty, object value)
@@ -125,9 +149,51 @@ namespace QuickCross
 						);
 					}
 					break;
-				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed += HandleTextViewChanged; break;
-                case "MonoTouch.Dialog.EntryElement": ((MonoTouch.Dialog.EntryElement)view).Changed += EntryElement_Changed; break;
-				default: 
+				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed += HandleTextViewChanged; 
+                    break;
+#if __DIALOG__
+                case "MonoTouch.Dialog.EntryElement": {
+                        var element = (EntryElement)view;
+                        element.Changed += (s, e) => binding.UpdateViewModel(viewModel, element.Value);
+                    }
+                    break;
+                case "MonoTouch.Dialog.BooleanElement":
+                case "MonoTouch.Dialog.BooleanImageElement":
+                    {
+                        var element = (BoolElement)view;
+                        element.ValueChanged += (s, e) => binding.UpdateViewModel(viewModel, element.Value);
+                    }
+                    break;
+                case "MonoTouch.Dialog.CheckboxElement":
+                    {
+                        var element = (CheckboxElement)view;
+                        element.Tapped += () => binding.UpdateViewModel(viewModel, element.Value);
+                    }
+                    break;
+                case "MonoTouch.Dialog.DateTimeElement":
+                case "MonoTouch.Dialog.DateElement":
+                case "MonoTouch.Dialog.TimeElement":
+                    {
+                        var element = (DateTimeElement)view;
+                        element.DateSelected += (d) => binding.UpdateViewModel(viewModel, d.DateValue);
+                    }
+                    break;
+                case "MonoTouch.Dialog.RootElement":
+                    {
+                        var rootElement = (RootElement)view;
+                        foreach (var section in rootElement)
+                        {
+                            foreach (var element in section.Elements)
+                            {
+                                var radioElement = element as RadioElement;
+                                if (radioElement != null) radioElement.Tapped += () => binding.UpdateViewModel(viewModel, rootElement.RadioSelected);
+                                    // TODO: is setting an int index the normal way to handle radiobutton select? should set an an item object on the viewmodel like selecteditem
+                            }
+                        }
+                    }
+                    break;
+#endif
+                default: 
 					if (view is UITableView) break;
 					throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }

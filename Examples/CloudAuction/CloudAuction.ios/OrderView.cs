@@ -164,9 +164,6 @@ namespace CloudAuction
         public OrderView(IntPtr handle) : base(handle)
         {
             Pushing = true;
-			//var expense = new Expense ();
-			//var bctx = new BindingContext (null, expense, "Create a task");
-			//Root = bctx.Root;
 			Root = new RootElement("Order") { 
                 new Section() {
                     (email = new EntryElement("Email", "Enter Email", "")), //.Bind(OrderViewModel.PROPERTYNAME_Email),
@@ -190,42 +187,42 @@ namespace CloudAuction
             // - bind to annotated model:
             //   - 
 
-//            Section s;
-//            Element e;
-//            EntryElement ee;
-//            DialogViewController dvc;
-//            BooleanElement be;
-//            BooleanImageElement bie;
-//            CheckboxElement ce;
-//            DateElement de;
-//            DateTimeElement dte;
-//            FloatElement fe;
-//            ImageElement ie;
-//            RadioElement re;
-//            RootElement rte;
-//            StringElement se;
-//            StyledStringElement sse;
-//            TimeElement te;
-//            UIViewElement ue;
+            //Section s; 
+            //Element e;
+            //EntryElement ee; var eev = ee.Value;
+            //DialogViewController dvc;
+            //BooleanElement be; var bev = be.Value;
+            //BooleanImageElement bie; var biev = bie.Value;
+            //CheckboxElement ce; var cev = ce.Value;
+            //DateElement de; var dev = de.DateValue;
+            //DateTimeElement dte; var dtev = dte.DateValue;
+            //FloatElement fe; var fev = fe.Value;
+            //ImageElement ie; var iev = ie.Value;
+            //RadioElement re; var rev = re.Value; // ?
+            //RootElement rte; var rtev = rte.RadioSelected;
+            //StringElement se; var sev = se.Value;
+            //StyledStringElement sse; var ssev = sse.Value;
+            //TimeElement te; var tes = te.DateValue;
+            //UIViewElement ue;
 
             //ee.Changed
             //be.ValueChanged
-            //bie.Tapped
             //bie.ValueChanged
             //ce.Tapped
             //de.DateSelected
-
+            //dte.DateSelected
+            //re.Tapped
+            //se.Tapped
+            //sse.Tapped
+            //sse.AccessoryTapped
+            // te.DateSelected
         }
 
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
             var bp = new BindingParameters[] {
-				new BindingParameters { 
-                    Property = () => ViewModel.Email, Mode = BindingMode.TwoWay, View = email, ViewMember = () => email.Value
-                    //UpdateView =      p => email.Value = ViewModel.Email,
-                    //UpdateViewModel = p => ViewModel.Email = email.Value
-                }
+				new BindingParameters { Property = () => ViewModel.Email, Mode = BindingMode.TwoWay, View = email }
 			};
 
             InitializeBindings(View, ViewModel, bp);
