@@ -71,7 +71,7 @@ namespace QuickCross
         #region View types that support one-way data binding
 
         public static Dictionary<string, string> ViewDefaultPropertyOrFieldName = new Dictionary<string, string>
-        { // Key: full type name of view. Value: name of a property or field on the view.
+        { // Key: full type name of view, Value: name of a property or field on the view
             { "MonoTouch.UIKit.UILabel", "Text" },
             { "MonoTouch.UIKit.UITextField", "Text" },
             { "MonoTouch.UIKit.UITextView", "Text" }
@@ -98,7 +98,7 @@ namespace QuickCross
 					}
 					else
 					{
-                        viewProperty.Value = value.ToString();
+                        viewProperty.Value = value;
                     }
 					break;
             }
@@ -126,24 +126,32 @@ namespace QuickCross
 					}
 					break;
 				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed += HandleTextViewChanged; break;
+                case "MonoTouch.Dialog.EntryElement": ((MonoTouch.Dialog.EntryElement)view).Changed += EntryElement_Changed; break;
 				default: 
 					if (view is UITableView) break;
 					throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
         }
 
+        void EntryElement_Changed(object sender, EventArgs e)
+        {
+            var view = (MonoTouch.Dialog.EntryElement)sender;
+            var binding = FindBindingForView(view);
+            if (binding != null) binding.UpdateViewModel(viewModel, view.Value);
+        }
+
 		private void HandleTextFieldTextDidChangeNotification(NSNotification notification)
 		{
 			UITextField view = (UITextField)notification.Object;
 			var binding = FindBindingForView(view);
-			if (binding != null) binding.ViewModelPropertyInfo.SetValue(viewModel, view.Text);
+			if (binding != null) binding.UpdateViewModel(viewModel, view.Text);
 		}
 
         void HandleTextViewChanged (object sender, EventArgs e)
         {
 			var view = (UITextView)sender;
 			var binding = FindBindingForView(view);
-			if (binding != null) binding.ViewModelPropertyInfo.SetValue(viewModel, view.Text);
+            if (binding != null) binding.UpdateViewModel(viewModel, view.Text);
         }
 
         private void RemoveTwoWayHandler(DataBinding binding)
@@ -160,8 +168,9 @@ namespace QuickCross
 						 textFieldTextDidChangeObserver = null;
 					 }
 					 break;
-				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed       -= HandleTextViewChanged; break;
-				default:
+				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed -= HandleTextViewChanged; break;
+                case "MonoTouch.Dialog.EntryElement": ((MonoTouch.Dialog.EntryElement)view).Changed -= EntryElement_Changed; break;
+                default:
 					 if (view is UITableView) break;
 					 throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }

@@ -158,24 +158,21 @@ namespace CloudAuction
 	{
 		private OrderViewModel ViewModel { get { return CloudAuctionApplication.Instance.OrderViewModel; } }
 
+        private EntryElement email;
+        private BooleanElement check;
+
         public OrderView(IntPtr handle) : base(handle)
         {
             Pushing = true;
 			//var expense = new Expense ();
 			//var bctx = new BindingContext (null, expense, "Create a task");
 			//Root = bctx.Root;
-
 			Root = new RootElement("Order") { 
                 new Section() {
-                    new EntryElement("Email", "Enter Email", ViewModel.Email), //.Bind(OrderViewModel.PROPERTYNAME_Email),
-					new BooleanElement("Check", false) //.Bind(OrderViewModel.PROPERTYNAME_DeliveryLocationListHasItems)
+                    (email = new EntryElement("Email", "Enter Email", "")), //.Bind(OrderViewModel.PROPERTYNAME_Email),
+					(check = new BooleanElement("Check", false)) //.Bind(OrderViewModel.PROPERTYNAME_DeliveryLocationListHasItems)
                 }
             };
-
-			var p = new BindingParameters[] {
-				new BindingParameters { Property = () => ViewModel.Email, Mode = BindingMode.TwoWay },
-				new BindingParameters { ViewModelPropertyName = OrderViewModel.PROPERTYNAME_Email, Mode = BindingMode.TwoWay }
-			};
 
             // TODO: figure out how to do data binding with monotouch.dialog -> choose the elements api, not the reflection api
             // 0) How to find the element given a propertyname?
@@ -223,7 +220,15 @@ namespace CloudAuction
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
-			InitializeBindings(View, ViewModel);
+            var bp = new BindingParameters[] {
+				new BindingParameters { 
+                    Property = () => ViewModel.Email, Mode = BindingMode.TwoWay, View = email, ViewMember = () => email.Value
+                    //UpdateView =      p => email.Value = ViewModel.Email,
+                    //UpdateViewModel = p => ViewModel.Email = email.Value
+                }
+			};
+
+            InitializeBindings(View, ViewModel, bp);
 
             var cancelButton = new UIBarButtonItem("Cancel", UIBarButtonItemStyle.Done, (s, e) => ViewModel.CancelCommand.Execute(null));
 			cancelButton.Enabled = ViewModel.CancelCommand.IsEnabled;

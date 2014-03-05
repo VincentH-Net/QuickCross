@@ -21,9 +21,8 @@ namespace QuickCross
 
 		private PropertyInfo propertyInfo;
 		private FieldInfo fieldInfo;
-        private Type convertToType, convertFromType;
+        private Type convertType, convertBackType;
         private bool typesDiffer;
-        private Func<object, object> convertTo, convertFrom;
 
 		public object ContainingObject { get; private set; }
 		public string PropertyOrFieldName { get; private set; }
@@ -37,16 +36,12 @@ namespace QuickCross
 				else if (fieldInfo != null) val = fieldInfo.GetValue(ContainingObject);
 				else throw new InvalidOperationException("Cannot access the Value because no PropertyOrFieldName was specified");
 
-                return convertFrom != null ? convertFrom(val) : 
-                       convertFromType != null && typesDiffer ? Convert.ChangeType(val, convertFromType) : 
-                       val;
+                return convertBackType != null && typesDiffer ? Convert.ChangeType(val, convertBackType) : val;
 			}
 
 			set
 			{
-                object val = convertTo != null ? convertTo(value) : 
-                             convertToType != null && typesDiffer ? Convert.ChangeType(value, convertToType) : 
-                             value;
+                object val = convertType != null && typesDiffer ? Convert.ChangeType(value, convertType) : value;
 
                 if (Value == val) return;
 				if (propertyInfo != null) propertyInfo.SetValue(ContainingObject, val);
@@ -54,27 +49,25 @@ namespace QuickCross
 			}
 		}
 
-        public PropertyReference(object containingObject, string propertyOrFieldName, Type convertFromType = null, Func<object, object> convertTo = null, Func<object, object> convertFrom = null)
+        public PropertyReference(object containingObject, string propertyOrFieldName, Type convertBackType = null)
 		{
 			ContainingObject = containingObject;
 			PropertyOrFieldName = propertyOrFieldName;
 			if (string.IsNullOrEmpty(PropertyOrFieldName)) return;
 
-            this.convertFromType = convertFromType;
-            this.convertTo = convertTo;
-            this.convertFrom = convertFrom;
+            this.convertBackType = convertBackType;
 
 			var type = ContainingObject.GetType();
 			propertyInfo = type.GetProperty(PropertyOrFieldName);
 			if (propertyInfo != null) {
-                convertToType = propertyInfo.PropertyType;
+                convertType = propertyInfo.PropertyType;
             } else {
 				fieldInfo = type.GetField(PropertyOrFieldName);
 				if (fieldInfo == null) throw new ArgumentException(string.Format("The type {0} has no property or field named '{1}'", type.FullName, PropertyOrFieldName), "propertyOrFieldName");
-                convertToType = fieldInfo.FieldType;
+                convertType = fieldInfo.FieldType;
 			}
 
-            typesDiffer = convertToType != convertFromType;
+            typesDiffer = convertType != convertBackType;
 		}
 
 		/// <summary>Constructor</summary>
@@ -82,8 +75,8 @@ namespace QuickCross
 		/// <param name="propertyOrField">A Linq expression that specifies the name of the property or field in a typesafe manner,
         /// e.g.: <example>() => obj.AProperty</example> or <example>() => obj.AField</example>
 		/// </param>
-        public PropertyReference(object containingObject, Expression<Func<object>> propertyOrField, Type convertFromType = null, Func<object, object> convertTo = null, Func<object, object> convertFrom = null)
-			: this(containingObject, GetMemberName(propertyOrField), convertFromType, convertTo, convertFrom)
+        public PropertyReference(object containingObject, Expression<Func<object>> propertyOrField, Type convertBackType = null)
+			: this(containingObject, GetMemberName(propertyOrField), convertBackType)
 		{ }
 	}
 }

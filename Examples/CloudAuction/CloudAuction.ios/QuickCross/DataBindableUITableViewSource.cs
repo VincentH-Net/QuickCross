@@ -202,7 +202,7 @@ namespace QuickCross
 				foreach (var bindingParameter in bindingParametersList)
 				{
                     var viewMemberName = bindingParameter.ViewMemberName;
-                    if ((bindingParameter.Mode == BindingMode.OneWay || bindingParameter.Mode == BindingMode.TwoWay) && viewMemberName == null)
+                    if ((bindingParameter.Mode == BindingMode.OneWay || bindingParameter.Mode == BindingMode.TwoWay) && bindingParameter.UpdateView == null && viewMemberName == null)
                     {
                         var typeName = bindingParameter.View.GetType().FullName;
                         if (!ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))

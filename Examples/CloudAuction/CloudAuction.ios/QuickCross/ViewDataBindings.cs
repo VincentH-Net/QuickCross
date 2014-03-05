@@ -28,17 +28,26 @@ namespace QuickCross
 		public object View;
 		public string ViewMemberName;
 
-		/// <summary>A Linq expression that specifies the name of the ViewMember in a typesafe manner, 
+		/// <summary>An optional Linq expression that specifies the ViewMemberName in a typesafe manner, 
         /// e.g.: <example>() => view.AProperty</example> or <example>() => view.AField</example>
 		/// </summary>
 		public Expression<Func<object>> ViewMember { set { ViewMemberName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
 
-        public Func<object, object> ConvertToView;
-        public Func<object, object> ConvertFromView;
+        /// <summary>
+        /// An optional action to update the view from the viewmodel, e.g. <example>() => myView.Color = ViewModel.MyBoolean ? UIColor.Green : UIColor.Red</example>
+        /// <remarks>You can use this action to convert value types, invoke methods on the view, combine multiple viewmodel properties etc.</remarks>
+        /// </summary>
+        public Action<PropertyReference> UpdateView; // TODO: verify if it makes most sense to omit the value parameter
 
-		public string ListPropertyName;
+        /// <summary>
+        /// An optional action to update the viewmodel from the view for two-way bindings, e.g. <example>() => ViewModel.MyBoolean = myView.Color == UIColor.Green</example>
+        /// <remarks>You can use this action to convert value types, invoke methods on the view, set multiple viewmodel properties etc.</remarks>
+        /// </summary>
+        public Action<PropertyReference> UpdateViewModel; // TODO: verify if it makes most sense to omit the viewmodel and viewmodelpropertyinfo parameters
 
-		/// <summary>A Linq expression that specifies the name of the ListProperty in a typesafe manner, 
+        public string ListPropertyName;
+
+        /// <summary>An optional Linq expression that specifies the ListPropertyName in a typesafe manner, 
         /// e.g.: <example>() => ViewModel.AProperty</example>
 		/// </summary>
 		public Expression<Func<object>> ListProperty { set { ListPropertyName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
@@ -49,7 +58,7 @@ namespace QuickCross
 		public string ListCanEditItem;
 		public string ListCanMoveItem;
 	}
-	
+
 	public partial class ViewDataBindings
     {
 		#region Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
@@ -126,11 +135,21 @@ namespace QuickCross
 		{
 			public BindingMode Mode;
 			public PropertyReference ViewProperty;
-			public PropertyInfo ViewModelPropertyInfo;
-			// TODO: store memberinfo for ViewMemberName
+            public Action<PropertyReference> UpdateViewAction;
+            public Action<PropertyReference> UpdateViewModelAction;
+            public PropertyInfo ViewModelPropertyInfo;
 
 			public PropertyInfo ViewModelListPropertyInfo;
 			public DataBindableUITableViewSource TableViewSource;
+
+            public void UpdateViewModel(ViewModelBase viewModel, object value)
+            {
+                if (UpdateViewModelAction != null) {
+                    UpdateViewModelAction(ViewProperty);
+                } else {
+                    ViewModelPropertyInfo.SetValue(viewModel, value);
+                }
+            }
 
 			public void Command_CanExecuteChanged(object sender, EventArgs e)
 			{
@@ -313,7 +332,7 @@ namespace QuickCross
 			var view = bp.View;
 			if (view == null) return null;
             var viewMemberName = bp.ViewMemberName;
-            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && viewMemberName == null)
+            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && bp.UpdateView == null && viewMemberName == null)
             {
                 var typeName = view.GetType().FullName;
                 if (!ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
@@ -330,7 +349,9 @@ namespace QuickCross
 
 			var binding = new DataBinding
 			{
-                ViewProperty = new PropertyReference(view, viewMemberName, viewModelPropertyInfo != null ? viewModelPropertyInfo.PropertyType : null, bp.ConvertToView, bp.ConvertFromView),
+                ViewProperty = new PropertyReference(view, viewMemberName, viewModelPropertyInfo != null ? viewModelPropertyInfo.PropertyType : null),
+                UpdateViewAction = bp.UpdateView,
+                UpdateViewModelAction = bp.UpdateViewModel,
 				Mode = mode,
 				ViewModelPropertyInfo = viewModelPropertyInfo
 			};
@@ -391,8 +412,12 @@ namespace QuickCross
             if (((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay)) && binding.ViewProperty != null && binding.ViewProperty.ContainingObject != null)
 			{
 				var viewProperty = binding.ViewProperty;
-				var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
-				if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(viewProperty, value); else UpdateView(viewProperty, value);
+                if (binding.UpdateViewAction != null) {
+                    binding.UpdateViewAction(viewProperty);
+                } else {
+                    var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
+                    if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(viewProperty, value); else UpdateView(viewProperty, value);
+                }
 			}
 		}
 
