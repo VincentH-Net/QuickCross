@@ -13,6 +13,7 @@ namespace QuickCross
 		/// <returns>The name of the property or field specified in the expression</returns>
 		public static string GetMemberName(Expression<Func<object>> expression)
 		{
+            if (expression == null) return null;
 			var unaryX = expression.Body as UnaryExpression;
 			var memberX = (unaryX != null) ? unaryX.Operand as MemberExpression : expression.Body as MemberExpression;
 			if (memberX == null || memberX.Member == null) throw new ArgumentException("Invalid expression for MemberName:\n" + expression.ToString() + "\nValid expressions are e.g.:\n() => obj.AProperty\n() => obj.AField");

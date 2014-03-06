@@ -356,19 +356,19 @@ namespace QuickCross
 				ViewModelPropertyInfo = viewModelPropertyInfo
 			};
 
-			if (binding.ViewProperty.ContainingObject is UITableView)
+			if (listPropertyName == null) listPropertyName = propertyName + "List";
+			var pi = viewModel.GetType().GetProperty(listPropertyName);
+			if (pi == null && binding.ViewModelPropertyInfo != null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
 			{
-				if (listPropertyName == null) listPropertyName = propertyName + "List";
-				var pi = viewModel.GetType().GetProperty(listPropertyName);
-				if (pi == null && binding.ViewModelPropertyInfo != null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
-				{
-					listPropertyName = propertyName;
-					pi = binding.ViewModelPropertyInfo;
-					binding.ViewModelPropertyInfo = null;
-				}
-				binding.ViewModelListPropertyInfo = pi;
+				listPropertyName = propertyName;
+				pi = binding.ViewModelPropertyInfo;
+				binding.ViewModelPropertyInfo = null;
+			}
+			binding.ViewModelListPropertyInfo = pi;
 
-				var tableView = (UITableView)binding.ViewProperty.ContainingObject;
+            if (binding.ViewProperty.ContainingObject is UITableView)
+            {
+                var tableView = (UITableView)binding.ViewProperty.ContainingObject;
 				if (tableView.Source == null)
 				{
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";

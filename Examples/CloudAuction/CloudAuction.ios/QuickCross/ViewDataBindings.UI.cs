@@ -186,8 +186,18 @@ namespace QuickCross
                             foreach (var element in section.Elements)
                             {
                                 var radioElement = element as RadioElement;
-                                if (radioElement != null) radioElement.Tapped += () => binding.UpdateViewModel(viewModel, rootElement.RadioSelected);
-                                    // TODO: is setting an int index the normal way to handle radiobutton select? should set an an item object on the viewmodel like selecteditem
+                                if (radioElement != null)
+                                {
+                                    radioElement.Tapped += () =>
+                                    {
+                                        if (binding.ViewModelListPropertyInfo != null)
+                                        {
+                                            var list = binding.ViewModelListPropertyInfo.GetValue(viewModel) as IList;
+                                            int i = rootElement.RadioSelected;
+                                            if (list != null && i >= 0 && i < list.Count) binding.UpdateViewModel(viewModel, list[i]);
+                                        }
+                                    };
+                                }
                             }
                         }
                     }
@@ -235,7 +245,18 @@ namespace QuickCross
 					 }
 					 break;
 				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed -= HandleTextViewChanged; break;
-                case "MonoTouch.Dialog.EntryElement": ((MonoTouch.Dialog.EntryElement)view).Changed -= EntryElement_Changed; break;
+#if __DIALOG__
+                case "MonoTouch.Dialog.EntryElement":
+                case "MonoTouch.Dialog.BooleanElement":
+                case "MonoTouch.Dialog.BooleanImageElement":
+                case "MonoTouch.Dialog.CheckboxElement":
+                case "MonoTouch.Dialog.DateTimeElement":
+                case "MonoTouch.Dialog.DateElement":
+                case "MonoTouch.Dialog.TimeElement":
+                case "MonoTouch.Dialog.RootElement":
+                    // All these view types have inline event handlers that are internal to the view controller - they wont cause memory leaks so they do not need to be removed
+                    break;
+#endif
                 default:
 					 if (view is UITableView) break;
 					 throw new NotImplementedException("View type not implemented: " + viewTypeName);
