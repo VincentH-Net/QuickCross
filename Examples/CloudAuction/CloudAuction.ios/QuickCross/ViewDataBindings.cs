@@ -13,6 +13,9 @@ using MonoTouch.ObjCRuntime;
 using MonoTouch.Foundation;
 using MonoTouch;
 using MonoMac;
+#if __DIALOG__
+using MonoTouch.Dialog;
+#endif
 
 namespace QuickCross
 {
@@ -58,6 +61,57 @@ namespace QuickCross
 		public string ListCanEditItem;
 		public string ListCanMoveItem;
 	}
+
+#if __DIALOG__
+    public static class ElementExtensions
+    {
+        public static Element Bind(
+            this Element element,
+            List<BindingParameters> bindingsParameters,
+            Expression<Func<object>> property,
+            BindingMode mode = BindingMode.TwoWay,
+            Expression<Func<object>> viewMember = null,
+            Action updateView = null,
+            Action updateViewModel = null,
+            Expression<Func<object>> listProperty = null)
+        {
+            bindingsParameters.Add(new BindingParameters
+            {
+                Property = property,
+                Mode = mode,
+                View = element,
+                ViewMember = viewMember,
+                UpdateView = updateView,
+                UpdateViewModel = updateViewModel,
+                ListProperty = listProperty
+            });
+            return element;
+        }
+
+        public static Element Bind(
+             this Element element,
+             List<BindingParameters> bindingsParameters,
+             string property,
+             BindingMode mode = BindingMode.TwoWay,
+             Expression<Func<object>> viewMember = null,
+             Action updateView = null,
+             Action updateViewModel = null,
+             string listProperty = null)
+        {
+            bindingsParameters.Add(new BindingParameters
+            {
+                ViewModelPropertyName = property,
+                Mode = mode,
+                View = element,
+                ViewMember = viewMember,
+                UpdateView = updateView,
+                UpdateViewModel = updateViewModel,
+                ListPropertyName = listProperty
+            });
+            return element;
+        }
+    }
+#endif
 
 	public partial class ViewDataBindings
     {

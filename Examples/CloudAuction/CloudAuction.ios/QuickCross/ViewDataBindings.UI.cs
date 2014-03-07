@@ -39,8 +39,6 @@ namespace QuickCross
 						}
 					}
 					break;
-                default:
-                    break;
             }
         }
 
@@ -70,8 +68,6 @@ namespace QuickCross
 						((UIButton)view).TouchUpInside -= HandleTouchUpInside;
 					}
 					break;
-                default:
-                    break;
             }
         }
 
@@ -84,7 +80,8 @@ namespace QuickCross
             { "MonoTouch.UIKit.UILabel"             , "Text" },
             { "MonoTouch.UIKit.UITextField"         , "Text" },
             { "MonoTouch.UIKit.UITextView"          , "Text" },
-#if __DIALOG__
+ 
+            #if __DIALOG__
             { "MonoTouch.Dialog.EntryElement"       , "Value" },
             { "MonoTouch.Dialog.BooleanElement"     , "Value" },
             { "MonoTouch.Dialog.BooleanImageElement", "Value" },
@@ -98,7 +95,7 @@ namespace QuickCross
             { "MonoTouch.Dialog.StringElement"      , "Value" },
             { "MonoTouch.Dialog.StyledStringElement", "Value" },
             { "MonoTouch.Dialog.TimeElement"        , "DateValue" }
-#endif
+            #endif
         };
 
         public static void UpdateView(PropertyReference viewProperty, object value)
@@ -151,7 +148,8 @@ namespace QuickCross
 					break;
 				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed += HandleTextViewChanged; 
                     break;
-#if __DIALOG__
+
+                #if __DIALOG__
                 case "MonoTouch.Dialog.EntryElement": {
                         var element = (EntryElement)view;
                         element.Changed += (s, e) => binding.UpdateViewModel(viewModel, element.Value);
@@ -202,18 +200,12 @@ namespace QuickCross
                         }
                     }
                     break;
-#endif
+                #endif
+
                 default: 
 					if (view is UITableView) break;
 					throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
-        }
-
-        void EntryElement_Changed(object sender, EventArgs e)
-        {
-            var view = (MonoTouch.Dialog.EntryElement)sender;
-            var binding = FindBindingForView(view);
-            if (binding != null) binding.UpdateViewModel(viewModel, view.Value);
         }
 
 		private void HandleTextFieldTextDidChangeNotification(NSNotification notification)
@@ -245,21 +237,6 @@ namespace QuickCross
 					 }
 					 break;
 				case "MonoTouch.UIKit.UITextView" : ((UITextView)view).Changed -= HandleTextViewChanged; break;
-#if __DIALOG__
-                case "MonoTouch.Dialog.EntryElement":
-                case "MonoTouch.Dialog.BooleanElement":
-                case "MonoTouch.Dialog.BooleanImageElement":
-                case "MonoTouch.Dialog.CheckboxElement":
-                case "MonoTouch.Dialog.DateTimeElement":
-                case "MonoTouch.Dialog.DateElement":
-                case "MonoTouch.Dialog.TimeElement":
-                case "MonoTouch.Dialog.RootElement":
-                    // All these view types have inline event handlers that are internal to the view controller - they wont cause memory leaks so they do not need to be removed
-                    break;
-#endif
-                default:
-					 if (view is UITableView) break;
-					 throw new NotImplementedException("View type not implemented: " + viewTypeName);
             }
         }
 
