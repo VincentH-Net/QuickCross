@@ -62,7 +62,7 @@ namespace QuickCross
 		public string ListCanMoveItem;
 	}
 
-#if __DIALOG__
+    #if __DIALOG__
     public static class ElementExtensions
     {
         public static Element Bind(
@@ -111,7 +111,7 @@ namespace QuickCross
             return element;
         }
     }
-#endif
+    #endif
 
 	public partial class ViewDataBindings
     {
@@ -126,63 +126,82 @@ namespace QuickCross
 		[MonoPInvokeCallback (typeof(SetValueForUndefinedKeyCallBack))]
 		private static void SetValueForUndefinedKey(IntPtr selfPtr, IntPtr cmdPtr, IntPtr valuePtr, IntPtr undefinedKeyPtr)
 		{
-			UIView self = (UIView) Runtime.GetNSObject(selfPtr);
+            var self = Runtime.GetNSObject(selfPtr);
 			var value = Runtime.GetNSObject(valuePtr);
 			var key = (NSString) Runtime.GetNSObject(undefinedKeyPtr);
 			if (key == BindKey) {
 				AddBinding(self, value.ToString());
 			} else {
 				Console.WriteLine("Value for unknown key: {0} = {1}", key.ToString(), value.ToString() );
-				// Call original implementation on super class of UIView:
-				void_objc_msgSendSuper_intptr_intptr(UIViewSuperClass, SetValueForUndefinedKeySelector, valuePtr, undefinedKeyPtr);
-			}
+				// Call original implementation on super class:
+                if (self is UIView) void_objc_msgSendSuper_intptr_intptr(UIViewSuperClass, SetValueForUndefinedKeySelector, valuePtr, undefinedKeyPtr);
+                else if (self is UIBarItem) void_objc_msgSendSuper_intptr_intptr(UIBarItemSuperClass, SetValueForUndefinedKeySelector, valuePtr, undefinedKeyPtr);
+            }
 		}
 
 		private static string BindKey;
-		private static IntPtr UIViewSuperClass, SetValueForUndefinedKeySelector;
+        private static IntPtr UIViewSuperClass, UIBarItemSuperClass, SetValueForUndefinedKeySelector;
 
 		public static void RegisterBindKey(string key = "Bind")
 		{
 			RootViewBindingParameters = new Dictionary<UIView, List<BindingParameters> >();
+            UIBarItemBindingParameters = new Dictionary<UIBarItem, BindingParameters>();
 			BindKey = key;
 			Console.WriteLine("Replacing implementation of SetValueForUndefinedKey on UIView...");
-			var uiViewClass = Class.GetHandle("UIView");
-			UIViewSuperClass = ObjcMagic.GetSuperClass(uiViewClass);
-			SetValueForUndefinedKeySelector = Selector.GetHandle("setValue:forUndefinedKey:");
-			ObjcMagic.AddMethod(uiViewClass, SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
-		}
+
+            var uiViewClass = Class.GetHandle("UIView");
+            UIViewSuperClass = ObjcMagic.GetSuperClass(uiViewClass);
+            
+            var uiBarItemClass = Class.GetHandle("UIBarItem");
+            UIBarItemSuperClass = ObjcMagic.GetSuperClass(uiBarItemClass);
+
+            SetValueForUndefinedKeySelector = Selector.GetHandle("setValue:forUndefinedKey:");
+			ObjcMagic.AddMethod(uiViewClass   , SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
+            ObjcMagic.AddMethod(uiBarItemClass, SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
+        }
 
 		#endregion Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
 
-		public static Dictionary<UIView, List<BindingParameters> > RootViewBindingParameters { get; private set; }
+		private static Dictionary<UIView, List<BindingParameters> > RootViewBindingParameters { get; set; }
+        private static Dictionary<UIBarItem, BindingParameters> UIBarItemBindingParameters { get; set; }
 
-		private static void AddBinding(UIView view, string bindingParameters)
+		private static void AddBinding(NSObject view, string bindingParameters)
 		{
 			Console.WriteLine("Binding parameters: {0}", bindingParameters);
 
-			// Get the rootview so we can group binding parameters under it.
-			var rootView = view;
-			while (rootView.Superview != null && rootView.Superview != rootView) {
-				rootView = rootView.Superview;
-				Console.Write(".");
-			}
-			Console.WriteLine("rootView = {0}", rootView.ToString());
+            var bp = ParseBindingParameters(bindingParameters);
+            if (bp == null)
+                throw new ArgumentException("Invalid data binding parameters: " + bindingParameters);
+            if (string.IsNullOrEmpty(bp.ViewModelPropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
+                throw new ArgumentException("At least one of PropertyName and ListPropertyName must be specified in data binding parameters: " + bindingParameters);
+            bp.View = view;
 
-			var bp = ParseBindingParameters(bindingParameters);
-			if (bp == null)
-				throw new ArgumentException("Invalid data binding parameters: " + bindingParameters);
-			if (string.IsNullOrEmpty(bp.ViewModelPropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
-				throw new ArgumentException("At least one of PropertyName and ListPropertyName must be specified in data binding parameters: " + bindingParameters);
-			bp.View = view;
+            // Get the rootview so we can group binding parameters under it.
+            if (view is UIView) {
+                var rootView = (UIView)view;
+                while (rootView.Superview != null && rootView.Superview != rootView) {
+                    rootView = rootView.Superview;
+                    Console.Write(".");
+                }
 
-			List<BindingParameters> bindingParametersList;
-			if (!RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
-			{
-				bindingParametersList = new List<BindingParameters>();
-				RootViewBindingParameters.Add(rootView, bindingParametersList);
-			}
+                Console.WriteLine("rootView = {0}", rootView.ToString());
 
-			bindingParametersList.Add(bp);
+                List<BindingParameters> bindingParametersList;
+                if (!RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
+                {
+                    bindingParametersList = new List<BindingParameters>();
+                    RootViewBindingParameters.Add(rootView, bindingParametersList);
+                }
+
+                bindingParametersList.Add(bp);
+            }
+            else if (view is UIBarItem)
+            {
+                // TODO: implement UIBarItem add
+            }
+            else {
+                throw new ArgumentException(string.Format("Unsupported view type for Bind custom runtime attribute: {0}. Supported base types: UIView, UIBarItem", view.GetType().FullName));
+            }
 		}
 
 		private class DataBinding
@@ -310,18 +329,36 @@ namespace QuickCross
 			if (binding != null && binding.TableViewSource != null) binding.TableViewSource.AddHandlers();
 		}
 
-		public void AddBindings(BindingParameters[] bindingsParameters)
+		public void AddBindings(BindingParameters[] bindingsParameters = null, UIView rootView = null, UINavigationItem navigationItem = null)
 		{
 			if (bindingsParameters != null)
 			{
-				foreach (var bp in bindingsParameters)
-				{
-					if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
-					if (dataBindings.ContainsKey(IdName(bp.ViewModelPropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.ViewModelPropertyName));
-					AddBinding(bp); 
-				}
+                Console.WriteLine("Adding bindings from code ...");
+                foreach (var bp in bindingsParameters) AddBinding(bp);
 			}
-		}
+            if (rootView != null)
+            {
+                List<BindingParameters> bindingParametersList;
+                if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
+                {
+                    Console.WriteLine("Adding bindings from markup ...");
+                    ViewDataBindings.RootViewBindingParameters.Remove(rootView); // Remove the static reference to the views to prevent memory leaks. Note that if we would want to recreate the bindings later, we could also store the parameters list in the bindings.
+                    foreach (var bp in bindingParametersList) AddBinding(bp);
+                }
+            }
+            if (navigationItem != null)
+            {
+                var uiBarItems = new List<UIBarItem>();
+                // TODO: check if we need this eg when leftItemsSupplementBackButton is true? uiBarItems.Add(navigationItem.BackBarButtonItem);
+                uiBarItems.AddRange(navigationItem.LeftBarButtonItems);
+                uiBarItems.AddRange(navigationItem.RightBarButtonItems);
+                // TODO: check if navigationItem.TitleView also needs Bind custom runtime attribute support?
+                foreach (var uiBarItem in uiBarItems)
+                {
+                    // TODO: uiBarItem add parameters
+                }
+            }
+        }
 
 		private string IdName(string name) { return idPrefix + name; }
 
@@ -383,7 +420,10 @@ namespace QuickCross
 
 		private DataBinding AddBinding(BindingParameters bp)
 		{
-			var view = bp.View;
+            if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
+            if (dataBindings.ContainsKey(IdName(bp.ViewModelPropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.ViewModelPropertyName));
+
+            var view = bp.View;
 			if (view == null) return null;
             var viewMemberName = bp.ViewMemberName;
             if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && bp.UpdateView == null && viewMemberName == null)

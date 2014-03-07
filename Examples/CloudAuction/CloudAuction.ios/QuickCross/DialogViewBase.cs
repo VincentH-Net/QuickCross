@@ -70,23 +70,14 @@ namespace QuickCross
 		/// <param name="viewModel">The view model</param>
 		/// <param name="bindingsParameters">Optional binding parameters; use to override default parameter values for specific bindings, or as an alternative for specifying binding parameters in the view tag attribute in AXML. Note that any binding parameters specified in the tag attribute wil override bindingsParameters.</param>
 		/// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
-		protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
+        protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
 		{
 			Bindings = new ViewDataBindings(viewModel, idPrefix ?? this.GetType().Name + "_", this);
 			this.viewModel = viewModel;
 
 			EnsureHandlersAreAdded();
 
-			Bindings.AddBindings(bindingsParameters); // First add any bindings that were specified in code
-			// TODO: Bindings.EnsureCommandBindings();  // Then add any command bindings that were not specified in code (based on the Id naming convention)
-
-			List<BindingParameters> bindingParametersList;
-			if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
-			{
-				Console.WriteLine("Adding bindings from markup ...");
-				ViewDataBindings.RootViewBindingParameters.Remove(rootView); // Remove the static reference to the views to prevent memory leaks. Note that if we would want to recreate the bindings later, we could also store the parameters list in the bindings.
-				Bindings.AddBindings(bindingParametersList.ToArray());
-			}
+			Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
 		}
 
 		public override void ViewWillAppear(bool animated)

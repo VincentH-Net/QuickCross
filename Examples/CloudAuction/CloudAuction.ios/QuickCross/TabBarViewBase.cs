@@ -75,16 +75,7 @@ namespace QuickCross
 
 			EnsureHandlersAreAdded();
 
-			Bindings.AddBindings(bindingsParameters); // First add any bindings that were specified in code
-			// TODO: Bindings.EnsureCommandBindings();  // Then add any command bindings that were not specified in code (based on the Id naming convention)
-
-			List<BindingParameters> bindingParametersList;
-			if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
-			{
-				Console.WriteLine("Adding bindings from markup ...");
-				ViewDataBindings.RootViewBindingParameters.Remove(rootView); // Remove the static reference to the views to prevent memory leaks. Note that if we would want to recreate the bindings later, we could also store the parameters list in the bindings.
-				Bindings.AddBindings(bindingParametersList.ToArray());
-			}
+            Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
 		}
 
 		public override void ViewWillAppear(bool animated)

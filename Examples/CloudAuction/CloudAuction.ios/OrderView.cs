@@ -1,16 +1,11 @@
 using System;
-using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.Dialog;
 using QuickCross;
-using CloudAuction;
 using CloudAuction.Shared;
 using CloudAuction.Shared.ViewModels;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace CloudAuction
 {
@@ -35,7 +30,7 @@ namespace CloudAuction
                     new RootElement("Title", new RadioGroup(0)) {
                         new Section() { from i in ViewModel.TitleList select new RadioElement(i) }
                     }                                          .Bind(bp, () => m.Title, listProperty: () => m.TitleList),
-                    new EntryElement("Name", "First name", "") .Bind(bp, () => m.FirstName),
+                    new EntryElement("Name", "First name", "") .Bind(bp, () => m.FirstName), // Note that MUST specify "" for the initial element value; any other value will update the viewmodel property in a 2-way binding.
                     new EntryElement(null, "Middle name", "")  .Bind(bp, () => m.MiddleName),
                     new EntryElement(null, "Last name", "")    .Bind(bp, () => m.LastName),
                     new EntryElement("Address", "Street", "")  .Bind(bp, () => m.Street),
@@ -44,29 +39,9 @@ namespace CloudAuction
                     new EntryElement(null, "Country", "")      .Bind(bp, () => m.Country),
                     new EntryElement("Email", "", "")          .Bind(bp, () => m.Email),
                     new EntryElement("Mobile", "", "")         .Bind(bp, () => m.Mobile),
-                    new EntryElement("Phone", "", "")          .Bind(bp, "Phone")
+                    new EntryElement("Phone", "", "")          .Bind(bp, () => m.Phone)
                 }
             };
-
-            var _ = ChangeData(); // Just a gimmick to show that background updates to the viewmodel are displayed in Monotouch.Dialog 
-        }
-
-        private async Task ChangeData()
-        {
-            for (bool first = true; ; first = !first)
-            {
-                await Task.Delay(1000);
-                if (first)
-                {
-                    ViewModel.FirstName = "!" + ViewModel.FirstName;
-                    ViewModel.Phone = "!" + ViewModel.Phone;
-                }
-                else
-                {
-                    ViewModel.FirstName = ViewModel.FirstName.Substring(1);
-                    ViewModel.Phone = ViewModel.Phone.Substring(1);
-                }
-            }
         }
 
 		public override void ViewDidLoad()
