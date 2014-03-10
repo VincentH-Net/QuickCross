@@ -162,7 +162,7 @@ namespace QuickCross
 
 		#endregion Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
 
-		private static Dictionary<UIView, List<BindingParameters> > RootViewBindingParameters { get; set; }
+		public static Dictionary<UIView, List<BindingParameters> > RootViewBindingParameters { get; private set; }
         private static Dictionary<UIBarItem, BindingParameters> UIBarItemBindingParameters { get; set; }
 
 		private static void AddBinding(NSObject view, string bindingParameters)
@@ -197,7 +197,7 @@ namespace QuickCross
             }
             else if (view is UIBarItem)
             {
-                // TODO: implement UIBarItem add
+                UIBarItemBindingParameters.Add((UIBarItem)view, bp);
             }
             else {
                 throw new ArgumentException(string.Format("Unsupported view type for Bind custom runtime attribute: {0}. Supported base types: UIView, UIBarItem", view.GetType().FullName));
@@ -350,12 +350,17 @@ namespace QuickCross
             {
                 var uiBarItems = new List<UIBarItem>();
                 // TODO: check if we need this eg when leftItemsSupplementBackButton is true? uiBarItems.Add(navigationItem.BackBarButtonItem);
-                uiBarItems.AddRange(navigationItem.LeftBarButtonItems);
-                uiBarItems.AddRange(navigationItem.RightBarButtonItems);
+                if (navigationItem.LeftBarButtonItems != null) uiBarItems.AddRange(navigationItem.LeftBarButtonItems);
+                if (navigationItem.RightBarButtonItems != null) uiBarItems.AddRange(navigationItem.RightBarButtonItems);
                 // TODO: check if navigationItem.TitleView also needs Bind custom runtime attribute support?
                 foreach (var uiBarItem in uiBarItems)
                 {
-                    // TODO: uiBarItem add parameters
+                    BindingParameters bp;
+                    if (UIBarItemBindingParameters.TryGetValue(uiBarItem, out bp))
+                    {
+                        AddBinding(bp);
+                        UIBarItemBindingParameters.Remove(uiBarItem);
+                    }
                 }
             }
         }
