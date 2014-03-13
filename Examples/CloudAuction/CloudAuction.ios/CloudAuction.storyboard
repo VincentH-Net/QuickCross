@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="bfi-c5-G00">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="bfi-c5-G00">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <scenes>
         <!--Auction View - Auction-->
@@ -54,11 +54,23 @@
                         <viewControllerLayoutGuide type="bottom" id="Mkg-bx-HTX"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="pCG-ry-57m">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" id="KAS-S0-FLr"/>
+                    <navigationItem key="navigationItem" title="Order" id="KAS-S0-FLr">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="oNm-NR-vux">
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="Bind" value="CancelCommand, Mode=Command"/>
+                            </userDefinedRuntimeAttributes>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Confirm" id="3Gg-aq-SQb">
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="Bind" value="ConfirmCommand, Mode=Command"/>
+                            </userDefinedRuntimeAttributes>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cfQ-tH-IF0" userLabel="First Responder" sceneMemberID="firstResponder"/>

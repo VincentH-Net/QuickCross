@@ -39,6 +39,18 @@ namespace QuickCross
 						}
 					}
 					break;
+                case "MonoTouch.UIKit.UIBarButtonItem":
+                    {
+                        var button = (UIBarButtonItem)view;
+                        button.Clicked += (s, e) => ExecuteCommand(binding);
+                        var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
+                        if (command != null)
+                        {
+                            command.CanExecuteChanged += binding.Command_CanExecuteChanged;
+                            button.Enabled = command.IsEnabled;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -80,6 +92,7 @@ namespace QuickCross
             { "MonoTouch.UIKit.UILabel"             , "Text" },
             { "MonoTouch.UIKit.UITextField"         , "Text" },
             { "MonoTouch.UIKit.UITextView"          , "Text" },
+            { "MonoTouch.UIKit.UINavigationItem"    , "Title"},
  
             #if __DIALOG__
             { "MonoTouch.Dialog.EntryElement"       , "Value" },
@@ -103,6 +116,7 @@ namespace QuickCross
             if (viewProperty == null || viewProperty.ContainingObject == null) return;
             var view = viewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
+
             switch (viewTypeName)
             {
                 // TODO: Add cases here for specialized view types, as needed
