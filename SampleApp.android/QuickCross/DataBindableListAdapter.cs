@@ -46,13 +46,13 @@ namespace QuickCross
         private readonly int itemTemplateResourceId;
         private readonly string idPrefix;
         private readonly int? itemValueResourceId;
-        private readonly ViewDataBindings.ViewExtensionPoints viewExtensionPoints;
+        private readonly ViewDataBindings.IViewExtensionPoints viewExtensionPoints;
 
         private IList list;
         private List<ItemDataBinding> itemDataBindings;
         private bool? itemIsViewModel;
 
-        public DataBindableListAdapter(LayoutInflater layoutInflater, int itemTemplateResourceId, string idPrefix, int? itemValueResourceId = null, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+        public DataBindableListAdapter(LayoutInflater layoutInflater, int itemTemplateResourceId, string idPrefix, int? itemValueResourceId = null, ViewDataBindings.IViewExtensionPoints viewExtensionPoints = null)
         {
             if (layoutInflater == null) throw new ArgumentNullException("layoutInflater");
             this.layoutInflater = layoutInflater;
@@ -231,7 +231,7 @@ namespace QuickCross
             private ViewModelBase viewModel;
             private readonly ViewDataBindings bindings;
 
-			public ViewDataBindingsHolder(View rootView, ViewModelBase viewModel, LayoutInflater layoutInflater, string idPrefix, ViewDataBindings.ViewExtensionPoints viewExtensionPoints)
+			public ViewDataBindingsHolder(View rootView, ViewModelBase viewModel, LayoutInflater layoutInflater, string idPrefix, ViewDataBindings.IViewExtensionPoints viewExtensionPoints)
             {
                 this.viewModel = viewModel;
                 bindings = new ViewDataBindings(rootView, viewModel, layoutInflater, idPrefix, viewExtensionPoints);

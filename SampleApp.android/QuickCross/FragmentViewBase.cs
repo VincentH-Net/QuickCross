@@ -61,7 +61,7 @@ namespace QuickCross
     }
 
 
-    public class FragmentViewBase<ViewModelType> : FragmentViewBase, ViewDataBindings.ViewExtensionPoints where ViewModelType : ViewModelBase
+    public class FragmentViewBase<ViewModelType> : FragmentViewBase, ViewDataBindings.IViewExtensionPoints where ViewModelType : ViewModelBase
     {
         private bool isJustInitialized;
         protected ViewModelType ViewModel { get; private set; }

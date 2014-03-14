@@ -70,7 +70,7 @@ namespace QuickCross
         }
     }
     
-    public class ActivityViewBase<ViewModelType> : ActivityViewBase, ViewDataBindings.ViewExtensionPoints where ViewModelType : ViewModelBase
+    public class ActivityViewBase<ViewModelType> : ActivityViewBase, ViewDataBindings.IViewExtensionPoints where ViewModelType : ViewModelBase
     {
         private bool isJustInitialized;
         protected ViewModelType ViewModel { get; private set; }
