@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using MonoTouch.Foundation;
@@ -8,7 +8,7 @@ using QuickCrossLibrary.Templates;
 
 namespace QuickCross
 {
-	public class ViewBase : UIViewController, ViewDataBindings.ViewExtensionPoints
+	public class ViewBase : UIViewController, ViewDataBindings.IViewExtensionPoints
     {
         public ViewBase() { }
         public ViewBase(string nibName, NSBundle bundle) : base(nibName, bundle) { }
@@ -70,22 +70,13 @@ namespace QuickCross
 		/// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
 		protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
 		{
-			Bindings = new ViewDataBindings(rootView, viewModel, idPrefix ?? this.GetType().Name + "_", this);
+			Bindings = new ViewDataBindings(viewModel, idPrefix ?? this.GetType().Name + "_", this);
 			this.viewModel = viewModel;
 
 			EnsureHandlersAreAdded();
 
-			Bindings.AddBindings(bindingsParameters); // First add any bindings that were specified in code
-			// TODO: Bindings.EnsureCommandBindings();  // Then add any command bindings that were not specified in code (based on the Id naming convention)
-
-			List<BindingParameters> bindingParametersList;
-			if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
-			{
-				Console.WriteLine("Adding bindings from markup ...");
-				ViewDataBindings.RootViewBindingParameters.Remove(rootView); // Remove the static reference to the views to prevent memory leaks. Note that if we would want to recreate the bindings later, we could also store the parameters list in the bindings.
-				Bindings.AddBindings(bindingParametersList.ToArray());
-			}
-		}
+            Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
+        }
 
 		public override void ViewWillAppear(bool animated)
 		{
@@ -117,11 +108,11 @@ namespace QuickCross
 		/// <summary>
 		/// Override this method in a derived view class to change how a data-bound value is set for specific views
 		/// </summary>
-		/// <param name="view"></param>
+        /// <param name="viewProperty"></param>
 		/// <param name="value"></param>
-		public virtual void UpdateView(UIView view, object value)
+        public virtual void UpdateView(PropertyReference viewProperty, object value)
 		{
-			ViewDataBindings.UpdateView(view, value);
+            ViewDataBindings.UpdateView(viewProperty, value);
 		}
 
 		/// <summary>

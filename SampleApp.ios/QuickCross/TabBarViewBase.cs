@@ -8,9 +8,11 @@ using QuickCrossLibrary.Templates;
 
 namespace QuickCross
 {
-	public class TableViewBase : UITableViewController, ViewDataBindings.IViewExtensionPoints
+	public class TabBarViewBase : UITabBarController, ViewDataBindings.IViewExtensionPoints
     {
-		public TableViewBase(IntPtr handle) : base(handle) { }
+		public TabBarViewBase() { }
+		public TabBarViewBase(string nibName, NSBundle bundle) : base(nibName, bundle) { }
+		public TabBarViewBase(IntPtr handle) : base(handle) { }
 
 		private bool areHandlersAdded;
 		private ViewModelBase viewModel;
@@ -59,8 +61,6 @@ namespace QuickCross
 			areHandlersAdded = false;
 		}
 
-		protected virtual object GetCommandParameter(string commandName) { return null; }
-
 		/// <summary>
 		/// Call InitializeBindings() in the ViewDidLoad method of a derived view class to create the data bindings and update the view with the current view model values.
 		/// </summary>
@@ -76,7 +76,7 @@ namespace QuickCross
 			EnsureHandlersAreAdded();
 
             Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
-        }
+		}
 
 		public override void ViewWillAppear(bool animated)
 		{
@@ -108,11 +108,11 @@ namespace QuickCross
 		/// <summary>
 		/// Override this method in a derived view class to change how a data-bound value is set for specific views
 		/// </summary>
-		/// <param name="viewProperty"></param>
+        /// <param name="viewProperty"></param>
 		/// <param name="value"></param>
-		public virtual void UpdateView(PropertyReference viewProperty, object value)
+        public virtual void UpdateView(PropertyReference viewProperty, object value)
 		{
-			ViewDataBindings.UpdateView(viewProperty, value);
+            ViewDataBindings.UpdateView(viewProperty, value);
 		}
 
 		/// <summary>
@@ -121,7 +121,6 @@ namespace QuickCross
 		/// <param name="sender">The ObservableCollection that was changed</param>
 		/// <param name="e">See http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html for details</param>
 		public virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) { }
-
 
 		/// <summary>
 		/// Override this method in a derived view class to supply of modify the parameter for a command in code, when the command is executed.

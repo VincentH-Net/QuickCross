@@ -14,7 +14,7 @@ namespace QuickCross
 		{
 			public readonly PropertyInfo ObjectPropertyInfo;
 			public readonly FieldInfo ObjectFieldInfo;
-			public readonly UIView View;
+			public readonly PropertyReference ViewProperty;
 
 			public string Name 
 			{ 
@@ -32,25 +32,25 @@ namespace QuickCross
 				return item;
 			}
 
-			public ItemDataBinding(PropertyInfo objectPropertyInfo, UIView view)
+			public ItemDataBinding(PropertyInfo objectPropertyInfo, PropertyReference viewProperty)
 			{
 				this.ObjectPropertyInfo = objectPropertyInfo;
-				this.View = view;
+                this.ViewProperty = viewProperty;
 			}
 
-			public ItemDataBinding(FieldInfo objectFieldInfo, UIView view)
+            public ItemDataBinding(FieldInfo objectFieldInfo, PropertyReference viewProperty)
 			{
 				this.ObjectFieldInfo = objectFieldInfo;
-				this.View = view;
+                this.ViewProperty = viewProperty;
 			}
 
-			public ItemDataBinding(UIView view)
+            public ItemDataBinding(PropertyReference viewProperty)
 			{
-				this.View = view;
+                this.ViewProperty = viewProperty;
 			}
 		}
 
-		private readonly ViewDataBindings.ViewExtensionPoints viewExtensionPoints;
+		private readonly ViewDataBindings.IViewExtensionPoints viewExtensionPoints;
 
 		private IList list;
 		private bool listIsObservable, ignoreCollectionChanged;
@@ -62,7 +62,7 @@ namespace QuickCross
 		private readonly bool rowSelectedPropertyIsCommand;
 		private readonly ViewModelBase viewModel;
 
-		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedPropertyName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+		public DataBindableUITableViewSource(UITableView tableView, string cellIdentifier, ViewModelBase viewModel = null, string canEdit = null, string canMove = null, string rowSelectedPropertyName = null, string deleteRowCommandName= null, string insertRowCommandName = null, ViewDataBindings.IViewExtensionPoints viewExtensionPoints = null)
         {
 			this.tableView = tableView;
 			this.cellIdentifier = new NSString(cellIdentifier);
@@ -201,17 +201,26 @@ namespace QuickCross
 				itemDataBindings = new ItemDataBindingsHolder();
 				foreach (var bindingParameter in bindingParametersList)
 				{
-					if (bindingParameter.PropertyName == ".")
+                    var viewMemberName = bindingParameter.ViewMemberName;
+                    if ((bindingParameter.Mode == BindingMode.OneWay || bindingParameter.Mode == BindingMode.TwoWay) && bindingParameter.UpdateView == null && viewMemberName == null)
+                    {
+                        var typeName = bindingParameter.View.GetType().FullName;
+                        if (!ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
+                            throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", typeName), "ViewMemberName");
+                    }
+                    var viewProperty = new PropertyReference(bindingParameter.View, viewMemberName);
+
+                    if (bindingParameter.ViewModelPropertyName == ".")
 					{
-						itemDataBindings.Add(new ItemDataBinding(bindingParameter.View));
+                        itemDataBindings.Add(new ItemDataBinding(viewProperty));
 					} else {
-						var pi = itemType.GetProperty(bindingParameter.PropertyName);
+						var pi = itemType.GetProperty(bindingParameter.ViewModelPropertyName);
 						if (pi != null)
 						{
-							itemDataBindings.Add(new ItemDataBinding(pi, bindingParameter.View));
+                            itemDataBindings.Add(new ItemDataBinding(pi, viewProperty));
 						} else {
-							var fi = itemType.GetField(bindingParameter.PropertyName);
-							if (fi != null) itemDataBindings.Add(new ItemDataBinding(fi, bindingParameter.View));
+							var fi = itemType.GetField(bindingParameter.ViewModelPropertyName);
+                            if (fi != null) itemDataBindings.Add(new ItemDataBinding(fi, viewProperty));
 						}
 					}
 				}
@@ -239,10 +248,10 @@ namespace QuickCross
 			private ViewModelBase viewModel;
 			private readonly ViewDataBindings bindings;
 
-			public ViewDataBindingsHolder(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewDataBindings.ViewExtensionPoints viewExtensionPoints = null)
+			public ViewDataBindingsHolder(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewDataBindings.IViewExtensionPoints viewExtensionPoints = null)
 			{
 				this.viewModel = viewModel;
-				bindings = new ViewDataBindings(rootView, viewModel, idPrefix, viewExtensionPoints);
+				bindings = new ViewDataBindings(viewModel, idPrefix, viewExtensionPoints);
 				List<BindingParameters> bindingParametersList;
 				if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
 				{
@@ -288,17 +297,17 @@ namespace QuickCross
 				if (holder == null)	return;
 				itemDataBindingsHolders.Add(rootView.Handle, holder);
 			}
-			foreach (var idb in holder) UpdateView(idb.View, idb.GetValue(itemObject));
+			foreach (var idb in holder) UpdateView(idb.ViewProperty, idb.GetValue(itemObject));
 		}
 
 		/// <summary>
 		/// Override this method in a derived table view source class to change how a data-bound value is set for specific views
 		/// </summary>
-		/// <param name="view"></param>
+        /// <param name="viewProperty"></param>
 		/// <param name="value"></param>
-		protected virtual void UpdateView(UIView view, object value)
+        protected virtual void UpdateView(PropertyReference viewProperty, object value)
 		{
-			if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(view, value); else ViewDataBindings.UpdateView(view, value);
+            if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(viewProperty, value); else ViewDataBindings.UpdateView(viewProperty, value);
 		}
 
 		private bool ExecuteCommand(string commandName, object parameter = null)

@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Linq.Expressions;
 
 using MonoTouch.UIKit;
 using MonoTouch.ObjCRuntime;
 using MonoTouch.Foundation;
-
-using MonoMac;
-using System.Collections;
 using MonoTouch;
+using MonoMac;
+#if __DIALOG__
+using MonoTouch.Dialog;
+#endif
 
 namespace QuickCross
 {
@@ -20,17 +23,96 @@ namespace QuickCross
 
 	public class BindingParameters
 	{
-		public string PropertyName;
+		public string ViewModelPropertyName;
+		public Expression<Func<object>> Property { set { ViewModelPropertyName = PropertyReference.GetMemberName(value); } }
+
 		public BindingMode Mode = BindingMode.OneWay;
-		public UIView View;
-		public string ListPropertyName;
+
+		public object View;
+		public string ViewMemberName;
+
+		/// <summary>An optional Linq expression that specifies the ViewMemberName in a typesafe manner, 
+        /// e.g.: <example>() => view.AProperty</example> or <example>() => view.AField</example>
+		/// </summary>
+		public Expression<Func<object>> ViewMember { set { ViewMemberName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
+
+        /// <summary>
+        /// An optional action to update the view from the viewmodel, e.g. <example>() => myView.Color = ViewModel.MyBoolean ? UIColor.Green : UIColor.Red</example>
+        /// <remarks>You can use this action to convert values, invoke methods on the view, combine multiple viewmodel properties etc.</remarks>
+        /// </summary>
+        public Action UpdateView;
+
+        /// <summary>
+        /// An optional action to update the viewmodel from the view for two-way bindings, e.g. <example>() => ViewModel.MyBoolean = myView.Color == UIColor.Green</example>
+        /// <remarks>You can use this action to convert values, invoke methods on the view, set multiple viewmodel properties etc.</remarks>
+        /// </summary>
+        public Action UpdateViewModel;
+
+        public string ListPropertyName;
+
+        /// <summary>An optional Linq expression that specifies the ListPropertyName in a typesafe manner, 
+        /// e.g.: <example>() => ViewModel.AProperty</example>
+		/// </summary>
+		public Expression<Func<object>> ListProperty { set { ListPropertyName = PropertyReference.GetMemberName(value); } } // We use a set-only property instead of a Set method because it allows to use array initializer syntax for BindingParameters; ease of use outweights the frowned upon - but intentional - side effect on the corresponding Name property.
+
 		public string ListItemTemplateName;
 		public string ListAddItemCommandName;
 		public string ListRemoveItemCommandName;
 		public string ListCanEditItem;
 		public string ListCanMoveItem;
 	}
-	
+
+    #if __DIALOG__
+    public static class ElementExtensions
+    {
+        public static Element Bind(
+            this Element element,
+            List<BindingParameters> bindingsParameters,
+            Expression<Func<object>> property,
+            BindingMode mode = BindingMode.TwoWay,
+            Expression<Func<object>> viewMember = null,
+            Action updateView = null,
+            Action updateViewModel = null,
+            Expression<Func<object>> listProperty = null)
+        {
+            bindingsParameters.Add(new BindingParameters
+            {
+                Property = property,
+                Mode = mode,
+                View = element,
+                ViewMember = viewMember,
+                UpdateView = updateView,
+                UpdateViewModel = updateViewModel,
+                ListProperty = listProperty
+            });
+            return element;
+        }
+
+        public static Element Bind(
+             this Element element,
+             List<BindingParameters> bindingsParameters,
+             string property,
+             BindingMode mode = BindingMode.TwoWay,
+             Expression<Func<object>> viewMember = null,
+             Action updateView = null,
+             Action updateViewModel = null,
+             string listProperty = null)
+        {
+            bindingsParameters.Add(new BindingParameters
+            {
+                ViewModelPropertyName = property,
+                Mode = mode,
+                View = element,
+                ViewMember = viewMember,
+                UpdateView = updateView,
+                UpdateViewModel = updateViewModel,
+                ListPropertyName = listProperty
+            });
+            return element;
+        }
+    }
+    #endif
+
 	public partial class ViewDataBindings
     {
 		#region Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
@@ -44,107 +126,138 @@ namespace QuickCross
 		[MonoPInvokeCallback (typeof(SetValueForUndefinedKeyCallBack))]
 		private static void SetValueForUndefinedKey(IntPtr selfPtr, IntPtr cmdPtr, IntPtr valuePtr, IntPtr undefinedKeyPtr)
 		{
-			UIView self = (UIView) Runtime.GetNSObject(selfPtr);
+            var self = Runtime.GetNSObject(selfPtr);
 			var value = Runtime.GetNSObject(valuePtr);
 			var key = (NSString) Runtime.GetNSObject(undefinedKeyPtr);
 			if (key == BindKey) {
 				AddBinding(self, value.ToString());
 			} else {
 				Console.WriteLine("Value for unknown key: {0} = {1}", key.ToString(), value.ToString() );
-				// Call original implementation on super class of UIView:
-				void_objc_msgSendSuper_intptr_intptr(UIViewSuperClass, SetValueForUndefinedKeySelector, valuePtr, undefinedKeyPtr);
-			}
+				// Call original implementation on super class:
+                if      (self is UIView)           void_objc_msgSendSuper_intptr_intptr(UIViewSuperClass          , SetValueForUndefinedKeySelector, valuePtr, undefinedKeyPtr);
+                else if (self is UIBarItem)        void_objc_msgSendSuper_intptr_intptr(UIBarItemSuperClass       , SetValueForUndefinedKeySelector, valuePtr, undefinedKeyPtr);
+                else if (self is UINavigationItem) void_objc_msgSendSuper_intptr_intptr(UINavigationItemSuperClass, SetValueForUndefinedKeySelector, valuePtr, undefinedKeyPtr);
+            }
 		}
 
 		private static string BindKey;
-		private static IntPtr UIViewSuperClass, SetValueForUndefinedKeySelector;
+        private static IntPtr UIViewSuperClass, UIBarItemSuperClass, UINavigationItemSuperClass, SetValueForUndefinedKeySelector;
 
 		public static void RegisterBindKey(string key = "Bind")
 		{
 			RootViewBindingParameters = new Dictionary<UIView, List<BindingParameters> >();
+            ObjectBindingParameters = new Dictionary<object, BindingParameters>();
 			BindKey = key;
 			Console.WriteLine("Replacing implementation of SetValueForUndefinedKey on UIView...");
-			var uiViewClass = Class.GetHandle("UIView");
-			UIViewSuperClass = ObjcMagic.GetSuperClass(uiViewClass);
-			SetValueForUndefinedKeySelector = Selector.GetHandle("setValue:forUndefinedKey:");
-			ObjcMagic.AddMethod(uiViewClass, SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
-		}
+
+            var uiViewClass = Class.GetHandle("UIView");
+            UIViewSuperClass = ObjcMagic.GetSuperClass(uiViewClass);
+            
+            var uiBarItemClass = Class.GetHandle("UIBarItem");
+            UIBarItemSuperClass = ObjcMagic.GetSuperClass(uiBarItemClass);
+
+            var uiNavigationItemClass = Class.GetHandle("UINavigationItem");
+            UINavigationItemSuperClass = ObjcMagic.GetSuperClass(uiNavigationItemClass);
+
+            SetValueForUndefinedKeySelector = Selector.GetHandle("setValue:forUndefinedKey:");
+			ObjcMagic.AddMethod(uiViewClass          , SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
+            ObjcMagic.AddMethod(uiBarItemClass       , SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
+            ObjcMagic.AddMethod(uiNavigationItemClass, SetValueForUndefinedKeySelector, SetValueForUndefinedKeyDelegate, "v@:@@");
+        }
 
 		#endregion Add support for user defined runtime attribute named "Bind" (default, type string) on UIView
 
 		public static Dictionary<UIView, List<BindingParameters> > RootViewBindingParameters { get; private set; }
+        private static Dictionary<object, BindingParameters> ObjectBindingParameters { get; set; }
 
-		private static void AddBinding(UIView view, string bindingParameters)
+		private static void AddBinding(object view, string bindingParameters)
 		{
 			Console.WriteLine("Binding parameters: {0}", bindingParameters);
 
-			// Get the rootview so we can group binding parameters under it.
-			var rootView = view;
-			while (rootView.Superview != null && rootView.Superview != rootView) {
-				rootView = rootView.Superview;
-				Console.Write(".");
-			}
-			Console.WriteLine("rootView = {0}", rootView.ToString());
+            var bp = ParseBindingParameters(bindingParameters);
+            if (bp == null)
+                throw new ArgumentException("Invalid data binding parameters: " + bindingParameters);
+            if (string.IsNullOrEmpty(bp.ViewModelPropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
+                throw new ArgumentException("At least one of PropertyName and ListPropertyName must be specified in data binding parameters: " + bindingParameters);
+            bp.View = view;
 
-			var bp = ParseBindingParameters(bindingParameters);
-			if (bp == null)
-				throw new ArgumentException("Invalid data binding parameters: " + bindingParameters);
-			if (string.IsNullOrEmpty(bp.PropertyName) && string.IsNullOrEmpty(bp.ListPropertyName))
-				throw new ArgumentException("At least one of PropertyName and ListPropertyName must be specified in data binding parameters: " + bindingParameters);
-			bp.View = view;
+            // Get the rootview so we can group binding parameters under it.
+            if (view is UIView) {
+                var rootView = (UIView)view;
+                while (rootView.Superview != null && rootView.Superview != rootView) {
+                    rootView = rootView.Superview;
+                    Console.Write(".");
+                }
 
-			List<BindingParameters> bindingParametersList;
-			if (!RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
-			{
-				bindingParametersList = new List<BindingParameters>();
-				RootViewBindingParameters.Add(rootView, bindingParametersList);
-			}
+                Console.WriteLine("rootView = {0}", rootView.ToString());
 
-			bindingParametersList.Add(bp);
+                List<BindingParameters> bindingParametersList;
+                if (!RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
+                {
+                    bindingParametersList = new List<BindingParameters>();
+                    RootViewBindingParameters.Add(rootView, bindingParametersList);
+                }
+
+                bindingParametersList.Add(bp);
+            }
+            else if (view is UIBarItem || view is UINavigationItem)
+            {
+                ObjectBindingParameters.Add(view, bp);
+            }
+            else {
+                throw new ArgumentException(string.Format("Unsupported view type for Bind custom runtime attribute: {0}. Supported base types: UIView, UIBarItem, UINavigationItem", view.GetType().FullName));
+            }
 		}
 
 		private class DataBinding
 		{
 			public BindingMode Mode;
-			public UIView View;
-			public PropertyInfo ViewModelPropertyInfo;
+			public PropertyReference ViewProperty;
+            public Action UpdateViewAction;
+            public Action UpdateViewModelAction;
+            public PropertyInfo ViewModelPropertyInfo;
 
 			public PropertyInfo ViewModelListPropertyInfo;
 			public DataBindableUITableViewSource TableViewSource;
 
+            public void UpdateViewModel(ViewModelBase viewModel, object value)
+            {
+                if (UpdateViewModelAction != null) {
+                    UpdateViewModelAction();
+                } else {
+                    ViewModelPropertyInfo.SetValue(viewModel, value);
+                }
+            }
+
 			public void Command_CanExecuteChanged(object sender, EventArgs e)
 			{
-				var control = View as UIControl;
-				if (control != null) control.Enabled = ((RelayCommand)sender).IsEnabled;
+                var view = ViewProperty.ContainingObject;
+                if (view is UIControl) ((UIControl)view).Enabled = ((RelayCommand)sender).IsEnabled;
+                else if (view is UIBarButtonItem) ((UIBarButtonItem)view).Enabled = ((RelayCommand)sender).IsEnabled;
 			}
 		}
 
-		private readonly UIView rootView;
-		private readonly ViewExtensionPoints rootViewExtensionPoints;
+		private readonly IViewExtensionPoints rootViewExtensionPoints;
 		private ViewModelBase viewModel;
 		private readonly string idPrefix;
 
 		private Dictionary<string, DataBinding> dataBindings = new Dictionary<string, DataBinding>();
 		// the string key is the idname which is a prefix + the name of the vm property
 
-		public interface ViewExtensionPoints  // Implement these methods as virtual in a view base class
+		public interface IViewExtensionPoints  // Implement these methods as virtual in a view base class
 		{
-			void UpdateView(UIView view, object value);
+            void UpdateView(PropertyReference viewProperty, object value);
 			void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
 			object GetCommandParameter(string commandName, object parameter = null);
 		}
 
-		public ViewDataBindings(UIView rootView, ViewModelBase viewModel, string idPrefix, ViewExtensionPoints rootViewExtensionPoints = null)
+		public ViewDataBindings(ViewModelBase viewModel, string idPrefix, IViewExtensionPoints rootViewExtensionPoints = null)
 		{
-			if (rootView == null)
-				throw new ArgumentNullException("rootView");
-			if (viewModel == null)
-				throw new ArgumentNullException("viewModel");
-			this.rootView = rootView;
+			if (viewModel == null) throw new ArgumentNullException("viewModel");
 			this.rootViewExtensionPoints = rootViewExtensionPoints;
 			this.viewModel = viewModel;
 			this.idPrefix = idPrefix; // Note that on iOS we may use idPrefix only for connecting outlet names to vm property names;
-			// The uiviews that have no outlets do noyt need a name or id; all info is in the Bind property
+			// The uiviews that have no outlets do not need a name or id; all info is in the Bind property
 		}
 
 		public void SetViewModel(ViewModelBase newViewModel)
@@ -222,18 +335,47 @@ namespace QuickCross
 			if (binding != null && binding.TableViewSource != null) binding.TableViewSource.AddHandlers();
 		}
 
-		public void AddBindings(BindingParameters[] bindingsParameters)
+		public void AddBindings(BindingParameters[] bindingsParameters = null, UIView rootView = null, UINavigationItem navigationItem = null)
 		{
 			if (bindingsParameters != null)
 			{
-				foreach (var bp in bindingsParameters)
-				{
-					if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
-					if (dataBindings.ContainsKey(IdName(bp.PropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.PropertyName));
-					AddBinding(bp); 
-				}
+                Console.WriteLine("Adding bindings from code ...");
+                foreach (var bp in bindingsParameters) AddBinding(bp);
 			}
-		}
+            if (rootView != null)
+            {
+                List<BindingParameters> bindingParametersList;
+                if (ViewDataBindings.RootViewBindingParameters.TryGetValue(rootView, out bindingParametersList))
+                {
+                    Console.WriteLine("Adding bindings from markup ...");
+                    ViewDataBindings.RootViewBindingParameters.Remove(rootView); // Remove the static reference to the views to prevent memory leaks. Note that if we would want to recreate the bindings later, we could also store the parameters list in the bindings.
+                    foreach (var bp in bindingParametersList) AddBinding(bp);
+                }
+            }
+            if (navigationItem != null)
+            {
+                BindingParameters bp;
+                if (ObjectBindingParameters.TryGetValue(navigationItem, out bp))
+                {
+                    AddBinding(bp);
+                    ObjectBindingParameters.Remove(navigationItem);
+                }
+
+                var uiBarItems = new List<UIBarItem>();
+                // TODO: check if we need this eg when leftItemsSupplementBackButton is true? uiBarItems.Add(navigationItem.BackBarButtonItem);
+                if (navigationItem.LeftBarButtonItems != null) uiBarItems.AddRange(navigationItem.LeftBarButtonItems);
+                if (navigationItem.RightBarButtonItems != null) uiBarItems.AddRange(navigationItem.RightBarButtonItems);
+                // TODO: check if navigationItem.TitleView also needs Bind custom runtime attribute support?
+                foreach (var uiBarItem in uiBarItems)
+                {
+                    if (ObjectBindingParameters.TryGetValue(uiBarItem, out bp))
+                    {
+                        AddBinding(bp);
+                        ObjectBindingParameters.Remove(uiBarItem);
+                    }
+                }
+            }
+        }
 
 		private string IdName(string name) { return idPrefix + name; }
 
@@ -258,22 +400,30 @@ namespace QuickCross
 								if (assignmentElements.Length == 1)
 								{
 									string value = assignmentElements[0].Trim();
-									if (value != "") bp.PropertyName = value;
+									if (value != "") bp.ViewModelPropertyName = value;
 								}
 								else if (assignmentElements.Length == 2)
 								{
 									string name = assignmentElements[0].Trim();
 									string value = assignmentElements[1].Trim();
-									switch (name)
+									if (name.StartsWith("."))
 									{
-										case "Mode": Enum.TryParse<BindingMode>(value, true, out bp.Mode); break;
-										case "ItemsSource": bp.ListPropertyName = value; break;
-										case "ItemTemplate": bp.ListItemTemplateName = value; break;
-										case "AddCommand": bp.ListAddItemCommandName = value; break;
-										case "RemoveCommand": bp.ListRemoveItemCommandName = value; break;
-										case "CanEdit": bp.ListCanEditItem = value; break;
-										case "CanMove": bp.ListCanMoveItem = value; break;
-										default: throw new ArgumentException("Unknown tag binding parameter: " + name);
+										bp.ViewMemberName = name.Substring(1);
+										if (value != "") bp.ViewModelPropertyName = value;
+									}
+									else
+									{
+										switch (name)
+										{
+											case "Mode": Enum.TryParse<BindingMode>(value, true, out bp.Mode); break;
+											case "ItemsSource": bp.ListPropertyName = value; break;
+											case "ItemTemplate": bp.ListItemTemplateName = value; break;
+											case "AddCommand": bp.ListAddItemCommandName = value; break;
+											case "RemoveCommand": bp.ListRemoveItemCommandName = value; break;
+											case "CanEdit": bp.ListCanEditItem = value; break;
+											case "CanMove": bp.ListCanMoveItem = value; break;
+											default: throw new ArgumentException("Unknown tag binding parameter: " + name);
+										}
 									}
 								}
 							}
@@ -287,39 +437,53 @@ namespace QuickCross
 
 		private DataBinding AddBinding(BindingParameters bp)
 		{
-			var view = bp.View;
+            if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
+            if (dataBindings.ContainsKey(IdName(bp.ViewModelPropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.ViewModelPropertyName));
+
+            var view = bp.View;
 			if (view == null) return null;
-			var propertyName = bp.PropertyName;
+            var viewMemberName = bp.ViewMemberName;
+            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && bp.UpdateView == null && viewMemberName == null)
+            {
+                var typeName = view.GetType().FullName;
+                if (!ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
+                    throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", typeName), "ViewMemberName");
+            }
+
+			var propertyName = bp.ViewModelPropertyName;
 			var mode = bp.Mode;
 			var listPropertyName = bp.ListPropertyName;
 			var itemTemplateName = bp.ListItemTemplateName;
 
 			var idName = IdName(propertyName);
+			var viewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName);
 
 			var binding = new DataBinding
 			{
-				View = view,
+                ViewProperty = new PropertyReference(view, viewMemberName, viewModelPropertyInfo != null ? viewModelPropertyInfo.PropertyType : null),
+                UpdateViewAction = bp.UpdateView,
+                UpdateViewModelAction = bp.UpdateViewModel,
 				Mode = mode,
-				ViewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName)
+				ViewModelPropertyInfo = viewModelPropertyInfo
 			};
 
-			if (binding.View is UITableView)
+			if (listPropertyName == null) listPropertyName = propertyName + "List";
+			var pi = viewModel.GetType().GetProperty(listPropertyName);
+			if (pi == null && binding.ViewModelPropertyInfo != null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
 			{
-				if (listPropertyName == null) listPropertyName = propertyName + "List";
-				var pi = viewModel.GetType().GetProperty(listPropertyName);
-				if (pi == null && binding.ViewModelPropertyInfo != null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
-				{
-					listPropertyName = propertyName;
-					pi = binding.ViewModelPropertyInfo;
-					binding.ViewModelPropertyInfo = null;
-				}
-				binding.ViewModelListPropertyInfo = pi;
+				listPropertyName = propertyName;
+				pi = binding.ViewModelPropertyInfo;
+				binding.ViewModelPropertyInfo = null;
+			}
+			binding.ViewModelListPropertyInfo = pi;
 
-				var tableView = (UITableView)binding.View;
+            if (binding.ViewProperty.ContainingObject is UITableView)
+            {
+                var tableView = (UITableView)binding.ViewProperty.ContainingObject;
 				if (tableView.Source == null)
 				{
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
-					string listItemSelectedPropertyName = (mode == BindingMode.Command || mode == BindingMode.TwoWay) ? bp.PropertyName : null;
+					string listItemSelectedPropertyName = (mode == BindingMode.Command || mode == BindingMode.TwoWay) ? bp.ViewModelPropertyName : null;
 					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(
 						tableView, 
 						itemTemplateName,
@@ -334,40 +498,6 @@ namespace QuickCross
 				}
 			}
 
-			/*
-			if (binding.View is AdapterView)
-			{
-				if (listPropertyName == null) listPropertyName = propertyName + "List";
-				var pi = viewModel.GetType().GetProperty(listPropertyName);
-				if (pi == null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
-				{
-					listPropertyName = propertyName;
-					pi = binding.ViewModelPropertyInfo;
-					binding.ViewModelPropertyInfo = null;
-				}
-				binding.ViewModelListPropertyInfo = pi;
-
-				pi = binding.View.GetType().GetProperty("Adapter", BindingFlags.Public | BindingFlags.Instance);
-				if (pi != null)
-				{
-					var adapter = pi.GetValue(binding.View);
-					if (adapter == null)
-					{
-						if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
-						if (itemIsValue && itemValueId == null) itemValueId = itemTemplateName;
-						int? itemTemplateResourceId = AndroidHelpers.FindResourceId(itemTemplateName, AndroidHelpers.ResourceCategory.Layout);
-						int? itemValueResourceId = AndroidHelpers.FindResourceId(itemValueId);
-						if (itemTemplateResourceId.HasValue)
-						{
-							adapter = new DataBindableListAdapter<object>(layoutInflater, itemTemplateResourceId.Value, itemTemplateName + "_", itemValueResourceId, rootViewExtensionPoints);
-							pi.SetValue(binding.View, adapter);
-						}
-					}
-					binding.ListAdapter = adapter as IDataBindableListAdapter;
-				}
-			}
-			*/
-
 			switch (binding.Mode)
 			{
 				case BindingMode.TwoWay: AddTwoWayHandler(binding); break;
@@ -378,9 +508,9 @@ namespace QuickCross
 			return binding;
 		}
 
-		private DataBinding FindBindingForView(UIView view)
+		private DataBinding FindBindingForView(object view)
 		{
-			return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.View, view)).Value;
+			return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.ViewProperty.ContainingObject, view)).Value;
 		}
 
 		private DataBinding FindBindingForListProperty(string propertyName)
@@ -390,11 +520,15 @@ namespace QuickCross
 
 		private void UpdateView(DataBinding binding)
 		{
-			if ((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay) && binding.View != null)
+            if (((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay)) && binding.ViewProperty != null && binding.ViewProperty.ContainingObject != null)
 			{
-				var view = binding.View;
-				var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
-				if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(view, value); else UpdateView(view, value);
+				var viewProperty = binding.ViewProperty;
+                if (binding.UpdateViewAction != null) {
+                    binding.UpdateViewAction();
+                } else {
+                    var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
+                    if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(viewProperty, value); else UpdateView(viewProperty, value);
+                }
 			}
 		}
 
@@ -412,6 +546,6 @@ namespace QuickCross
 			if (rootViewExtensionPoints != null) parameter = rootViewExtensionPoints.GetCommandParameter(binding.ViewModelPropertyInfo.Name, parameter);
 			var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
 			command.Execute(parameter);
-		}	
+		}
     }
 }

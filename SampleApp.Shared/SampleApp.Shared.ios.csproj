@@ -43,6 +43,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <ItemGroup>
     <Compile Include="ISampleAppNavigator.cs" />
+    <Compile Include="QuickCross\PropertyReference.cs" />
     <Compile Include="SampleAppApplication.cs" />
     <Compile Include="Models\SampleItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

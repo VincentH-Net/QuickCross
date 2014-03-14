@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using QuickCross.Templates;
-using QuickCrossLibrary.Templates;
+using MonoTouch.Dialog;
+using SampleApp;
+using SampleApp.Shared;
 
 namespace QuickCross
 {
-	public class TableViewBase : UITableViewController, ViewDataBindings.IViewExtensionPoints
+    public class DialogViewBase : DialogViewController, ViewDataBindings.IViewExtensionPoints
     {
-		public TableViewBase(IntPtr handle) : base(handle) { }
+        public DialogViewBase(IntPtr handle)    : base(handle) { }
+        public DialogViewBase(RootElement root, bool pushing = false) : base(root, pushing) { }
 
 		private bool areHandlersAdded;
 		private ViewModelBase viewModel;
@@ -19,7 +21,7 @@ namespace QuickCross
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
 		{
-			if (!(sender is _APPNAME_Navigator) && viewModel != null)
+			if (!(sender is SampleAppNavigator) && viewModel != null)
 			{
 				string commandName = segue.Identifier;
 				if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
@@ -68,15 +70,15 @@ namespace QuickCross
 		/// <param name="viewModel">The view model</param>
 		/// <param name="bindingsParameters">Optional binding parameters; use to override default parameter values for specific bindings, or as an alternative for specifying binding parameters in the view tag attribute in AXML. Note that any binding parameters specified in the tag attribute wil override bindingsParameters.</param>
 		/// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
-		protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
+        protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
 		{
 			Bindings = new ViewDataBindings(viewModel, idPrefix ?? this.GetType().Name + "_", this);
 			this.viewModel = viewModel;
 
 			EnsureHandlersAreAdded();
 
-            Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
-        }
+			Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
+		}
 
 		public override void ViewWillAppear(bool animated)
 		{
@@ -108,11 +110,11 @@ namespace QuickCross
 		/// <summary>
 		/// Override this method in a derived view class to change how a data-bound value is set for specific views
 		/// </summary>
-		/// <param name="viewProperty"></param>
+        /// <param name="viewProperty"></param>
 		/// <param name="value"></param>
-		public virtual void UpdateView(PropertyReference viewProperty, object value)
+        public virtual void UpdateView(PropertyReference viewProperty, object value)
 		{
-			ViewDataBindings.UpdateView(viewProperty, value);
+            ViewDataBindings.UpdateView(viewProperty, value);
 		}
 
 		/// <summary>

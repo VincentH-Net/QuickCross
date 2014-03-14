@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;__MOBILE__;__IOS__;TEMPLATE;</DefineConstants>
+    <DefineConstants>DEBUG;__IOS__;__DIALOG__;__MOBILE__;TEMPLATE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -34,7 +34,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
-    <DefineConstants>__MOBILE__;__IOS__;TEMPLATE;</DefineConstants>
+    <DefineConstants>__IOS__;__DIALOG__;__MOBILE__;TEMPLATE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
@@ -106,12 +106,13 @@
     <AssemblyName>SampleAppios</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhoneSimulator'">
-    <DefineConstants>__MOBILE__;__IOS__;TEMPLATE;</DefineConstants>
+    <DefineConstants>__IOS__;__DIALOG__;__MOBILE__;TEMPLATE;</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppStore|iPhoneSimulator'">
-    <DefineConstants>__MOBILE__;__IOS__;TEMPLATE;</DefineConstants>
+    <DefineConstants>__IOS__;__DIALOG__;__MOBILE__;TEMPLATE;</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MonoTouch.Dialog-1" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -125,6 +126,10 @@
     <None Include="QuickCross\Templates\_VIEWNAME_CodeView.cs" />
     <None Include="QuickCross\Templates\_VIEWNAME_XibView.cs" />
     <None Include="QuickCross\Templates\_VIEWNAME_XibView.designer.cs" />
+    <None Include="QuickCross\DialogViewBase.cs" />
+    <None Include="QuickCross\TabBarViewBase.cs" />
+    <Compile Include="DialogViewBase.cs" />
+    <Compile Include="TabBarViewBase.cs" />
     <Compile Include="TableViewBase.cs" />
     <Compile Include="ViewBase.cs" />
     <None Include="Info.plist" />
@@ -135,7 +140,6 @@
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="QuickCross\ObjcMagic.cs" />
-    <Compile Include="QuickCross\Templates\_VIEWNAME_StoryBoardTableView.cs" />
     <Compile Include="QuickCross\ViewDataBindings.cs" />
     <Compile Include="QuickCross\ViewDataBindings.UI.cs" />
     <Compile Include="SampleAppNavigator.cs" />

@@ -1,4 +1,4 @@
-using MonoTouch.Foundation;
+﻿using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using QuickCrossLibrary.Templates;
 
