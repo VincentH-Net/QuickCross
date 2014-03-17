@@ -3,6 +3,7 @@ using System;
 using Android.Views;
 using Android.Widget;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace QuickCross
 {
@@ -12,8 +13,8 @@ namespace QuickCross
 
         private void AddCommandHandler(DataBinding binding)
         {
-            var view = binding.View;
-            if (view == null) return;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -21,14 +22,15 @@ namespace QuickCross
                 default:
                     if (view is AbsSpinner) ((AdapterView)view).ItemSelected += AdapterView_ItemSelected;
                     else if (view is AdapterView) ((AdapterView)view).ItemClick += AdapterView_ItemClick;
-                    else
+                    else if (view is View)
                     {
-                        view.Click += View_Click;
+                        var androidView = (View)view;
+                        androidView.Click += View_Click;
                         var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
                         if (command != null)
                         {
                             command.CanExecuteChanged += binding.Command_CanExecuteChanged;
-                            view.Enabled = command.IsEnabled;
+                            androidView.Enabled = command.IsEnabled;
                         }
                     }
                     break;
@@ -37,8 +39,8 @@ namespace QuickCross
 
         private void RemoveCommandHandler(DataBinding binding)
         {
-            var view = binding.View;
-            if (view == null) return;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -46,11 +48,12 @@ namespace QuickCross
                 default:
                     if (view is AbsSpinner) ((AdapterView)view).ItemSelected -= AdapterView_ItemSelected;
                     else if (view is AdapterView) ((AdapterView)view).ItemClick -= AdapterView_ItemClick;
-                    else
+                    else if (view is View)
                     {
+                        var androidView = (View)view;
                         var command = (RelayCommand)binding.ViewModelPropertyInfo.GetValue(viewModel);
                         if (command != null) command.CanExecuteChanged -= binding.Command_CanExecuteChanged;
-                        view.Click -= View_Click;
+                        androidView.Click -= View_Click;
                     }
                     break;
             }
@@ -109,68 +112,73 @@ namespace QuickCross
 
         #region View types that support one-way data binding
 
-        public static void UpdateView(View view, object value)
-        {
-            if (view != null)
-            {
-                string viewTypeName = view.GetType().FullName;
-                switch (viewTypeName)
-                {
-                    // TODO: Add cases here for specialized view types, as needed
-                    case "Android.Widget.ProgressBar":
-                        {
-                            var progressBar = (ProgressBar)view;
-                            int progressValue = (int)(value ?? 0);
-                            if (progressBar.Progress != progressValue) progressBar.Progress = progressValue;
-                        }
-                        break;
+        public static Dictionary<string, string> ViewDefaultPropertyOrFieldName = new Dictionary<string, string>
+        { // Key: full type name of view, Value: name of a property or field on the view
+            { "Android.Widget.ProgressBar", "Progress" }
+        };
 
-                    case "Android.Webkit.WebView":
+
+        public static void UpdateView(PropertyReference viewProperty, object value)
+        {
+            if (viewProperty == null || viewProperty.ContainingObject == null) return;
+            var view = viewProperty.ContainingObject;
+            string viewTypeName = view.GetType().FullName;
+            switch (viewTypeName)
+            {
+                // TODO: Add cases here for specialized view types, as needed
+                case "Android.Widget.ProgressBar":
+                    {
+                        var progressBar = (ProgressBar)view;
+                        int progressValue = (int)(value ?? 0);
+                        if (progressBar.Progress != progressValue) progressBar.Progress = progressValue;
+                    }
+                    break;
+
+                case "Android.Webkit.WebView":
+                    {
+                        var webView = (Android.Webkit.WebView)view;
+                        if (value is Uri)
                         {
-                            var webView = (Android.Webkit.WebView)view;
-                            if (value is Uri)
+                            string newUrl = value.ToString();
+                            if (webView.Url != newUrl) webView.LoadUrl(newUrl);
+                        }
+                        else
+                        {
+                            webView.LoadData(value == null ? "" : value.ToString(), "text/html", null);
+                        }
+                    }
+                    break;
+
+                default:
+                    if (view is TextView)
+                    {
+                        var textView = (TextView)view;
+                        string text = value == null ? "" : value.ToString();
+                        if (textView.Text != text) textView.Text = text;
+                    }
+                    else if (view is AdapterView)
+                    {
+                        var adapterView = (AdapterView)view;
+                        var adapter = adapterView.GetAdapter() as IDataBindableListAdapter;
+                        if (adapter != null)
+                        {
+                            int position = adapter.GetItemPosition(value);
+                            if (adapterView is AbsListView)
                             {
-                                string newUrl = value.ToString();
-                                if (webView.Url != newUrl) webView.LoadUrl(newUrl);
+                                var absListView = (AbsListView)adapterView;
+                                if (!absListView.IsItemChecked(position))
+                                {
+                                    absListView.SetItemChecked(position, true);
+                                }
                             }
                             else
                             {
-                                webView.LoadData(value == null ? "" : value.ToString(), "text/html", null);
+                                if (adapterView.SelectedItemPosition != position) adapterView.SetSelection(position);
                             }
                         }
-                        break;
-
-                    default:
-                        if (view is TextView)
-                        {
-                            var textView = (TextView)view;
-                            string text = value == null ? "" : value.ToString();
-                            if (textView.Text != text) textView.Text = text;
-                        }
-                        else if (view is AdapterView)
-                        {
-                            var adapterView = (AdapterView)view;
-                            var adapter = adapterView.GetAdapter() as IDataBindableListAdapter;
-                            if (adapter != null)
-                            {
-                                int position = adapter.GetItemPosition(value);
-                                if (adapterView is AbsListView)
-                                {
-                                    var absListView = (AbsListView)adapterView;
-                                    if (!absListView.IsItemChecked(position))
-                                    {
-                                        absListView.SetItemChecked(position, true);
-                                    }
-                                }
-                                else
-                                {
-                                    if (adapterView.SelectedItemPosition != position) adapterView.SetSelection(position);
-                                }
-                            }
-                        }
-                        else throw new NotImplementedException("View type not implemented: " + viewTypeName);
-                        break;
-                }
+                    }
+                    else viewProperty.Value = value;
+                    break;
             }
         }
 
@@ -180,8 +188,8 @@ namespace QuickCross
 
         private void AddTwoWayHandler(DataBinding binding)
         {
-            var view = binding.View;
-            if (view == null) return;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -197,8 +205,8 @@ namespace QuickCross
 
         private void RemoveTwoWayHandler(DataBinding binding)
         {
-            var view = binding.View;
-            if (view == null) return;
+            if (binding.ViewProperty == null || binding.ViewProperty.ContainingObject == null) return;
+            var view = binding.ViewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
@@ -216,10 +224,7 @@ namespace QuickCross
         {
             var view = (TextView)sender;
             var binding = FindBindingForView(view);
-            if (binding != null)
-            {
-                binding.ViewModelPropertyInfo.SetValue(viewModel, view.Text);
-            }
+            if (binding != null) binding.UpdateViewModel(viewModel, view.Text);
         }
 
         private void HandleAdapterViewItemChosen(AdapterView adapterView, int itemPosition)
@@ -238,7 +243,7 @@ namespace QuickCross
                             command.Execute(value);
                             break;
                         case BindingMode.TwoWay:
-                            binding.ViewModelPropertyInfo.SetValue(viewModel, value);
+                            binding.UpdateViewModel(viewModel, value);
                             break;
                     }
                 }

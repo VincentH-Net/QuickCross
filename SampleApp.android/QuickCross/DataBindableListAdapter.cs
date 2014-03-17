@@ -161,9 +161,9 @@ namespace QuickCross
         /// </summary>
         /// <param name="view"></param>
         /// <param name="value"></param>
-        protected virtual void UpdateView(View view, object value)
+        protected virtual void UpdateView(PropertyReference viewProperty, object value)
         {
-            if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(view, value); else ViewDataBindings.UpdateView(view, value);
+            if (viewExtensionPoints != null) viewExtensionPoints.UpdateView(viewProperty, value); else ViewDataBindings.UpdateView(viewProperty, value);
         }
 
         public override View GetView(int position, View convertView, ViewGroup parent)
@@ -175,6 +175,7 @@ namespace QuickCross
                 if (itemValueResourceId.HasValue)
                 {
                     var valueView = EnsureSingleViewHolder(rootView);
+                    // TODO: ***HERE: mirroring IOS binding enhancements in android 
                     UpdateView(valueView, list[position]);
                 }
                 else

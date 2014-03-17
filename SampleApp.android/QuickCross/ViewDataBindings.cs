@@ -57,7 +57,6 @@ namespace QuickCross
         {
             public BindingMode Mode;
 
-            public View View;
             public PropertyReference ViewProperty;
             public Action UpdateViewAction;
             public Action UpdateViewModelAction; 
@@ -236,7 +235,6 @@ namespace QuickCross
 
         private DataBinding AddBinding(string propertyName, BindingMode mode = BindingMode.OneWay, string listPropertyName = null, object view = null, string viewMemberName = null, Action updateViewAction = null, Action updateViewModelAction = null, AdapterView commandParameterSelectedItemAdapterView = null)
         {
-            // TODO: ***HERE: mirroring IOS binding enhancements in android 
             var androidView = view as View;
             string idName = (androidView != null) ? androidView.Id.ToString() : IdName(propertyName);
             int? resourceId = AndroidHelpers.FindResourceId(idName);
@@ -313,34 +311,43 @@ namespace QuickCross
                 }
             }
 
+            if ((mode == BindingMode.OneWay || mode == BindingMode.TwoWay) && updateViewAction == null && viewMemberName == null)
+            {
+                var typeName = view.GetType().FullName;
+                if (!ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
+                    throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", typeName), "ViewMemberName");
+            }
+
             var viewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName);
 
             var binding = new DataBinding
             {
-                View = view,
+                ViewProperty = new PropertyReference(view, viewMemberName, viewModelPropertyInfo != null ? viewModelPropertyInfo.PropertyType : null),
                 ResourceId = resourceId,
+                UpdateViewAction = updateViewAction,
+                UpdateViewModelAction = updateViewModelAction,
                 Mode = mode,
-                ViewModelPropertyInfo = viewModel.GetType().GetProperty(propertyName),
+                ViewModelPropertyInfo = viewModelPropertyInfo,
                 CommandParameterListId = commandParameterListId,
                 CommandParameterListView = commandParameterSelectedItemAdapterView
             };
 
-            if (binding.ViewProperty.ContainingObject is AdapterView)
+            if (listPropertyName == null) listPropertyName = propertyName + "List";
+            var pi = viewModel.GetType().GetProperty(listPropertyName);
+            if (pi == null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
             {
-                if (listPropertyName == null) listPropertyName = propertyName + "List";
-                var pi = viewModel.GetType().GetProperty(listPropertyName);
-                if (pi == null && binding.ViewModelPropertyInfo.PropertyType.GetInterface("IList") != null)
-                {
-                    listPropertyName = propertyName;
-                    pi = binding.ViewModelPropertyInfo;
-                    binding.ViewModelPropertyInfo = null;
-                }
-                binding.ViewModelListPropertyInfo = pi;
+                listPropertyName = propertyName;
+                pi = binding.ViewModelPropertyInfo;
+                binding.ViewModelPropertyInfo = null;
+            }
+            binding.ViewModelListPropertyInfo = pi;
 
-                pi = binding.ViewProperty.ContainingObject.GetType().GetProperty("Adapter", BindingFlags.Public | BindingFlags.Instance);
+            if (view is AdapterView)
+            {
+                pi = view.GetType().GetProperty("Adapter", BindingFlags.Public | BindingFlags.Instance);
                 if (pi != null)
                 {
-                    var adapter = pi.GetValue(binding.View);
+                    var adapter = pi.GetValue(view);
                     if (adapter == null)
                     {
                         if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
@@ -350,7 +357,7 @@ namespace QuickCross
                         if (itemTemplateResourceId.HasValue)
                         {
                             adapter = new DataBindableListAdapter<object>(layoutInflater, itemTemplateResourceId.Value, itemTemplateName + "_", itemValueResourceId, rootViewExtensionPoints);
-                            pi.SetValue(binding.View, adapter);
+                            pi.SetValue(view, adapter);
                         }
                     }
                     binding.ListAdapter = adapter as IDataBindableListAdapter;
@@ -369,7 +376,7 @@ namespace QuickCross
 
         private DataBinding FindBindingForView(object view)
         {
-            return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.View, view)).Value;
+            return dataBindings.FirstOrDefault(i => object.ReferenceEquals(i.Value.ViewProperty.ContainingObject, view)).Value;
         }
 
         private DataBinding FindBindingForListProperty(string propertyName)
@@ -379,11 +386,18 @@ namespace QuickCross
 
         private void UpdateView(DataBinding binding)
         {
-            if ((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay) && binding.View != null && binding.ViewModelPropertyInfo != null)
+            if (((binding.Mode == BindingMode.OneWay) || (binding.Mode == BindingMode.TwoWay)) && binding.ViewProperty != null && binding.ViewProperty.ContainingObject != null)
             {
-                var view = binding.View;
-                var value = binding.ViewModelPropertyInfo.GetValue(viewModel);
-                if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(view, value); else UpdateView(view, value);
+				var viewProperty = binding.ViewProperty;
+                if (binding.UpdateViewAction != null)
+                {
+                    binding.UpdateViewAction();
+                }
+                else
+                {
+                    var value = (binding.ViewModelPropertyInfo == null) ? viewModel : binding.ViewModelPropertyInfo.GetValue(viewModel);
+                    if (rootViewExtensionPoints != null) rootViewExtensionPoints.UpdateView(viewProperty, value); else UpdateView(viewProperty, value);
+                }
             }
         }
 
@@ -394,7 +408,7 @@ namespace QuickCross
                 var list = (IList)binding.ViewModelListPropertyInfo.GetValue(viewModel);
                 if (binding.ListAdapter.SetList(list))
                 {
-                    var listView = binding.View;
+                    var listView = binding.ViewProperty.ContainingObject;
                     if (listView is AbsListView) ((AbsListView)listView).ClearChoices(); // Apparently, calling BaseAdapter.NotifyDataSetChanged() does not clear the choices, so we do that here.
                 }
             }

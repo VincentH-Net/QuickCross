@@ -138,10 +138,10 @@ namespace QuickCross
         /// Override this method in a derived view class to change how a data-bound value is set for specific views
         /// </summary>
         /// <param name="view"></param>
-        /// <param name="value"></param>
-        public virtual void UpdateView(View view, object value)
+        /// <param name="viewProperty"></param>
+        public virtual void UpdateView(PropertyReference viewProperty, object value)
         {
-            ViewDataBindings.UpdateView(view, value);
+            ViewDataBindings.UpdateView(viewProperty, value);
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 
  /* TODO: To complete adding the _VIEWNAME_ Xib view, follow these steps:
  *
- * 1 In Xamarin Studio, add a new Xib file named _VIEWNAME_View and open it in XCode.
+ * 1 In Xamarin Studio, add a new Xib file (i.e. with the iPhone View Controller project item template) named _VIEWNAME_View and open it in XCode.
  * 2 In XCode, in the left pane select "File's Owner", then in the identity inspector
      (which is in the right pane), set the Class to _VIEWNAME_View.
  * 3 With "File's Owner" still selected, select the connections inspector (in the right pane), 
