@@ -480,8 +480,10 @@ namespace QuickCross
             if (binding.ViewProperty.ContainingObject is UITableView)
             {
                 var tableView = (UITableView)binding.ViewProperty.ContainingObject;
-				if (tableView.Source == null)
-				{
+				var tableView = (UITableView)binding.View;
+				if (tableView.Source != null) {
+                    binding.TableViewSource = tableView.Source as DataBindableUITableViewSource;
+                } else {
 					if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
 					string listItemSelectedPropertyName = (mode == BindingMode.Command || mode == BindingMode.TwoWay) ? bp.ViewModelPropertyName : null;
 					tableView.Source = binding.TableViewSource = new DataBindableUITableViewSource(
