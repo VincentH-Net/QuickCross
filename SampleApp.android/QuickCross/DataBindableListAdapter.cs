@@ -159,7 +159,7 @@ namespace QuickCross
         /// <summary>
         /// Override this method in a derived adapter class to change how a data-bound value is set for specific views
         /// </summary>
-        /// <param name="view"></param>
+        /// <param name="viewProperty"></param>
         /// <param name="value"></param>
         protected virtual void UpdateView(PropertyReference viewProperty, object value)
         {
@@ -174,9 +174,8 @@ namespace QuickCross
             {
                 if (itemValueResourceId.HasValue)
                 {
-                    var valueView = EnsureSingleViewHolder(rootView);
-                    // TODO: ***HERE: mirroring IOS binding enhancements in android 
-                    UpdateView(valueView, list[position]);
+                    var valueViewProperty = EnsureSingleViewHolder(rootView);
+                    UpdateView(valueViewProperty, list[position]);
                 }
                 else
                 {
@@ -191,7 +190,7 @@ namespace QuickCross
                         else
                         {
                             ListDictionary viewHolder = EnsureMultipleViewHolder(rootView);
-                            foreach (var idb in itemDataBindings) UpdateView((View)viewHolder[idb.ResourceId], idb.GetValue(itemObject));
+                            foreach (var idb in itemDataBindings) UpdateView((PropertyReference)viewHolder[idb.ResourceId], idb.GetValue(itemObject));
                         }
                     }
                 }
@@ -199,16 +198,35 @@ namespace QuickCross
             return rootView;
         }
 
-        // Implement the ViewHolder pattern; e.g. see http://www.jmanzano.es/blog/?p=166
-        private View EnsureSingleViewHolder(View rootView)
+        private PropertyReference GetViewDefaultProperty(View view)
         {
-            var valueView = (View)rootView.Tag;
-            if (valueView == null)
+            if (view == null) return null;
+            var viewTypeName = view.GetType().FullName;
+            string viewMemberName;
+            if (!ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(viewTypeName, out viewMemberName))
+                throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", viewTypeName), "ViewMemberName");
+            return new PropertyReference(view, viewMemberName);
+        }
+
+        // Implement the ViewHolder pattern; e.g. see http://www.jmanzano.es/blog/?p=166
+        private PropertyReference EnsureSingleViewHolder(View rootView)
+        {
+            PropertyReference valueViewProperty = rootView.Tag as Wrapper<PropertyReference>;
+            if (valueViewProperty == null)
             {
-                valueView = rootView.FindViewById(itemValueResourceId.Value);
-                rootView.Tag = valueView;
+                var view = rootView.FindViewById(itemValueResourceId.Value);
+                if (view != null)
+                {
+                    if (view.Tag != null)
+                    {
+                        var tag = view.Tag.ToString();
+                        // TODO: *** HERE adding tag parameters parsing to non-viewmodel list items 
+                    }
+                    valueViewProperty = GetViewDefaultProperty(view);
+                    rootView.Tag = (Wrapper<PropertyReference>)valueViewProperty;
+                }
             }
-            return valueView;
+            return valueViewProperty;
         }
 
         // If the list item is a viewmodel, we can bind it using a ViewBindings instance, which then becomes the viewholder
@@ -268,7 +286,7 @@ namespace QuickCross
             if (viewHolder == null)
             {
                 viewHolder = new ListDictionary();
-                foreach (var idb in itemDataBindings) viewHolder.Add(idb.ResourceId, rootView.FindViewById(idb.ResourceId));
+                foreach (var idb in itemDataBindings) viewHolder.Add(idb.ResourceId, GetViewDefaultProperty(rootView.FindViewById(idb.ResourceId)));
                 rootView.Tag = (Wrapper<ListDictionary>)viewHolder;
             }
             return viewHolder;

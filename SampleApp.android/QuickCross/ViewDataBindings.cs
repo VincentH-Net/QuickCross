@@ -224,7 +224,7 @@ namespace QuickCross
             {
                 foreach (var bp in bindingsParameters)
                 {
-                    if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + bp.View.Id.ToString());
+                    if (bp.View != null && FindBindingForView(bp.View) != null) throw new ArgumentException("Cannot add binding because a binding already exists for the view " + bp.View.ToString());
                     if (dataBindings.ContainsKey(IdName(bp.ViewModelPropertyName))) throw new ArgumentException("Cannot add binding because a binding already exists for the view with Id " + IdName(bp.ViewModelPropertyName));
                     AddBinding(bp.ViewModelPropertyName, bp.Mode, bp.ListPropertyName, bp.View, bp.ViewMemberName, bp.UpdateView, bp.UpdateViewModel, bp.CommandParameterSelectedItemAdapterView);
                 }
@@ -232,6 +232,63 @@ namespace QuickCross
         }
 
         private string IdName(string name) { return idPrefix + name; }
+
+        public static BindingParameters ParseBindingParameters(string tag)
+        {
+            BindingParameters bp = null;
+            if (tag != null && tag.Contains("{"))
+            {
+                var match = Regex.Match(tag, @"({Binding\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{List\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{CommandParameter\s+((?<assignment>[^,{}]+),?)+\s*})?");
+                if (match.Success)
+                {
+                    var gc = match.Groups["assignment"];
+                    if (gc != null)
+                    {
+                        var cc = gc.Captures;
+                        if (cc != null)
+                        {
+                            for (int i = 0; i < cc.Count; i++)
+                            {
+                                string[] assignmentElements = cc[i].Value.Split('=');
+                                if (assignmentElements.Length == 1)
+                                {
+                                    string value = assignmentElements[0].Trim();
+                                    if (value != "") bp.ViewModelPropertyName = value;
+                                }
+                                else if (assignmentElements.Length == 2)
+                                {
+                                    string name = assignmentElements[0].Trim();
+                                    string value = assignmentElements[1].Trim();
+                                    if (name.StartsWith("."))
+                                    {
+                                        bp.ViewMemberName = name.Substring(1);
+                                        if (value != "") bp.ViewModelPropertyName = value;
+                                    }
+                                    else
+                                    {
+                                        switch (name)
+                                        {
+                                            case "Mode": Enum.TryParse<BindingMode>(value, true, out bp.Mode); break;
+                                            case "ItemsSource": bp.ListPropertyName= value; break;
+                                            case "ItemIsValue": Boolean.TryParse(value, out bp.itemIsValue); break; // TODO: *** HERE separating parsing parameters - why is itemIsValue not present in bp?
+
+                                            case "ItemTemplate": itemTemplateName = value; break;
+                                            case "ItemValueId": itemValueId = value; break;
+                                            case "ListId":
+                                                commandParameterListId = AndroidHelpers.FindResourceId(value);
+                                                if (commandParameterSelectedItemAdapterView == null && commandParameterListId.HasValue) commandParameterSelectedItemAdapterView = rootView.FindViewById<AdapterView>(commandParameterListId.Value);
+                                                break;
+                                            default: throw new ArgumentException("Unknown tag binding parameter: " + name);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return bp;
+        }
 
         private DataBinding AddBinding(string propertyName, BindingMode mode = BindingMode.OneWay, string listPropertyName = null, object view = null, string viewMemberName = null, Action updateViewAction = null, Action updateViewModelAction = null, AdapterView commandParameterSelectedItemAdapterView = null)
         {
