@@ -480,7 +480,6 @@ namespace QuickCross
             if (binding.ViewProperty.ContainingObject is UITableView)
             {
                 var tableView = (UITableView)binding.ViewProperty.ContainingObject;
-				var tableView = (UITableView)binding.View;
 				if (tableView.Source != null) {
                     binding.TableViewSource = tableView.Source as DataBindableUITableViewSource;
                 } else {
