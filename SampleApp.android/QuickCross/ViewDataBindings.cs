@@ -298,7 +298,7 @@ namespace QuickCross
             View androidView = view as View;
             string propertyName = bp.ViewModelPropertyName;
 
-            string idName = (androidView != null) ? androidView.Id.ToString() : IdName(propertyName);
+            string idName = (androidView != null) ? androidView.Id.ToString() : IdName(propertyName); // TODO: *** HERE: need to get enum Name of androidView.Id int, and also check viewModelPropertyname must be equal to Id!
             int? resourceId = AndroidHelpers.FindResourceId(idName);
             if (view == null && resourceId.HasValue) view = androidView = rootView.FindViewById(resourceId.Value);
             if (view == null) return null;
