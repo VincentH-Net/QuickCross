@@ -198,14 +198,23 @@ namespace QuickCross
             return rootView;
         }
 
-        private PropertyReference GetViewDefaultProperty(View view)
+        private PropertyReference GetViewProperty(View view)
         {
             if (view == null) return null;
+
+            string viewMemberName = null;
+            if (view.Tag != null)
+            {
+                var tag = view.Tag.ToString();
+                var bp = ViewDataBindings.ParseBindingParameters(tag);
+                if (bp != null) viewMemberName = bp.ViewMemberName;
+            }
+            if (viewMemberName != null) return new PropertyReference(view, viewMemberName);
+
             var viewTypeName = view.GetType().FullName;
-            string viewMemberName;
-            if (!ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(viewTypeName, out viewMemberName))
-                throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", viewTypeName), "ViewMemberName");
-            return new PropertyReference(view, viewMemberName);
+            if (ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(viewTypeName, out viewMemberName)) return new PropertyReference(view, viewMemberName);
+
+            throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", viewTypeName), "ViewMemberName");
         }
 
         // Implement the ViewHolder pattern; e.g. see http://www.jmanzano.es/blog/?p=166
@@ -215,16 +224,8 @@ namespace QuickCross
             if (valueViewProperty == null)
             {
                 var view = rootView.FindViewById(itemValueResourceId.Value);
-                if (view != null)
-                {
-                    if (view.Tag != null)
-                    {
-                        var tag = view.Tag.ToString();
-                        // TODO: *** HERE adding tag parameters parsing to non-viewmodel list items 
-                    }
-                    valueViewProperty = GetViewDefaultProperty(view);
-                    rootView.Tag = (Wrapper<PropertyReference>)valueViewProperty;
-                }
+                valueViewProperty = GetViewProperty(view);
+                if (valueViewProperty != null) rootView.Tag = (Wrapper<PropertyReference>)valueViewProperty;
             }
             return valueViewProperty;
         }
@@ -286,7 +287,7 @@ namespace QuickCross
             if (viewHolder == null)
             {
                 viewHolder = new ListDictionary();
-                foreach (var idb in itemDataBindings) viewHolder.Add(idb.ResourceId, GetViewDefaultProperty(rootView.FindViewById(idb.ResourceId)));
+                foreach (var idb in itemDataBindings) viewHolder.Add(idb.ResourceId, GetViewProperty(rootView.FindViewById(idb.ResourceId)));
                 rootView.Tag = (Wrapper<ListDictionary>)viewHolder;
             }
             return viewHolder;
