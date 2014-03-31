@@ -37,6 +37,14 @@ namespace QuickCross
             return (int)fieldInfo.GetValue(null);
         }
 
+        public static string FindResourceName(int id, ResourceCategory category = ResourceCategory.Id)
+        {
+            if (resourceClassType == null) return null;
+            var categoryClassType = resourceClassType.GetNestedType(category.ToString()); // MQC TODO: Check if optimize perf by caching type for each category is needed?
+            if (categoryClassType == null) return null;
+            return Enum.GetName(categoryClassType, id);
+        }
+
         public static object GetAdapter(this AdapterView adapterView)
         {
             if (adapterView == null) return null;
