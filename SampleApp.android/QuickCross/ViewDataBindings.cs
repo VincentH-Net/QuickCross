@@ -239,9 +239,8 @@ namespace QuickCross
 
         private string IdName(string name) { return idPrefix + name; }
 
-        public static BindingParameters ParseBindingParameters(string tag)
+        public static BindingParameters ParseBindingParameters(string tag, BindingParameters bp = null)
         {
-            BindingParameters bp = null;
             if (tag != null && tag.Contains("{"))
             {
                 var match = Regex.Match(tag, @"({Binding\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{List\s+((?<assignment>[^,{}]+),?)+\s*})?(\s*{CommandParameter\s+((?<assignment>[^,{}]+),?)+\s*})?");
@@ -253,6 +252,7 @@ namespace QuickCross
                         var cc = gc.Captures;
                         if (cc != null)
                         {
+                            if (bp == null) bp = new BindingParameters();
                             for (int i = 0; i < cc.Count; i++)
                             {
                                 string[] assignmentElements = cc[i].Value.Split('=');
@@ -309,28 +309,23 @@ namespace QuickCross
             }
             else
             {
-                idName = IdName(propertyName);
                 resourceId = AndroidHelpers.FindResourceId(idName);
             }
 
             if (view == null && resourceId.HasValue) view = androidView = rootView.FindViewById(resourceId.Value);
             if (view == null) return null;
 
-            bool itemIsValue = false;
-            string itemTemplateName = null, itemValueId = null;
-            int? commandParameterListId = null;
+            if (androidView != null && androidView.Tag != null) bp = ParseBindingParameters(androidView.Tag.ToString(), bp);
 
             string viewMemberName = bp.ViewMemberName;
-            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && bp.UpdateView == null && viewMemberName == null)
-            {
-                var typeName = view.GetType().FullName;
-                if (!ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
-                    throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", typeName), "ViewMemberName");
-            }
+            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && bp.UpdateView == null && viewMemberName == null) ViewDefaultPropertyOrFieldName.TryGetValue(view.GetType().FullName, out viewMemberName);
 
             var viewModelPropertyInfo = (string.IsNullOrEmpty(propertyName) || propertyName == ".") ? null : viewModel.GetType().GetProperty(propertyName);
             AdapterView commandParameterSelectedItemAdapterView = bp.CommandParameterSelectedItemAdapterView;
-            if (commandParameterSelectedItemAdapterView == null && commandParameterListId.HasValue) commandParameterSelectedItemAdapterView = rootView.FindViewById<AdapterView>(commandParameterListId.Value);
+            if (commandParameterSelectedItemAdapterView == null && bp.ListId.HasValue)
+            {
+                commandParameterSelectedItemAdapterView = rootView.FindViewById<AdapterView>(bp.ListId.Value);
+            }
 
             var binding = new DataBinding
             {
@@ -340,7 +335,7 @@ namespace QuickCross
                 UpdateViewModelAction = bp.UpdateViewModel,
                 Mode = bp.Mode,
                 ViewModelPropertyInfo = viewModelPropertyInfo,
-                CommandParameterListId = commandParameterListId,
+                CommandParameterListId = bp.ListId,
                 CommandParameterListView = commandParameterSelectedItemAdapterView
             };
 
@@ -363,8 +358,8 @@ namespace QuickCross
                     var adapter = pi.GetValue(view);
                     if (adapter == null)
                     {
-                        if (itemTemplateName == null) itemTemplateName = listPropertyName + "Item";
-                        if (itemIsValue && itemValueId == null) itemValueId = itemTemplateName;
+                        string itemTemplateName = bp.ListItemTemplateName ?? listPropertyName + "Item";
+                        string itemValueId = (bp.ListItemIsValue && bp.ListItemValueId == null) ? itemTemplateName : bp.ListItemValueId;
                         int? itemTemplateResourceId = AndroidHelpers.FindResourceId(itemTemplateName, AndroidHelpers.ResourceCategory.Layout);
                         int? itemValueResourceId = AndroidHelpers.FindResourceId(itemValueId);
                         if (itemTemplateResourceId.HasValue)

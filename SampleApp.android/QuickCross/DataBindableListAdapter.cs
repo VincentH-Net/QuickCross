@@ -211,10 +211,8 @@ namespace QuickCross
             }
             if (viewMemberName != null) return new PropertyReference(view, viewMemberName);
 
-            var viewTypeName = view.GetType().FullName;
-            if (ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(viewTypeName, out viewMemberName)) return new PropertyReference(view, viewMemberName);
-
-            throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", viewTypeName), "ViewMemberName");
+            ViewDataBindings.ViewDefaultPropertyOrFieldName.TryGetValue(view.GetType().FullName, out viewMemberName);
+            return new PropertyReference(view, viewMemberName);
         }
 
         // Implement the ViewHolder pattern; e.g. see http://www.jmanzano.es/blog/?p=166

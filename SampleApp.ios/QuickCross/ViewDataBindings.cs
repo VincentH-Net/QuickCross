@@ -442,13 +442,9 @@ namespace QuickCross
 
             var view = bp.View;
 			if (view == null) return null;
+
             var viewMemberName = bp.ViewMemberName;
-            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && bp.UpdateView == null && viewMemberName == null)
-            {
-                var typeName = view.GetType().FullName;
-                if (!ViewDefaultPropertyOrFieldName.TryGetValue(typeName, out viewMemberName))
-                    throw new ArgumentException(string.Format("No default property or field name exists for view type {0}. Please specify the name of a property or field in the ViewMemberName binding parameter", typeName), "ViewMemberName");
-            }
+            if ((bp.Mode == BindingMode.OneWay || bp.Mode == BindingMode.TwoWay) && bp.UpdateView == null && viewMemberName == null) ViewDefaultPropertyOrFieldName.TryGetValue(view.GetType().FullName, out viewMemberName);
 
 			var propertyName = bp.ViewModelPropertyName;
 			var mode = bp.Mode;

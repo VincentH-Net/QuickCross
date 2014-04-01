@@ -121,19 +121,18 @@ namespace QuickCross
         public static void UpdateView(PropertyReference viewProperty, object value)
         {
             if (viewProperty == null || viewProperty.ContainingObject == null) return;
+
+            if (!string.IsNullOrEmpty(viewProperty.PropertyOrFieldName))
+            {
+                viewProperty.Value = value;
+                return;
+            }
+
             var view = viewProperty.ContainingObject;
             string viewTypeName = view.GetType().FullName;
             switch (viewTypeName)
             {
                 // TODO: Add cases here for specialized view types, as needed
-                case "Android.Widget.ProgressBar":
-                    {
-                        var progressBar = (ProgressBar)view;
-                        int progressValue = (int)(value ?? 0);
-                        if (progressBar.Progress != progressValue) progressBar.Progress = progressValue;
-                    }
-                    break;
-
                 case "Android.Webkit.WebView":
                     {
                         var webView = (Android.Webkit.WebView)view;
@@ -177,7 +176,7 @@ namespace QuickCross
                             }
                         }
                     }
-                    else viewProperty.Value = value;
+                    else throw new NotImplementedException(string.Format("Unsupported view type {0} for UpdateView(). Add the type to either ViewDefaultPropertyOrFieldName or UpdateView()", viewTypeName));
                     break;
             }
         }
