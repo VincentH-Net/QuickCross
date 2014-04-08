@@ -11,7 +11,7 @@ namespace QuickCross.Templates
     {
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            _APPNAME_Application.Instance.ContinueTo_VIEWNAME_(skipNavigation: true); // This line is only needed if this view can be navigated to by some other means than through ContinueTo_VIEWNAME_() 
+            _APPNAME_Application.Instance.ContinueTo_VIEWNAME_(); // This line is only needed if this view can be navigated to by some other means than through ContinueTo_VIEWNAME_() 
             var view = inflater.Inflate(Resource.Layout._VIEWNAME_View, container, false);
             Initialize(view, _APPNAME_Application.Instance._VIEWNAME_ViewModel, inflater);
             return view;
