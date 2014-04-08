@@ -24,6 +24,11 @@ namespace CloudAuction
             NavigationContext.StartActivity(type);
         }
 
+        public void NavigateToPreviousView()
+        {
+            if (AndroidHelpers.CurrentActivity != null) AndroidHelpers.CurrentActivity.Finish();
+        }
+
         public void NavigateToMainView(MainViewModel.SubView? subView)
         {
             if (subView.HasValue) MainView.CurrentSubView = subView.Value;

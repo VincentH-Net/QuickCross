@@ -44,7 +44,6 @@ namespace CloudAuction.Shared.ViewModels
 }
 
 // Design data support
-#if DEBUG
 namespace CloudAuction.Shared.ViewModels.Design
 {
     public class AuctionViewModelDesign : AuctionViewModel
@@ -83,4 +82,3 @@ namespace CloudAuction.Shared.ViewModels.Design
         }
     }
 }
-#endif

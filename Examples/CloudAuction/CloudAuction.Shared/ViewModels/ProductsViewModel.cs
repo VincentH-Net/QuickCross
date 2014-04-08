@@ -29,7 +29,6 @@ namespace CloudAuction.Shared.ViewModels
 }
 
 // Design-time data support
-#if DEBUG
 namespace CloudAuction.Shared.ViewModels.Design
 {
     public class ProductsViewModelDesign : ProductsViewModel
@@ -53,4 +52,3 @@ namespace CloudAuction.Shared.ViewModels.Design
         }
     }
 }
-#endif
