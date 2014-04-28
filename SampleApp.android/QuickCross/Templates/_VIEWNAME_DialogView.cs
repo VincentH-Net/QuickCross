@@ -9,9 +9,8 @@ using QuickCrossLibrary.Templates.ViewModels;
 namespace QuickCross.Templates
 {
     /// <summary>
-    /// A Dialog that shows a custom view
-    /// See http://docs.xamarin.com/guides/android/platform_features/fragments/part_3_-_specialized_fragment_classes/ 
-    /// for guidance on how to create AlertDialogs or dialogs with a custom view.
+    /// A Dialog that shows a custom view. See https://github.com/MacawNL/QuickCross#android-dialogs
+    /// for guidance on how to implement the dialog logic in your application and viewmodels.
     /// </summary>
     public class _VIEWNAME_View : DialogFragmentViewBase<_VIEWNAME_ViewModel>
     {
