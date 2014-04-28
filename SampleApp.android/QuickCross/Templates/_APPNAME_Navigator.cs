@@ -2,6 +2,7 @@
 using System;
 
 using Android.Content;
+using Android.App;
 using QuickCross;
 using QuickCrossLibrary.Templates;
 using System.Collections.Generic;
@@ -22,6 +23,14 @@ namespace QuickCross.Templates
 
         private void Navigate(Type type)
         {
+            if (type.IsSubclassOf(typeof(DialogFragmentViewBase)))
+            {
+                if (AndroidHelpers.CurrentActivity == null) return;
+                var dialogFragment = (DialogFragment)Activator.CreateInstance(type);
+                dialogFragment.Show(AndroidHelpers.CurrentActivity.FragmentManager, type.Name);
+                return;
+            }
+
             if (NavigationContext == null) return;
             if (AndroidHelpers.CurrentActivity != null && AndroidHelpers.CurrentActivity.GetType() == type) return;
 			NavigationContext.StartActivity(type);

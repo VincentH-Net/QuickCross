@@ -60,6 +60,8 @@
     <Compile Include="QuickCross\DialogFragmentViewBase.cs" />
     <Compile Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
     <Compile Include="QuickCross\CheckableLayouts.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_AlertDialogView.cs" />
+    <Compile Include="QuickCross\Templates\_VIEWNAME_DialogView.cs" />
     <Compile Include="QuickCross\Templates\_VIEWNAME_FragmentView.cs" />
     <Compile Include="QuickCross\Templates\_VIEWNAME_ActivityView.cs" />
     <None Include="QuickCross\Templates\_VIEWNAME_MainLauncherView.cs" />

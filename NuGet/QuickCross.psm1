@@ -558,16 +558,21 @@ function New-View
 
         'android' {
             if ("$ViewType" -eq '') { $ViewType = 'Activity' }
-            foreach ($markupType in @($ViewType, ''))
-            {
-                if (AddProjectItem -project $project `
-                                   -destinationProjectRelativePath ('Resources\Layout\{0}View.axml' -f $ViewName) `
-                                   -templatePackageFolder          'app.android' `
-                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.axml.template' -f $markupType) `
-                                   -contentReplacements            @{ '_VIEWNAME_' = $ViewName } `
-                                   -isOptionalItem:($markupType -ne ''))
-                { break }
-            }
+
+			if ($ViewType -ne 'AlertDialog')
+			{
+				foreach ($markupType in @($ViewType, ''))
+				{
+					if (AddProjectItem -project $project `
+									   -destinationProjectRelativePath ('Resources\Layout\{0}View.axml' -f $ViewName) `
+									   -templatePackageFolder          'app.android' `
+									   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.axml.template' -f $markupType) `
+									   -contentReplacements            @{ '_VIEWNAME_' = $ViewName } `
+									   -isOptionalItem:($markupType -ne ''))
+					{ break }
+				}
+			}
+
             $null = AddProjectItem -project $project `
                                    -destinationProjectRelativePath ('{0}View.cs' -f $ViewName) `
                                    -templatePackageFolder          'app.android' `
