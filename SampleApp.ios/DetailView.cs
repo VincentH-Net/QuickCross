@@ -7,11 +7,9 @@ using SampleApp.Shared.ViewModels;
 
 namespace SampleApp
 {
-	public partial class DetailView : ViewBase
+    public partial class DetailView : ViewBase<SampleItemViewModel>
     {
         UIPopoverController masterPopoverController;
-
-		private SampleItemViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemViewModel; } }
 
 		public DetailView(IntPtr handle) : base(handle) { }
 
@@ -24,7 +22,7 @@ namespace SampleApp
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-			InitializeBindings(View, ViewModel);
+            InitializeBindings(View, SampleAppApplication.Instance.SampleItemViewModel);
         }
 
         [Export("splitViewController:willHideViewController:withBarButtonItem:forPopoverController:")]

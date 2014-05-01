@@ -8,42 +8,16 @@ using SampleApp.Shared;
 
 namespace QuickCross
 {
-    public class TableViewBase : UITableViewController, ViewDataBindings.IViewExtensionPoints
+    /// <summary>
+    /// Base class for UITableViewController views that have no viewmodel. 
+    /// This class adds lifecycle management for event handlers, you can use this to prevent memory leaks,
+    /// as advised in http://docs.xamarin.com/guides/cross-platform/application_fundamentals/memory_perf_best_practices/ 
+    /// </summary>
+    public abstract class TableViewBase : UITableViewController
     {
         public TableViewBase(IntPtr handle) : base(handle) { }
 
         private bool areHandlersAdded;
-        private ViewModelBase viewModel;
-
-        protected ViewDataBindings Bindings { get; private set; }
-
-        public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
-        {
-            if (!(sender is SampleAppNavigator) && viewModel != null)
-            {
-                string commandName = segue.Identifier;
-                if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
-            }
-            base.PrepareForSegue(segue, sender);
-        }
-
-        /// <summary>
-        /// Override this method in a derived view class to register additional event handlers for your view. Always call base.AddHandlers() in your override.
-        /// </summary>
-        protected virtual void AddHandlers()
-        {
-            viewModel.PropertyChanged += ViewModel_PropertyChanged;
-            Bindings.AddHandlers();
-        }
-
-        /// <summary>
-        /// Override this method in a derived view class to unregister additional event handlers for your view. Always call base.AddHandlers() in your override.
-        /// </summary>
-        protected virtual void RemoveHandlers()
-        {
-            Bindings.RemoveHandlers();
-            viewModel.PropertyChanged -= ViewModel_PropertyChanged;
-        }
 
         private void EnsureHandlersAreAdded()
         {
@@ -59,6 +33,76 @@ namespace QuickCross
             areHandlersAdded = false;
         }
 
+        /// <summary>
+        /// Call Initialize() in the ViewDidLoad method of a derived view class to ensure handlers are added.
+        /// </summary>
+        protected void Initialize()
+        {
+            EnsureHandlersAreAdded();
+        }
+
+        /// <summary>
+        /// Override this method in a derived view class to register additional event handlers for your view. Always call base.AddHandlers() in your override.
+        /// </summary>
+        protected virtual void AddHandlers() { }
+
+        /// <summary>
+        /// Override this method in a derived view class to unregister additional event handlers for your view. Always call base.AddHandlers() in your override.
+        /// </summary>
+        protected virtual void RemoveHandlers() { }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+            EnsureHandlersAreAdded();
+        }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            EnsureHandlersAreRemoved();
+            base.ViewDidDisappear(animated);
+        }
+
+
+    }
+
+    public class TableViewBase<ViewModelType> : TableViewBase, ViewDataBindings.IViewExtensionPoints where ViewModelType : ViewModelBase
+    {
+        public TableViewBase(IntPtr handle) : base(handle) { }
+
+        protected ViewModelType ViewModel { get; private set; }
+        protected ViewDataBindings Bindings { get; private set; }
+
+        public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
+        {
+            if (!(sender is SampleAppNavigator) && ViewModel != null)
+            {
+                string commandName = segue.Identifier;
+                if (ViewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
+            }
+            base.PrepareForSegue(segue, sender);
+        }
+
+        /// <summary>
+        /// Override this method in a derived view class to register additional event handlers for your view. Always call base.AddHandlers() in your override.
+        /// </summary>
+        protected override void AddHandlers()
+        {
+            base.AddHandlers();
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            Bindings.AddHandlers();
+        }
+
+        /// <summary>
+        /// Override this method in a derived view class to unregister additional event handlers for your view. Always call base.AddHandlers() in your override.
+        /// </summary>
+        protected virtual void RemoveHandlers()
+        {
+            Bindings.RemoveHandlers();
+            ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            base.RemoveHandlers();
+        }
+
         protected virtual object GetCommandParameter(string commandName) { return null; }
 
         /// <summary>
@@ -68,27 +112,18 @@ namespace QuickCross
         /// <param name="viewModel">The view model</param>
         /// <param name="bindingsParameters">Optional binding parameters; use to override default parameter values for specific bindings, or as an alternative for specifying binding parameters in the view tag attribute in AXML. Note that any binding parameters specified in the tag attribute wil override bindingsParameters.</param>
         /// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
-        protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
+        protected void InitializeBindings(UIView rootView, ViewModelType viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
         {
             Bindings = new ViewDataBindings(viewModel, idPrefix ?? this.GetType().Name + "_", this);
-            this.viewModel = viewModel;
-
-            EnsureHandlersAreAdded();
-
+            ViewModel = viewModel;
+            Initialize();
             Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-            EnsureHandlersAreAdded();
-            viewModel.RaisePropertiesChanged(); // Update the root view with the current property values
-        }
-
-        public override void ViewDidDisappear(bool animated)
-        {
-            EnsureHandlersAreRemoved();
-            base.ViewDidDisappear(animated);
+            ViewModel.RaisePropertiesChanged(); // Update the root view with the current property values
         }
 
         /// <summary>

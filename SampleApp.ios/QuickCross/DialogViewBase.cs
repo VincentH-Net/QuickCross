@@ -11,22 +11,82 @@ using QuickCrossLibrary.Templates;
 
 namespace QuickCross
 {
-    public class DialogViewBase : DialogViewController, ViewDataBindings.IViewExtensionPoints
+    /// <summary>
+    /// Base class for DialogViewController views that have no viewmodel. 
+    /// This class adds lifecycle management for event handlers, you can use this to prevent memory leaks,
+    /// as advised in http://docs.xamarin.com/guides/cross-platform/application_fundamentals/memory_perf_best_practices/ 
+    /// </summary>
+    public abstract class DialogViewBase : DialogViewController
+    {
+        private bool areHandlersAdded;
+
+        public DialogViewBase(IntPtr handle) : base(handle) { }
+        public DialogViewBase(RootElement root, bool pushing = false) : base(root, pushing) { }
+
+        private void EnsureHandlersAreAdded()
+        {
+            if (areHandlersAdded) return;
+            AddHandlers();
+            areHandlersAdded = true;
+        }
+
+        private void EnsureHandlersAreRemoved()
+        {
+            if (!areHandlersAdded) return;
+            RemoveHandlers();
+            areHandlersAdded = false;
+        }
+
+        /// <summary>
+        /// Call Initialize() in the ViewDidLoad method of a derived view class to ensure handlers are added.
+        /// </summary>
+        protected void Initialize()
+        {
+            EnsureHandlersAreAdded();
+        }
+
+        /// <summary>
+        /// Override this method in a derived view class to register additional event handlers for your view. Always call base.AddHandlers() in your override.
+        /// </summary>
+        protected virtual void AddHandlers() { }
+
+        /// <summary>
+        /// Override this method in a derived view class to unregister additional event handlers for your view. Always call base.AddHandlers() in your override.
+        /// </summary>
+        protected virtual void RemoveHandlers() { }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+            EnsureHandlersAreAdded();
+        }
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            EnsureHandlersAreRemoved();
+            base.ViewDidDisappear(animated);
+        }
+    }
+
+    /// <summary>
+    /// Base class for DialogViewController views that have a viewmodel. 
+    /// This class adds a viewmodel and bindings.
+    /// </summary>
+    /// <typeparam name="ViewModelType">The viewmodel type</typeparam>
+    public class DialogViewBase<ViewModelType> : DialogViewBase, ViewDataBindings.IViewExtensionPoints where ViewModelType : ViewModelBase
     {
         public DialogViewBase(IntPtr handle)    : base(handle) { }
         public DialogViewBase(RootElement root, bool pushing = false) : base(root, pushing) { }
 
-		private bool areHandlersAdded;
-		private ViewModelBase viewModel;
-
-		protected ViewDataBindings Bindings { get; private set; }
+        protected ViewModelType ViewModel { get; private set; }
+        protected ViewDataBindings Bindings { get; private set; }
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
 		{
-			if (!(sender is _APPNAME_Navigator) && viewModel != null)
+			if (!(sender is _APPNAME_Navigator) && ViewModel != null)
 			{
 				string commandName = segue.Identifier;
-				if (viewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
+				if (ViewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
 			} 
 			base.PrepareForSegue(segue, sender);
 		}
@@ -34,33 +94,21 @@ namespace QuickCross
 		/// <summary>
 		/// Override this method in a derived view class to register additional event handlers for your view. Always call base.AddHandlers() in your override.
 		/// </summary>
-		protected virtual void AddHandlers() 
+		protected override void AddHandlers() 
 		{
-			viewModel.PropertyChanged += ViewModel_PropertyChanged;
+            base.AddHandlers();
+			ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 			Bindings.AddHandlers();
 		}
 
 		/// <summary>
 		/// Override this method in a derived view class to unregister additional event handlers for your view. Always call base.AddHandlers() in your override.
 		/// </summary>
-		protected virtual void RemoveHandlers() 
+		protected override void RemoveHandlers() 
 		{ 
 			Bindings.RemoveHandlers();
-			viewModel.PropertyChanged -= ViewModel_PropertyChanged;
-		}
-
-		private void EnsureHandlersAreAdded()
-		{
-			if (areHandlersAdded) return;
-			AddHandlers();
-			areHandlersAdded = true;
-		}
-
-		private void EnsureHandlersAreRemoved()
-		{
-			if (!areHandlersAdded) return;
-			RemoveHandlers();
-			areHandlersAdded = false;
+			ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            base.RemoveHandlers();
 		}
 
 		protected virtual object GetCommandParameter(string commandName) { return null; }
@@ -72,27 +120,18 @@ namespace QuickCross
 		/// <param name="viewModel">The view model</param>
 		/// <param name="bindingsParameters">Optional binding parameters; use to override default parameter values for specific bindings, or as an alternative for specifying binding parameters in the view tag attribute in AXML. Note that any binding parameters specified in the tag attribute wil override bindingsParameters.</param>
 		/// <param name="idPrefix">The name prefix used to match view Id to property name. Default value is the root view class name + "_"</param>
-        protected void InitializeBindings(UIView rootView, ViewModelBase viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
+        protected void InitializeBindings(UIView rootView, ViewModelType viewModel, BindingParameters[] bindingsParameters = null, string idPrefix = null)
 		{
 			Bindings = new ViewDataBindings(viewModel, idPrefix ?? this.GetType().Name + "_", this);
-			this.viewModel = viewModel;
-
-			EnsureHandlersAreAdded();
-
+            ViewModel = viewModel;
+			Initialize();
 			Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
 		}
 
 		public override void ViewWillAppear(bool animated)
 		{
 			base.ViewWillAppear(animated);
-			EnsureHandlersAreAdded();
-			viewModel.RaisePropertiesChanged(); // Update the root view with the current property values
-		}
-
-		public override void ViewDidDisappear(bool animated)
-		{
-			EnsureHandlersAreRemoved();
-			base.ViewDidDisappear(animated);
+			ViewModel.RaisePropertiesChanged(); // Update the root view with the current property values
 		}
 
 		/// <summary>

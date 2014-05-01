@@ -9,10 +9,8 @@ using SampleApp.Shared.ViewModels;
 
 namespace SampleApp
 {
-	public partial class MasterView : TableViewBase
+    public partial class MasterView : TableViewBase<SampleItemListViewModel>
     {
-		private SampleItemListViewModel ViewModel { get { return SampleAppApplication.Instance.SampleItemListViewModel; } }
-
         public MasterView(IntPtr handle) : base(handle)
         {
             Title = NSBundle.MainBundle.LocalizedString("Master", "Master");
@@ -36,7 +34,7 @@ namespace SampleApp
             base.ViewDidLoad();
             NavigationItem.LeftBarButtonItem = EditButtonItem;
 			NavigationItem.RightBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewItem);
-			InitializeBindings(View, ViewModel);
+            InitializeBindings(View, SampleAppApplication.Instance.SampleItemListViewModel);
         }
 
 		protected override object GetCommandParameter(string commandName)
