@@ -38,7 +38,7 @@ namespace QuickCross.Templates
 
 		public void ContinueTo_VIEWNAME_()
 		{
-			if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = new _VIEWNAME_ViewModelDesign(); // TODO: Once _VIEWNAME_ViewModel has runtime data, instantiate that instead of _VIEWNAME_ViewModelDesign
+            if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = UseDesignViewModels ? new _VIEWNAME_ViewModelDesign() : new _VIEWNAME_ViewModel();
 			// Any actions to update the viewmodel go here
 			RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
 		}

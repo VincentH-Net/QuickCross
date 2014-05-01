@@ -6,6 +6,11 @@ namespace QuickCross
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
+        public ViewModelBase()
+        {
+            ApplicationBase.Instance.UserInteractionStopped += OnUserInteractionStopped;
+        }
+
         #if __ANDROID__ || __IOS__
         private List<string> propertyNames;
         private List<string> commandNames;
@@ -84,5 +89,14 @@ namespace QuickCross
             var handler = PropertyChanged;
             if (handler != null) ApplicationBase.RunOnUIThread(() => handler(this, new PropertyChangedEventArgs(propertyName)));
         }
+
+        /// <summary>
+        /// This method is called when the user is done interacting with the viewmodel.
+        /// <example>E.g. override this method to save changes in the viewmodel without the need for a save button.</example>
+        /// <remarks>The standard QuickCross implementation will call this method from app and view lifecycle events,
+        /// such as when the app is stopped or when navigating away from a view.
+        /// E.g. you could also call this method directly from your view when the user is inactive for a number of seconds.</remarks>
+        /// </summary>
+        public virtual void OnUserInteractionStopped() { }
     }
 }

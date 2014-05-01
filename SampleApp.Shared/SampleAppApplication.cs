@@ -3,6 +3,7 @@ using QuickCross;
 using SampleApp.Shared.Models;
 using SampleApp.Shared.Services;
 using SampleApp.Shared.ViewModels;
+using SampleApp.Shared.ViewModels.Design;
 using System;
 
 namespace SampleApp.Shared
@@ -40,27 +41,27 @@ namespace SampleApp.Shared
 
 		public void ContinueToSampleItemList()
         {
-            if (SampleItemListViewModel == null) SampleItemListViewModel = new SampleItemListViewModel(_itemService);
+            if (SampleItemListViewModel == null) SampleItemListViewModel = UseDesignViewModels ? new SampleItemListViewModelDesign() : new SampleItemListViewModel(_itemService);
             SampleItemListViewModel.Refresh();
             RunOnUIThread(() => _navigator.NavigateToSampleItemListView());
         }
 
 		public void ContinueToSampleItem(SampleItem item = null)
         {
-            if (SampleItemViewModel == null) SampleItemViewModel = new SampleItemViewModel(_itemService);
+            if (SampleItemViewModel == null) SampleItemViewModel = UseDesignViewModels ? new SampleItemViewModelDesign() : new SampleItemViewModel(_itemService);
 			SampleItemViewModel.Initialize(item);
 			RunOnUIThread(() => _navigator.NavigateToSampleItemView());
         }
 
-		/* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
+        /* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
          * and then navigate to the view using the navigator, like this:
 
         public void ContinueTo_VIEWNAME_()
         {
-            if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = new _VIEWNAME_ViewModelDesign(); // TODO: Once _VIEWNAME_ViewModel has runtime data, instantiate that instead of _VIEWNAME_ViewModelDesign
+            if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = UseDesignViewModels ? new _VIEWNAME_ViewModelDesign() : new _VIEWNAME_ViewModel();
             // Any actions to update the viewmodel go here
             RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
         }
          * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
-	}
+    }
 }

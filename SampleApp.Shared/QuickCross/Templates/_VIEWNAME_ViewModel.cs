@@ -24,7 +24,6 @@ namespace QuickCross.Templates.ViewModels
 }
 
 // Design-time data support
-#if DEBUG
 namespace QuickCross.Templates.ViewModels.Design
 {
     public class _VIEWNAME_ViewModelDesign : _VIEWNAME_ViewModel
@@ -35,6 +34,5 @@ namespace QuickCross.Templates.ViewModels.Design
         }
     }
 }
-#endif
 
 #endif // TEMPLATE
