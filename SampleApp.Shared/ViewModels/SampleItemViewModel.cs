@@ -22,6 +22,7 @@ namespace SampleApp.Shared.ViewModels
         {
             if (item == null)
             {
+                if (_itemService == null) return;
                 _itemId = -1;
                 Title = "";
                 Description = "";
@@ -41,6 +42,7 @@ namespace SampleApp.Shared.ViewModels
 
         private void Save()
         {
+            if (_itemService == null) return;
             if (_itemId < 0)
             {
                 _itemService.AddItem(Title, Description);

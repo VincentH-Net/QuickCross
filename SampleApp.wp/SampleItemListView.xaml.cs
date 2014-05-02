@@ -10,5 +10,12 @@ namespace SampleApp
             InitializeComponent();
             DataContext = SampleAppApplication.Instance.SampleItemListViewModel;
         }
+
+        protected override void OnNavigatingFrom(System.Windows.Navigation.NavigatingCancelEventArgs e)
+        {
+            var vm = DataContext as QuickCross.ViewModelBase;
+            if (vm != null) vm.OnUserInteractionStopped();
+            base.OnNavigatingFrom(e);
+        }
     }
 }

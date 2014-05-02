@@ -42,8 +42,8 @@ namespace SampleApp
         {
             Navigate(typeof(_VIEWNAME_View));
         }
-         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
+         * DO NOT REMOVE this comment; the New-View command uses this to add the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
 
-        
+
     }
 }

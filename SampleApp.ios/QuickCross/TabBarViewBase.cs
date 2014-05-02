@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-using QuickCross.Templates;
-using QuickCrossLibrary.Templates;
 
 namespace QuickCross
 {
@@ -83,7 +81,7 @@ namespace QuickCross
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
 		{
-			if (!(sender is _APPNAME_Navigator) && ViewModel != null)
+            if (!(sender is INavigator) && ViewModel != null)
 			{
 				string commandName = segue.Identifier;
 				if (ViewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
@@ -131,6 +129,12 @@ namespace QuickCross
 			base.ViewWillAppear(animated);
 			ViewModel.RaisePropertiesChanged(); // Update the root view with the current property values
 		}
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            if (ViewModel != null) ViewModel.OnUserInteractionStopped();
+            base.ViewDidDisappear(animated);
+        }
 
 		/// <summary>
 		/// Override this method in a derived view class to handle changes for specific properties in custom code instead of through data binding.

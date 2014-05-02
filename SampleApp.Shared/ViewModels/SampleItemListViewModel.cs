@@ -19,6 +19,7 @@ namespace SampleApp.Shared.ViewModels
 
         public void Refresh()
         {
+            if (_itemService == null) return;
             Items = new ObservableCollection<SampleItem>(_itemService.GetItems());
         }
 
@@ -43,6 +44,7 @@ namespace SampleApp.Shared.ViewModels
 
         private void RemoveItem(object parameter)
         {
+            if (_itemService == null) return;
             var item = (SampleItem)parameter;
             if (item != null)
             {

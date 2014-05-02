@@ -26,23 +26,23 @@ namespace QuickCross.Templates
 
         /* TODO: For each viewmodel, add a public property with a private setter like this:
         public _VIEWNAME_ViewModel _VIEWNAME_ViewModel { get; private set; }
-         * Note that the New-View and New-ViewModel commands add the above code automatically (see http://github.com/MacawNL/QuickCross#new-viewmodel). */
+         * DO NOT REMOVE this comment; the New-View and New-ViewModel commands use this to add the above code automatically (see http://github.com/MacawNL/QuickCross#new-viewmodel). */
 
 		public void ReturnToPreviousView()
 		{
 			RunOnUIThread(() => _navigator.NavigateToPreviousView());
 		}
 
-		/* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
-		 * and then navigate to the view using the navigator, like this:
+        /* TODO: For each view, add a method (with any parameters needed) to initialize its viewmodel
+         * and then navigate to the view using the navigator, like this:
 
-		public void ContinueTo_VIEWNAME_()
-		{
+        public void ContinueTo_VIEWNAME_()
+        {
             if (_VIEWNAME_ViewModel == null) _VIEWNAME_ViewModel = UseDesignViewModels ? new _VIEWNAME_ViewModelDesign() : new _VIEWNAME_ViewModel();
-			// Any actions to update the viewmodel go here
-			RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
-		}
-		 * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
+            // Any actions to update the viewmodel go here
+            RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
+        }
+         * DO NOT REMOVE this comment; the New-View command uses this to add the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
 }
 

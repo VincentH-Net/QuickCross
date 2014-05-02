@@ -50,21 +50,21 @@ namespace QuickCross
                 if (useDesignViewModels != value)
                 {
                     useDesignViewModels = value;
+
                     // Set all ViewModel properties to null so they will be recreated as the correct type on the next ContinueTo...() call
+#if NETFX_CORE
+                    foreach (var pi in this.GetType().GetTypeInfo().DeclaredProperties)
+                    {
+                        if (pi.PropertyType.GetTypeInfo().IsSubclassOf(typeof(ViewModelBase))) pi.SetValue(this, null);
+                    }
+#else
                     foreach (var pi in this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
                         if (pi.PropertyType.IsSubclassOf(typeof(ViewModelBase))) pi.SetValue(this, null);
                     }
+#endif
                 }
             }
-        }
-
-        public event Action UserInteractionStopped;
-
-        public void RaiseUserInteractionStopped()
-        {
-            var handler = UserInteractionStopped;
-            if (handler != null) handler();
         }
     }
 }

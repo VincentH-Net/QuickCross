@@ -30,11 +30,11 @@ namespace SampleApp.Shared
         public SampleItemListViewModel SampleItemListViewModel { get; private set; }
         public SampleItemViewModel SampleItemViewModel { get; private set; }
 
-		/* TODO: For each viewmodel, add a public property with a private setter like this:
+        /* TODO: For each viewmodel, add a public property with a private setter like this:
         public _VIEWNAME_ViewModel _VIEWNAME_ViewModel { get; private set; }
-         * Note that the New-View and New-ViewModel commands add the above code automatically (see http://github.com/MacawNL/QuickCross#new-viewmodel). */
+         * DO NOT REMOVE this comment; the New-View and New-ViewModel commands use this to add the above code automatically (see http://github.com/MacawNL/QuickCross#new-viewmodel). */
 
-		public void ReturnToPreviousView()
+        public void ReturnToPreviousView()
 		{
 			RunOnUIThread(() => _navigator.NavigateToPreviousView());
 		}
@@ -62,6 +62,6 @@ namespace SampleApp.Shared
             // Any actions to update the viewmodel go here
             RunOnUIThread(() => _navigator.NavigateTo_VIEWNAME_View());
         }
-         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
+         * DO NOT REMOVE this comment; the New-View command uses this to add the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
 }

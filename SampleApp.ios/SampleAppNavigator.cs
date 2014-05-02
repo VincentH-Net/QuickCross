@@ -123,13 +123,13 @@ namespace SampleApp
 			}
 		}
 
-		/* TODO: For each view, add a method to navigate to that view like this:
+        /* TODO: For each view, add a method to navigate to that view like this:
 
         public void NavigateTo_VIEWNAME_View()
         {
             Navigate("_VIEWNAME_View", typeof(_VIEWNAME_View), true);
         }
-         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
-		}
+         * DO NOT REMOVE this comment; the New-View command uses this to add the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
+    }
 }
 

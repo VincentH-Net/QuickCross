@@ -94,6 +94,12 @@ namespace QuickCross
             isJustInitialized = true;
         }
 
+        protected override void OnPause()
+        {
+            if (ViewModel != null) ViewModel.OnUserInteractionStopped();
+            base.OnPause();
+        }
+
         protected override void OnResume()
         {
             base.OnResume();

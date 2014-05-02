@@ -52,6 +52,19 @@
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>SampleAppios</AssemblyName>
+    <MtouchSdkVersion>7.0</MtouchSdkVersion>
+    <MtouchDebug>False</MtouchDebug>
+    <MtouchProfiling>False</MtouchProfiling>
+    <MtouchExtraArgs />
+    <MtouchFastDev>False</MtouchFastDev>
+    <MtouchEnableGenericValueTypeSharing>True</MtouchEnableGenericValueTypeSharing>
+    <MtouchArch>Default, ARMv7</MtouchArch>
+    <MtouchUseLlvm>False</MtouchUseLlvm>
+    <MtouchUseThumb>False</MtouchUseThumb>
+    <MtouchUseSGen>False</MtouchUseSGen>
+    <MtouchUseRefCounting>False</MtouchUseRefCounting>
+    <MtouchOptimizePNGs>True</MtouchOptimizePNGs>
+    <MtouchI18n />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -136,12 +149,8 @@
     <None Include="QuickCross\Templates\_VIEWNAME_CodeView.cs" />
     <None Include="QuickCross\Templates\_VIEWNAME_XibView.cs" />
     <None Include="QuickCross\Templates\_VIEWNAME_XibView.designer.cs" />
-    <None Include="QuickCross\DialogViewBase.cs" />
-    <None Include="QuickCross\TabBarViewBase.cs" />
-    <Compile Include="DialogViewBase.cs" />
-    <Compile Include="TabBarViewBase.cs" />
-    <Compile Include="TableViewBase.cs" />
-    <Compile Include="ViewBase.cs" />
+    <Compile Include="QuickCross\DialogViewBase.cs" />
+    <Compile Include="QuickCross\TabBarViewBase.cs" />
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
     <Compile Include="QuickCross\Templates\_VIEWNAME_StoryBoardView.cs" />
@@ -164,8 +173,8 @@
       <DependentUpon>MasterView.cs</DependentUpon>
     </Compile>
     <None Include="QuickCross\Templates\_APPNAME_Navigator.cs" />
-    <None Include="QuickCross\TableViewBase.cs" />
-    <None Include="QuickCross\ViewBase.cs" />
+    <Compile Include="QuickCross\TableViewBase.cs" />
+    <Compile Include="QuickCross\ViewBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard_iPhone.storyboard" />

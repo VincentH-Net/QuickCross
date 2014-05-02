@@ -26,7 +26,9 @@ namespace SampleApp
         public static SampleAppApplication EnsureSampleAppApplication(Frame navigationContext)
         {
             SampleAppNavigator.Instance.NavigationContext = navigationContext;
-            return SampleAppApplication.Instance ?? new SampleAppApplication(SampleAppNavigator.Instance);
+            var app = SampleAppApplication.Instance ?? new SampleAppApplication(SampleAppNavigator.Instance);
+            app.UseDesignViewModels = false; // By default, UseDesignViewModels is true in Debug build and false otherwise. Since this app has a built-in mock service, we never use design data at runtime.
+            return app;
         }
 
         /// <summary>

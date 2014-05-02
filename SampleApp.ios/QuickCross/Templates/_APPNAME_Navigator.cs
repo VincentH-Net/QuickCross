@@ -113,7 +113,7 @@ namespace QuickCross.Templates
         {
             Navigate("_VIEWNAME_View", typeof(_VIEWNAME_View), true); // TODO: If this is not a storyboard view, remove the viewControllerIdentifier parameter
         }
-         * Note that the New-View command adds the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
+         * DO NOT REMOVE this comment; the New-View command uses this to add the above code automatically (see http://github.com/MacawNL/QuickCross#new-view). */
     }
 }
 #endif // TEMPLATE

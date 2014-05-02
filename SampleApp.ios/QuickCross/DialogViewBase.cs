@@ -6,8 +6,6 @@ using MonoTouch.UIKit;
 #if __DIALOG__
 using MonoTouch.Dialog;
 #endif
-using QuickCross.Templates;
-using QuickCrossLibrary.Templates;
 
 namespace QuickCross
 {
@@ -83,7 +81,7 @@ namespace QuickCross
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
 		{
-			if (!(sender is _APPNAME_Navigator) && ViewModel != null)
+            if (!(sender is INavigator) && ViewModel != null)
 			{
 				string commandName = segue.Identifier;
 				if (ViewModel.ExecuteCommand(commandName, GetCommandParameter(commandName))) return;
@@ -128,11 +126,11 @@ namespace QuickCross
 			Bindings.AddBindings(bindingsParameters, rootView, NavigationItem);
 		}
 
-		public override void ViewWillAppear(bool animated)
-		{
-			base.ViewWillAppear(animated);
-			ViewModel.RaisePropertiesChanged(); // Update the root view with the current property values
-		}
+        public override void ViewDidDisappear(bool animated)
+        {
+            if (ViewModel != null) ViewModel.OnUserInteractionStopped();
+            base.ViewDidDisappear(animated);
+        }
 
 		/// <summary>
 		/// Override this method in a derived view class to handle changes for specific properties in custom code instead of through data binding.

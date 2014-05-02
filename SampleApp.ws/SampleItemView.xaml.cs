@@ -18,18 +18,16 @@ namespace SampleApp
             DataContext = SampleAppApplication.Instance.SampleItemViewModel;
         }
 
-        /// <summary>
-        /// Invoked when this page is about to be displayed in a Frame.
-        /// </summary>
-        /// <param name="e">Event data that describes how this page was reached.  The Parameter
-        /// property is typically used to configure the page.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
+            var vm = DataContext as QuickCross.ViewModelBase;
+            if (vm != null) vm.OnUserInteractionStopped();
+            base.OnNavigatingFrom(e);
         }
 
         private void Button_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            ((Frame)Window.Current.Content).GoBack();
+            SampleAppNavigator.Instance.NavigateToPreviousView();
         }
     }
 }

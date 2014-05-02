@@ -11,6 +11,8 @@ namespace QuickCross.Templates
             InitializeComponent();
             if (_APPNAME_Application.Instance != null) DataContext = _APPNAME_Application.Instance._VIEWNAME_ViewModel;
         }
+
+        // TODO: Find a way to call OnUserInteractionStopped() in a UserControl at the appropriate time - UserControl does not have a method equivalent to OnNavigatingFrom()
     }
 }
 #endif // TEMPLATE

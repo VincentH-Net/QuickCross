@@ -13,6 +13,13 @@ namespace QuickCross.Templates
             InitializeComponent();
             DataContext = _APPNAME_Application.Instance._VIEWNAME_ViewModel;
         }
+
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            var vm = DataContext as QuickCross.ViewModelBase;
+            if (vm != null) vm.OnUserInteractionStopped();
+            base.OnNavigatingFrom(e);
+        }
     }
 }
 #endif // TEMPLATE
