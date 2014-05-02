@@ -47,15 +47,15 @@
     <DefineConstants>__IOS__;__DIALOG__;__MOBILE__;TEMPLATE;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>SdkOnly</MtouchLink>
     <ConsolePause>false</ConsolePause>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>SampleAppios</AssemblyName>
-    <MtouchSdkVersion>7.0</MtouchSdkVersion>
+    <MtouchSdkVersion>7.1</MtouchSdkVersion>
     <MtouchDebug>False</MtouchDebug>
     <MtouchProfiling>False</MtouchProfiling>
-    <MtouchExtraArgs />
+    <MtouchExtraArgs>--xml=%24{ProjectDir}/source/QuickCross/LinkDescription.xml</MtouchExtraArgs>
     <MtouchFastDev>False</MtouchFastDev>
     <MtouchEnableGenericValueTypeSharing>True</MtouchEnableGenericValueTypeSharing>
     <MtouchArch>Default, ARMv7</MtouchArch>
@@ -187,5 +187,7 @@
       <Name>SampleApp.Shared.ios</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="QuickCross\LinkDescription.xml" />
+  </ItemGroup>
 </Project>

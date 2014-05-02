@@ -109,6 +109,12 @@ namespace QuickCross
             { "MonoTouch.Dialog.StyledStringElement", "Value" },
             { "MonoTouch.Dialog.TimeElement"        , "DateValue" }
             #endif
+          // IMPORTANT NOTE: 
+          // If you want to turn on Linking for SDK Assemblies in a release build to reduce your app package size and loading time, 
+          // be sure to include any properties or fields that you add above, as well as any properties or fields that you
+          // only reference by name from markup, in the QuickCross\LinkDescription.xml file.
+          // This will prevent the linker to remove properties that you do not reference from code 
+          // (which will cause an exception when accesssing them at runtime via reflection).
         };
 
         public static void UpdateView(PropertyReference viewProperty, object value)

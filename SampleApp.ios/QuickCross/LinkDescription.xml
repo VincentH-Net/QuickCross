@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<linker>
+  <!-- Xamarin Custom Linker Description
+     In an Android project, this file must be included with Build Action LinkDescription.
+     
+     In an iOS project, this file must be included with Build Action None and in the project properties you
+     need to specify this value in "Additional mtouch arguments": (omit the space between the two minus signs)
+     - -xml=${ProjectDir}/source/QuickCross/LinkDescription.xml
+     
+     This linker description prevents types, methods and fields that are only used dynamically
+     (i.e. with reflection) from being removed by the linker. This prevents runtime errors 
+     when linking is enabled in the project options - which is typically done in release builds.
+     
+     By default this file contains the external types and members that are only used dynamically 
+     by QuickCross, so you can set the linking to "Sdk Assemblies Only" without errors.
+     
+     If you add more external types or members that are only used dynamically (e.g. when you add 
+     data binding to new view types and new view members from markup), add them to this file to 
+     enable safe linking.
+
+     Note that enabling linking for User Assemblies would require that you also preserve all 
+     members of all viewmodel classes, by adding the appropriate Preserve attribute on each 
+     viewmodel class, like this:
+
+        #if __iOS__
+        [Xamarin.iOS.Foundation.Preserve(AllMembers=true)]
+        #elif __ANDROID__
+        [Android.Runtime.Preserve(AllMembers=true)]
+        #end
+        public class MyViewModel ...
+     
+     References:
+     - http://docs.xamarin.com/guides/cross-platform/advanced/custom_linking/
+     - http://docs.xamarin.com/guides/ios/advanced_topics/linker/
+     - http://docs.xamarin.com/guides/android/advanced_topics/linking/
+     Notes:
+     - You cannot place xml comments outside the linker tag; the entire link description will be ignored if you do.
+  -->
+  <assembly fullname="monotouch">
+    <!-- Properties used via reflection only,
+         from the ViewDataBindings.ViewDefaultPropertyOrFieldName table 
+         or from a ViewMemberName binding parameter in markup: -->
+    <type fullname="MonoTouch.UIKit.UILabel">
+      <method name="get_Text" />
+      <method name="set_Text" />
+    </type>
+    <type fullname="MonoTouch.UIKit.UITextField">
+      <method name="get_Text" />
+      <method name="set_Text" />
+    </type>
+    <type fullname="MonoTouch.UIKit.UITextView">
+      <method name="get_Text" />
+      <method name="set_Text" />
+    </type>
+    <type fullname="MonoTouch.UIKit.UINavigationItem">
+      <method name="get_Title" />
+      <method name="set_Title" />
+    </type>
+  </assembly>
+</linker>

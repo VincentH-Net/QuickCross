@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\AndroidManifest.xml" />
+    <LinkDescription Include="QuickCross\LinkDescription.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SampleApp.Shared\SampleApp.Shared.android.csproj">
