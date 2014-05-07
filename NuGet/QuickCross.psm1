@@ -33,6 +33,24 @@ function ReplaceStringsInFile
     }
 }
 
+function GetProjectFolderItem
+{
+    Param(
+        [Parameter(Mandatory=$true)] $projectOrItem,
+        [Parameter(Mandatory=$true)] [string]$relativePath
+    )
+
+    $relativePath = $relativePath.Trim('\')
+    if (($relativePath.Length -eq 0) -or ($projectOrItem -eq $null)) { return $projectOrItem }
+    $subFolder = $relativePath.Split('\')[0]
+    $subItem = $projectOrItem.ProjectItems.Item($subFolder)
+    $subPath = $relativePath.   ### TODO HERE
+    return (GetProjectFolderItem -projectOrItem $item -relativePath 
+    if (($item -eq $null) -or ()) { return $item }
+
+    $item
+}
+
 function AddProjectItem
 {
     Param(
@@ -59,7 +77,10 @@ function AddProjectItem
 
     $destinationPath = Join-Path -Path $projectFolder -ChildPath $destinationProjectRelativePath
     $destinationFolder = Split-Path -Path $destinationPath -Parent
-    if (-not(Test-Path -Path $destinationFolder)) { $null = New-Item $destinationFolder -ItemType Directory -Force }
+    if (-not(Test-Path -Path $destinationFolder)) { 
+        $null = $project.ProjectItems.AddFolder($destinationProjectRelativePath, '')
+        # $null = New-Item $destinationFolder -ItemType Directory -Force 
+    }
 
     if (Test-Path -Path $destinationPath) { Write-Host ('NOT adding project item because it already exists: {0}' -f (SolutionRelativePath -path $destinationPath)); return $false }
     Write-Host ('Adding project item: {0}' -f (SolutionRelativePath -path $destinationPath))
@@ -111,52 +132,6 @@ function AddProjectItemsFromDirectory
             $null = $project.ProjectItems.AddFromFile($destinationPath)
         }
     }
-}
-
-function GetProjectPlatform
-{
-    Param([Parameter(Mandatory=$true)] $project, [switch]$allowUnknown)
-
-    try   { $targetFrameworkMoniker = $project.Properties.Item("TargetFrameworkMoniker").Value } 
-    catch { $targetFrameworkMoniker = 'none' }
-    # E.g. valid target framework monikers are:
-    # Windows Store:   .NETCore,Version=v4.5
-    # Windows Phone:   WindowsPhone,Version=v8.0
-    # Xamarin.Android: MonoAndroid,Version=v4.2
-    # Xamarin.iOS:     MonoTouch,Version=v1.0
-
-    $targetFrameworkName = $targetFrameworkMoniker.Split(',')[0]
-    switch ($targetFrameworkName)
-    {
-        'MonoAndroid'  { $platform = "android" }
-        'MonoTouch'    { $platform = "ios"     }
-        '.NETCore'     { $platform = "ws"      }
-        'WindowsPhone' { $platform = "wp"      }
-        default {
-            if ($allowUnknown) { $platform = '' } else { throw "Unsupported target framework: " + $targetFrameworkName } 
-        }
-    }
-
-    $platform
-}
-
-Function IsApplicationProject
-{
-    Param([Parameter(Mandatory=$true)] $project)
-
-    $projectFileContent = [System.IO.File]::ReadAllText($project.FullName)
-    $platform = GetProjectPlatform -project $project
-
-    switch ($platform)
-    {
-        'android' { $isApplication = $projectFileContent -match '<\s*AndroidApplication\s*>\s*true\s*</\s*AndroidApplication\s*>' }
-        'ios'     { $isApplication = $projectFileContent -match '<\s*OutputType\s*>\s*Exe\s*</\s*OutputType\s*>' }
-        'ws'      { $isApplication = $projectFileContent -match '<\s*OutputType\s*>\s*AppContainerExe\s*</\s*OutputType\s*>' }
-        'wp'      { $isApplication = $projectFileContent -match '<\s*SilverlightApplication\s*>\s*true\s*</\s*SilverlightApplication\s*>' }
-        default   { throw "Unknown platform: " + $platform }
-    }
-
-    $isApplication
 }
 
 function EnsureConditionalCompilationSymbol
@@ -280,8 +255,7 @@ function GetContentReplacements
             '(?m)^\s*#endif\s+//\s*TEMPLATE[^\r\n]*[\r\n]*' = ''
         } 
         if ($isApplication) {
-            $libraryProject = GetDefaultProject
-            if ($libraryProject -eq $null)  { throw "No library project found. Add a class library project for your target platform to the solution." }
+            $libraryProject = $script:sharedCodeProjects[0]
             $libraryDefaultNamespace = $libraryProject.Properties.Item("DefaultNamespace").Value
             $contentReplacements.Add('QuickCrossLibrary\.Templates', $libraryDefaultNamespace)
             $libraryAssemblyName =  $libraryProject.Properties.Item("AssemblyName").Value
@@ -298,21 +272,150 @@ function GetContentReplacements
     $contentReplacements
 }
 
-function GetDefaultProject
+$vsProjectKindSolutionFolder = '{66A26720-8FB5-11D2-AA7E-00C04F688DDE}' # ProjectKinds.vsProjectKindSolutionFolder
+
+function GetSubProjects
 {
-    Param([switch]$application)
+    Param([Parameter(Mandatory=$true)] $solutionFolderProject)
+
+	$projects = @()
+
+    foreach ($item in $solutionFolderProject.ProjectItems) {
+        $project = $item.SubProject
+		if ($project -ne $null) {
+			if ($project.Kind -eq $vsProjectKindSolutionFolder) {
+				$projects += GetSubProjects -solutionFolderProject $project
+			} else {
+				$projects += $project
+			}
+		}
+    }
+
+	$projects
+}
+
+function GetAllProjects
+{
+	$projects = @()
 
     foreach ($project in $dte.Solution.Projects)
     {
-        $platform = GetProjectPlatform -project $project -allowUnknown
-        if ($platform -ne '')
-        {
-            $isApplication = IsApplicationProject -project $project
-            if (-not ($application -xor $isApplication)) { return $project }
+		if ($project -ne $null) {
+			if ($project.Kind -eq $vsProjectKindSolutionFolder) {
+				$projects += GetSubProjects -solutionFolderProject $project
+			} else {
+				$projects += $project
+			}
+		}
+    }
+
+    $projects
+}
+
+function GetProjectPlatform
+{
+    Param([Parameter(Mandatory=$true)] $project, [switch]$allowUnknown)
+
+    try   { $targetFrameworkMoniker = $project.Properties.Item("TargetFrameworkMoniker").Value } 
+    catch { $targetFrameworkMoniker = 'none' }
+    # E.g. valid target framework monikers are:
+    # Windows Store:   .NETCore,Version=v4.5
+    # Windows Phone:   WindowsPhone,Version=v8.0
+    # Xamarin.Android: MonoAndroid,Version=v4.2
+    # Xamarin.iOS:     MonoTouch,Version=v1.0
+
+    $targetFrameworkName = $targetFrameworkMoniker.Split(',')[0]
+    switch ($targetFrameworkName)
+    {
+        'MonoAndroid'     { $platform = 'android' }
+        'MonoTouch'       { $platform = 'ios'     }
+        'WindowsPhone'    { $platform = 'wp'      } # Windows Phone 8 Silverlight
+        '.NETCore'        { $platform = 'ws'      } # Windows Store 8
+        'WindowsPhoneApp' { $platform = 'wpa'     } # Windows Phone 8.1
+        '.NETPortable'    { $platform = 'pcl'     } # Portable Class Library
+        'none'            { $platform = 'none'    } # Miscellaneous Files
+        default {
+            if ($allowUnknown) { $platform = '' } else { throw "Unsupported target framework: " + $targetFrameworkName } 
         }
     }
 
-    return $null
+    $platform
+}
+
+function GetProjectType
+{
+    Param([Parameter(Mandatory=$true)] $project)
+
+	$projectType = 'other'
+
+	if ("$($project.FullName)" -ne '') {
+		if ($project.FullName.EndsWith('.shproj')) {
+			$projectType = 'shared'
+		} else {
+			$projectFileContent = [System.IO.File]::ReadAllText($project.FullName)
+			$platform = GetProjectPlatform -project $project
+			switch ($platform) {
+				'android' { $isApplication = $projectFileContent -match '<\s*AndroidApplication\s*>\s*true\s*</\s*AndroidApplication\s*>' }
+				'ios'     { $isApplication = $projectFileContent -match '<\s*OutputType\s*>\s*Exe\s*</\s*OutputType\s*>' }
+				'wp'      { $isApplication = $projectFileContent -match '<\s*SilverlightApplication\s*>\s*true\s*</\s*SilverlightApplication\s*>' }
+				'ws'      { $isApplication = $projectFileContent -match '<\s*OutputType\s*>\s*AppContainerExe\s*</\s*OutputType\s*>' }
+				'wpa'     { $isApplication = $projectFileContent -match '<\s*OutputType\s*>\s*AppContainerExe\s*</\s*OutputType\s*>' }
+				'pcl'     { $isApplication = $null }
+				'none'    { $isApplication = $null }
+				default   { throw "Unknown platform: " + $platform }
+			}
+			if ($isApplication -ne $null) {
+				if ($isApplication) { $projectType = 'application' } else { $projectType = 'shared' }
+			}
+		}
+	}
+
+    $projectType
+}
+
+$sharedCodeProjects = @()
+$applicationProjects = @()
+$otherProjects = @()
+
+function InitializeProjects
+{
+    Param(
+       [string]$ProjectName
+    )
+
+    if ("$ProjectName" -eq '') {
+        $projects = GetAllProjects
+    } else {
+        $project = Get-Project $ProjectName
+        if ($project -eq $null)  { Write-Host "Project '$ProjectName' not found in solution."; return }
+        if ((GetProjectType -project $project) -eq 'other') { Write-Host "Project '$ProjectName' is not an application or shared code project. Please specify an application project, a shared code project for all target platforms, or a class library project for a single target platform."; return }
+        $projects = @($project);
+    }
+
+    $script:sharedCodeProjects = @()
+    $script:applicationProjects = @()
+    $script:otherProjects = @()
+    foreach ($project in $projects)
+    {
+        switch ((GetProjectType -project $project))
+        {
+            'shared'      { $script:sharedCodeProjects  += $project }
+            'application' { $script:applicationProjects += $project }
+            'other'       { $script:otherProjects       += $project }
+        }
+    }
+
+    if (("$ProjectName" -eq '') -and ($script:sharedCodeProjects.Count -eq 0)) {
+        Write-Host "No shared code project found to install the QuickCross shared code into. Please add either a shared code project for all target platforms, or a class library project for a single target platform to the solution."
+        return $false
+    }
+    if ($script:sharedCodeProjects.Count -gt 1) {
+        Write-Host "NOT installing the QuickCross shared code because more than one shared code project was found. Please use the ProjectName parameter to specify in which one of these projects the QuickCross shared code should be installed:"
+        Write-Host ($script:sharedCodeProjects | Select -ExpandProperty Name)
+        return $false
+    }
+
+    return $true
 }
 
 function Install-Mvvm
@@ -322,139 +425,152 @@ function Install-Mvvm
        [string]$ProjectName
     )
 
-    $projects = @()
-    if ("$ProjectName" -eq '') { 
-        $libraryProject = GetDefaultProject
-        if ($libraryProject -eq $null)  { Write-Host "No library project found. Add a class library project for your target platform to the solution."; return }
-        $applicationProject = GetDefaultProject -application
-        if ($libraryProject -eq $null)  { Write-Host "No application project found. Add an application project for your target platform to the solution."; return }
- 
-        $projects += $libraryProject
-        $projects += $applicationProject
-    } else {
-        $project = Get-Project $ProjectName
-        if ($project -eq $null)  { Write-Host "Project '$ProjectName' not found in solution."; return }
+    if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
 
-        $projects += $project;
+    Write-Host "QuickCross files will be added to these projects (existing files will not be modified)"
+    if ($script:sharedCodeProjects.Count -gt 0) {
+        Write-host "- Shared code     : " ($script:sharedCodeProjects | Select -ExpandProperty Name) 
+    }
+    if ($script:applicationProjects.Count -gt 0) {
+        Write-host "- Application code: " ($script:applicationProjects | Select -ExpandProperty Name) 
+    }
+    if ($script:otherProjects.Count -gt 0) {
+        Write-host "Other projects will not be modified because they are neither an application project nor a shared code project: " ($script:otherProjects | Select -ExpandProperty Name) 
+    }
+    Write-Host ""
+    Write-Host "Press Y to continue, any other key to cancel..."
+    if ($host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown").Character -ne 'Y') {
+        Write-Host "Command canceled."
+        return
     }
 
-    foreach ($project in $projects)
+    $toolsPath = $PSScriptRoot
+    # Get the application name from the solution file name
+    $solutionName = Split-Path ($dte.Solution.FullName) -Leaf
+    $appName = $solutionName.Split('.')[0]
+    $platformDefines = @{
+        'android' = '__ANDROID__';
+        'ios'     = '__IOS__';
+        'wp'      = 'WINDOWS_PHONE'
+        'ws'      = 'NETFX_CORE';
+        'wpa'     = 'NETFX_CORE';
+    }
+
+    foreach ($project in $script:sharedCodeProjects)
     {
+        # TODO: ?check if the shared code is already present in another (referenced?) project in the solution, if not, install the shared code into the same project - to also support one-project solutions?
+        #       OR: if shared code not installed, fail and give message to install and reference first? nonblocking Dialog needed?
         $ProjectName = $project.Name
-
-        # Get the application name from the solution file name
-        $solutionName = Split-Path ($project.DTE.Solution.FullName) -Leaf
-        $appName = $solutionName.Split('.')[0]
-
         $defaultNamespace = $project.Properties.Item("DefaultNamespace").Value
         $platform = GetProjectPlatform -project $project
-        $isApplication = IsApplicationProject -project $project
-        $projectType = ('library', 'application')[$isApplication]
 
         Write-Host '-------------------------'
-        Write-Host "Installing QuickCross $platform $projectType files in project $ProjectName ..."
+        Write-Host "Installing QuickCross shared code files in project $ProjectName ..."
 
-        $toolsPath = $PSScriptRoot
         $nameReplacements = @{
             "_APPNAME_" = $appName
         }
+        $csContentReplacements = GetContentReplacements -project $project -cs
+        $contentReplacements = @{
+            '_APPNAME_' = $appName;
+            'QuickCross\.Templates' = $defaultNamespace
+        }
+        $librarySourceDirectory = Join-Path -Path $toolsPath -ChildPath library
+        AddProjectItemsFromDirectory -project $project -sourceDirectory $librarySourceDirectory -contentReplacements $contentReplacements
 
-        $csContentReplacements = GetContentReplacements -project $project -cs -isApplication:$isApplication
-        $installSharedCode = -not $isApplication
-        # TODO: ?check if the shared code is already present in another (referenced?) project in the solution, if not, install the shared code into the same project - to also support one-project solutions?
-        #       OR: if shared code not installed, fail and give message to install and reference first? nonblocking Dialog needed?
-        if ($installSharedCode) # Do the shared library file actions
+        # Create default project items
+        $null = AddProjectItem  -project $project `
+                                -destinationProjectRelativePath ('I{0}Navigator.cs' -f $appName) `
+                                -templatePackageFolder          'library' `
+                                -templateProjectRelativePath    'QuickCross\Templates\I_APPNAME_Navigator.cs' `
+                                -contentReplacements            $csContentReplacements
+        $null = AddProjectItem  -project $project `
+                                -destinationProjectRelativePath ('{0}Application.cs' -f $appName) `
+                                -templatePackageFolder          'library' `
+                                -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Application.cs' `
+                                -contentReplacements            $csContentReplacements
+        New-ViewModel -ViewModelName Main
+
+		if (-not $project.FullName.EndsWith('.shproj')) {
+            EnsureConditionalCompilationSymbol -project $project -define $platformDefines[$platform]
+        }
+    }
+
+    foreach ($project in $script:applicationProjects)
+    {
+        $ProjectName = $project.Name
+        $defaultNamespace = $project.Properties.Item("DefaultNamespace").Value
+        $platform = GetProjectPlatform -project $project
+
+        Write-Host '-------------------------'
+        Write-Host "Installing QuickCross $platform application files in project $ProjectName ..."
+
+        $nameReplacements = @{
+            "_APPNAME_" = $appName
+        }
+        $csContentReplacements = GetContentReplacements -project $project -cs -isApplication
+        $contentReplacements = @{
+            '_APPNAME_' = $appName;
+            'QuickCrossLibrary\.Templates' = $csContentReplacements['QuickCrossLibrary\.Templates'];
+            'QuickCross\.Templates' = $defaultNamespace
+        }
+
+        $appSourceDirectory = Join-Path -Path $toolsPath -ChildPath "app.$platform"
+        AddProjectItemsFromDirectory -project $project -sourceDirectory $appSourceDirectory -contentReplacements $contentReplacements
+
+        # Create default project items
+        switch ($platform)
         {
-            $contentReplacements = @{
-                '_APPNAME_' = $appName;
-                'QuickCross\.Templates' = $defaultNamespace
-            }
-            $librarySourceDirectory = Join-Path -Path $toolsPath -ChildPath library
-            AddProjectItemsFromDirectory -project $project -sourceDirectory $librarySourceDirectory -contentReplacements $contentReplacements
-
-            # Create default project items
-            $null = AddProjectItem  -project $project `
-                                    -destinationProjectRelativePath ('I{0}Navigator.cs' -f $appName) `
-                                    -templatePackageFolder          'library' `
-                                    -templateProjectRelativePath    'QuickCross\Templates\I_APPNAME_Navigator.cs' `
-                                    -contentReplacements            $csContentReplacements
-            $null = AddProjectItem  -project $project `
-                                    -destinationProjectRelativePath ('{0}Application.cs' -f $appName) `
-                                    -templatePackageFolder          'library' `
-                                    -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Application.cs' `
-                                    -contentReplacements            $csContentReplacements
-            New-ViewModel -ViewModelName Main
-        }
-
-        if ($isApplication) {
-            $contentReplacements = @{
-                '_APPNAME_' = $appName;
-                'QuickCrossLibrary\.Templates' = $csContentReplacements['QuickCrossLibrary\.Templates'];
-                'QuickCross\.Templates' = $defaultNamespace
+            'ios' {
+                $null = AddProjectItem -project $project `
+                                        -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
+                                        -templatePackageFolder          'app.ios' `
+                                        -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
+                                        -contentReplacements            $csContentReplacements
+                New-View -ViewName Main
             }
 
-            $appSourceDirectory = Join-Path -Path $toolsPath -ChildPath "app.$platform"
-            AddProjectItemsFromDirectory -project $project -sourceDirectory $appSourceDirectory -contentReplacements $contentReplacements
-
-            # Create default project items
-            switch ($platform)
-            {
-                'ios' {
-                    $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
-                                           -templatePackageFolder          'app.ios' `
-                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
-                                           -contentReplacements            $csContentReplacements
-                    New-View -ViewName Main
-                }
-
-                'android' {
-                    $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
-                                           -templatePackageFolder          'app.android' `
-                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
-                                           -contentReplacements            $csContentReplacements
-                    New-View -ViewName Main -ViewType MainLauncher
-                }
-
-                'wp' {
-                    $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('QuickCross\App.xaml.cs' -f $appName) `
-                                           -templatePackageFolder          'app.wp' `
-                                           -templateProjectRelativePath    'QuickCross\Templates\App.xaml.cs' `
-                                           -contentReplacements            $csContentReplacements
-                    $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
-                                           -templatePackageFolder          'app.wp' `
-                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
-                                           -contentReplacements            $csContentReplacements
-                    New-View -ViewName Main
-                }
-
-                'ws' {
-                    $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('QuickCross\App.xaml.cs' -f $appName) `
-                                           -templatePackageFolder          'app.ws' `
-                                           -templateProjectRelativePath    'QuickCross\Templates\App.xaml.cs' `
-                                           -contentReplacements            $csContentReplacements
-                    $null = AddProjectItem -project $project `
-                                           -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
-                                           -templatePackageFolder          'app.ws' `
-                                           -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
-                                           -contentReplacements            $csContentReplacements
-                    New-View -ViewName Main
-                }
+            'android' {
+                $null = AddProjectItem -project $project `
+                                        -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
+                                        -templatePackageFolder          'app.android' `
+                                        -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
+                                        -contentReplacements            $csContentReplacements
+                New-View -ViewName Main -ViewType MainLauncher
             }
+
+            'wp' {
+                $null = AddProjectItem -project $project `
+                                        -destinationProjectRelativePath ('QuickCross\App.xaml.cs' -f $appName) `
+                                        -templatePackageFolder          'app.wp' `
+                                        -templateProjectRelativePath    'QuickCross\Templates\App.xaml.cs' `
+                                        -contentReplacements            $csContentReplacements
+                $null = AddProjectItem -project $project `
+                                        -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
+                                        -templatePackageFolder          'app.wp' `
+                                        -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
+                                        -contentReplacements            $csContentReplacements
+                New-View -ViewName Main
+            }
+
+            'ws' {
+                $null = AddProjectItem -project $project `
+                                        -destinationProjectRelativePath ('QuickCross\App.xaml.cs' -f $appName) `
+                                        -templatePackageFolder          'app.ws' `
+                                        -templateProjectRelativePath    'QuickCross\Templates\App.xaml.cs' `
+                                        -contentReplacements            $csContentReplacements
+                $null = AddProjectItem -project $project `
+                                        -destinationProjectRelativePath ('{0}Navigator.cs' -f $appName) `
+                                        -templatePackageFolder          'app.ws' `
+                                        -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
+                                        -contentReplacements            $csContentReplacements
+                New-View -ViewName Main
+            }
+
+            # TODO: Add wpa - maybe identical to ws?
         }
 
-        $platformDefines = @{
-            'android' = '__ANDROID__';
-            'ios'     = '__IOS__';
-            'ws'      = 'NETFX_CORE';
-            'wp'      = 'WINDOWS_PHONE'
-        }
         EnsureConditionalCompilationSymbol -project $project -define $platformDefines[$platform]
-
     }
 }
 
@@ -467,11 +583,11 @@ function New-ViewModel
         [switch]$NotInApplication
     )
 
-    if ("$ProjectName" -eq '') { $project = GetDefaultProject } else { $project = Get-Project $ProjectName }
-    if ($project -eq $null)  { Write-Host "Project '$ProjectName' not found."; return }
+    if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
+    $project = $script:sharedCodeProjects[0]
     $ProjectName = $project.Name
     
-    if (IsApplicationProject -project $project)
+    if ((GetProjectType -project $project) -eq 'application')
     {
         Write-Host "Project $ProjectName is an application project; view models should be coded in a library project. Either specify a library project with the ProjectName parameter, or omit the ProjectName parameter to use the first class library project in the solution."
         return
@@ -505,120 +621,132 @@ function New-View
         [switch]$WithoutNavigation
     )
 
-    if ("$ViewModelName" -eq '') { $ViewModelName = $ViewName }
-    if ("$ProjectName" -eq '') { $project = Get-Project } else { $project = Get-Project $ProjectName }
-    if ($project -eq $null)  { Write-Host "Project '$ProjectName' not found."; return }
-    $ProjectName = $project.Name
-    
-    if (-not(IsApplicationProject -project $project))
-    {
-        Write-Host "Project $ProjectName is not an application project; views should be coded in an application project. Specify an application project with the ProjectName parameter or select an application project as the default project in the Package Manager Console."
+    if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
+    if ($script:applicationProjects.Count -eq 0) {
+        Write-Host "NOT adding view code because no application projects were found. Please add one or mode application projects to the solution."
+        return
+    }
+    if (("$ViewType" -ne '') -and ($script:applicationProjects.Count -gt 1)) {
+        Write-Host "NOT adding view code because the ViewType parameter was specified, which is platform-specific, and more than one application project was found. Please specify the project to which the view should be added by using the ProjectName parameter."
         return
     }
 
     # Create the view model if it does not exist:
+    if ("$ViewModelName" -eq '') { $ViewModelName = $ViewName }
     New-ViewModel -ViewModelName $ViewModelName -NotInApplication:$WithoutNavigation
 
-    $csContentReplacements = GetContentReplacements -project $project -cs -isApplication
-    $csContentReplacements.Add('_VIEWNAME_', $ViewName)
+    foreach ($project in $script:applicationProjects) {
+        $ProjectName = $project.Name
+    
+        if ((GetProjectType -project $project) -ne 'application')
+        {
+            Write-Host "Project $ProjectName is not an application project; views should be coded in an application project. Specify an application project with the ProjectName parameter or select an application project as the default project in the Package Manager Console."
+            return
+        }
 
-    if (-not $WithoutNavigation)
-    {
-        # Add the navigation code for the new view:
-        $appName = $csContentReplacements._APPNAME_
-        $libraryProject = GetDefaultProject
-        $libraryProjectDirectory = Split-Path -Path $libraryProject.FullName -Parent
-        $applicationProjectDirectory = Split-Path -Path $project.FullName -Parent
-        AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $libraryProjectDirectory     -ChildPath ('I{0}Navigator.cs'  -f $appName)) -templateName 'view' -replacements $csContentReplacements
-        AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $applicationProjectDirectory -ChildPath ('{0}Navigator.cs'   -f $appName)) -templateName 'view' -replacements $csContentReplacements
-        AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $libraryProjectDirectory     -ChildPath ('{0}Application.cs' -f $appName)) -templateName 'view' -replacements $csContentReplacements
-    }
+        $csContentReplacements = GetContentReplacements -project $project -cs -isApplication
+        $csContentReplacements.Add('_VIEWNAME_', $ViewName)
 
-    $platform = GetProjectPlatform -project $project
-    switch ($platform)
-    {
-        'ios' {
-            if ("$ViewType" -eq '') { $ViewType = 'Code' }
-            $viewNameSuffix = ''
-            if ($ViewType.StartsWith('StoryBoard')) { $viewNameSuffix = '.TODO' }
-            $null = AddProjectItem -project $project `
-                                   -destinationProjectRelativePath ('{0}View{1}.cs' -f $ViewName, $viewNameSuffix) `
-                                   -templatePackageFolder          'app.ios' `
-                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
-                                   -contentReplacements            $csContentReplacements
-            if ($ViewType.StartsWith('Xib'))
-            {
+        if (-not $WithoutNavigation)
+        {
+            # Add the navigation code for the new view:
+            $appName = $csContentReplacements._APPNAME_
+            $libraryProject = $script:sharedCodeProjects[0]
+            $libraryProjectDirectory = Split-Path -Path $libraryProject.FullName -Parent
+            $applicationProjectDirectory = Split-Path -Path $project.FullName -Parent
+            AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $libraryProjectDirectory     -ChildPath ('I{0}Navigator.cs'  -f $appName)) -templateName 'view' -replacements $csContentReplacements
+            AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $applicationProjectDirectory -ChildPath ('{0}Navigator.cs'   -f $appName)) -templateName 'view' -replacements $csContentReplacements
+            AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $libraryProjectDirectory     -ChildPath ('{0}Application.cs' -f $appName)) -templateName 'view' -replacements $csContentReplacements
+        }
+
+        $platform = GetProjectPlatform -project $project
+        switch ($platform)
+        {
+            'ios' {
+                if ("$ViewType" -eq '') { $ViewType = 'Code' }
+                $viewNameSuffix = ''
+                if ($ViewType.StartsWith('StoryBoard')) { $viewNameSuffix = '.TODO' }
                 $null = AddProjectItem -project $project `
-                                       -destinationProjectRelativePath ('{0}View{1}.designer.cs' -f $ViewName, $viewNameSuffix) `
+                                       -destinationProjectRelativePath ('{0}View{1}.cs' -f $ViewName, $viewNameSuffix) `
                                        -templatePackageFolder          'app.ios' `
-                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.designer.cs' -f $ViewType) `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
+                                       -contentReplacements            $csContentReplacements
+                if ($ViewType.StartsWith('Xib'))
+                {
+                    $null = AddProjectItem -project $project `
+                                           -destinationProjectRelativePath ('{0}View{1}.designer.cs' -f $ViewName, $viewNameSuffix) `
+                                           -templatePackageFolder          'app.ios' `
+                                           -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.designer.cs' -f $ViewType) `
+                                           -contentReplacements            $csContentReplacements
+                }
+            }
+
+            'android' {
+                if ("$ViewType" -eq '') { $ViewType = 'Activity' }
+
+			    if ($ViewType -ne 'AlertDialog')
+			    {
+				    foreach ($markupType in @($ViewType, ''))
+				    {
+					    if (AddProjectItem -project $project `
+									       -destinationProjectRelativePath ('Resources\Layout\{0}View.axml' -f $ViewName) `
+									       -templatePackageFolder          'app.android' `
+									       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.axml.template' -f $markupType) `
+									       -contentReplacements            @{ '_VIEWNAME_' = $ViewName } `
+									       -isOptionalItem:($markupType -ne ''))
+					    { break }
+				    }
+			    }
+
+                $null = AddProjectItem -project $project `
+                                       -destinationProjectRelativePath ('{0}View.cs' -f $ViewName) `
+                                       -templatePackageFolder          'app.android' `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
                                        -contentReplacements            $csContentReplacements
             }
-        }
 
-        'android' {
-            if ("$ViewType" -eq '') { $ViewType = 'Activity' }
-
-			if ($ViewType -ne 'AlertDialog')
-			{
-				foreach ($markupType in @($ViewType, ''))
-				{
-					if (AddProjectItem -project $project `
-									   -destinationProjectRelativePath ('Resources\Layout\{0}View.axml' -f $ViewName) `
-									   -templatePackageFolder          'app.android' `
-									   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.axml.template' -f $markupType) `
-									   -contentReplacements            @{ '_VIEWNAME_' = $ViewName } `
-									   -isOptionalItem:($markupType -ne ''))
-					{ break }
-				}
-			}
-
-            $null = AddProjectItem -project $project `
-                                   -destinationProjectRelativePath ('{0}View.cs' -f $ViewName) `
-                                   -templatePackageFolder          'app.android' `
-                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
-                                   -contentReplacements            $csContentReplacements
-        }
-
-        'wp' {
-            if ("$ViewType" -eq '') { $ViewType = 'Page' }
-            foreach ($markupType in @($ViewType, ''))
-            {
-                if (AddProjectItem -project $project `
-                                   -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
-                                   -templatePackageFolder          'app.wp' `
-                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
-                                   -contentReplacements            $csContentReplacements `
-                                   -isOptionalItem:($markupType -ne ''))
-                { break }
+            'wp' {
+                if ("$ViewType" -eq '') { $ViewType = 'Page' }
+                foreach ($markupType in @($ViewType, ''))
+                {
+                    if (AddProjectItem -project $project `
+                                       -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
+                                       -templatePackageFolder          'app.wp' `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
+                                       -contentReplacements            $csContentReplacements `
+                                       -isOptionalItem:($markupType -ne ''))
+                    { break }
+                }
+                $null = AddProjectItem -project $project `
+                                       -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
+                                       -templatePackageFolder          'app.wp' `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
+                                       -contentReplacements            $csContentReplacements
             }
-            $null = AddProjectItem -project $project `
-                                   -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
-                                   -templatePackageFolder          'app.wp' `
-                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
-                                   -contentReplacements            $csContentReplacements
-        }
 
-        'ws' {
-            if ("$ViewType" -eq '') { $ViewType = 'Page' }
-            foreach ($markupType in @($ViewType, ''))
-            {
-                if (AddProjectItem -project $project `
-                                   -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
-                                   -templatePackageFolder          'app.ws' `
-                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
-                                   -contentReplacements            $csContentReplacements `
-                                   -isOptionalItem:($markupType -ne ''))
-                { break }
+            'ws' {
+                if ("$ViewType" -eq '') { $ViewType = 'Page' }
+                foreach ($markupType in @($ViewType, ''))
+                {
+                    if (AddProjectItem -project $project `
+                                       -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
+                                       -templatePackageFolder          'app.ws' `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.template' -f $markupType) `
+                                       -contentReplacements            $csContentReplacements `
+                                       -isOptionalItem:($markupType -ne ''))
+                    { break }
+                }
+                $null = AddProjectItem -project $project `
+                                       -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
+                                       -templatePackageFolder          'app.ws' `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
+                                       -contentReplacements            $csContentReplacements
             }
-            $null = AddProjectItem -project $project `
-                                   -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
-                                   -templatePackageFolder          'app.ws' `
-                                   -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
-                                   -contentReplacements            $csContentReplacements
-        }
 
-        default { Write-Host "New-View currenty only supports iOS, Android, Windows Phone and Windows Store application projects"; return }
+            # TODO: add wpa
+
+            default { Write-Host "New-View currenty only supports iOS, Android, Windows Phone and Windows Store application projects; platform $platform is currently not supported"; return }
+        }
     }
 }
 
