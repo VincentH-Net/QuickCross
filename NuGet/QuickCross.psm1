@@ -33,22 +33,63 @@ function ReplaceStringsInFile
     }
 }
 
-function GetProjectFolderItem
+
+# EnsureProjectFolderItem exists to compensate that $project.ProjectItems.AddFromFile() does not
+# work correctly in Shared Code projects when the item is in a subfolder below the project folder
+# (it always adds the item to the project root - verified in VS 2013 Update 2 RC).
+# Another limitation is that when a subfolder already exists on disk, you can neither include it in 
+# the project nor create it as a project item with AddFolder()
+# The workaround is to temporarily rename the folder on disk if it exists.
+# Then add the existing project item using ProjectItems.AddFromFile() on the obtained parent folder 
+# project item node, instead of on the project node.
+# Note that a rename may fail because files in the folder may be opened even though they are not 
+# included in the project. Sigh.
+function EnsureProjectFolderItem
 {
     Param(
-        [Parameter(Mandatory=$true)] $projectOrItem,
-        [Parameter(Mandatory=$true)] [string]$relativePath
+        [Parameter(Mandatory=$true)] $project,
+        [Parameter(Mandatory=$true)] [string]$folderPath
     )
 
-    $relativePath = $relativePath.Trim('\')
-    if (($relativePath.Length -eq 0) -or ($projectOrItem -eq $null)) { return $projectOrItem }
-    $subFolder = $relativePath.Split('\')[0]
-    $subItem = $projectOrItem.ProjectItems.Item($subFolder)
-    $subPath = $relativePath.   ### TODO HERE
-    return (GetProjectFolderItem -projectOrItem $item -relativePath 
-    if (($item -eq $null) -or ()) { return $item }
+    if ($folderPath.TrimEnd('\') -eq (Split-Path -Path $project.FullName -Parent).TrimEnd('\')) { return $project }
 
-    $item
+    $folderPathItem = $dte.Solution.FindProjectItem($folderPath)
+
+    if ($folderPathItem -eq $null) {
+        $renameDone = $false
+        if (Test-Path -Path $folderPath) {
+            try   { 
+                $renamedFolderPath = $folderPath + '.tmp'
+                Write-Host "Temporarily renaming $folderPath to $renamedFolderPath ..."
+                Move-Item -Path $folderPath -Destination $renamedFolderPath -Force 
+                $renameDone = $true
+            }
+            catch { Write-Error "Cannot temporarily rename folder:`r`n   '$folderPath' to: `r`n   '$renamedFolderPath'.`r`nPlease close any windows that access this folder or files and folders within it, and then try again." }
+        }
+
+        try {
+            $folderPathItem = $project.ProjectItems.AddFolder($folderPath, '')
+            # As long as the last folder in the path does not exist, AddFolder will create and include as much of the path as needed - in a VS Shared Code project
+        }
+        finally {
+            if ($renameDone) {
+                Write-Host "Reversing temporarily renamed $renamedFolderPath back to $folderPath ..."
+                Remove-Item -Path $folderPath -Recurse -Force
+                Move-Item -Path $renamedFolderPath -Destination $folderPath -Force
+            }
+        }
+    }
+
+    $folderPathItem
+}
+
+function IsVsSharedCodeProject
+{
+    Param(
+        [Parameter(Mandatory=$true)] $project
+    )
+
+    $project.FullName.EndsWith('.shproj')
 }
 
 function AddProjectItem
@@ -76,18 +117,25 @@ function AddProjectItem
     }
 
     $destinationPath = Join-Path -Path $projectFolder -ChildPath $destinationProjectRelativePath
-    $destinationFolder = Split-Path -Path $destinationPath -Parent
-    if (-not(Test-Path -Path $destinationFolder)) { 
-        $null = $project.ProjectItems.AddFolder($destinationProjectRelativePath, '')
-        # $null = New-Item $destinationFolder -ItemType Directory -Force 
-    }
-
     if (Test-Path -Path $destinationPath) { Write-Host ('NOT adding project item because it already exists: {0}' -f (SolutionRelativePath -path $destinationPath)); return $false }
     Write-Host ('Adding project item: {0}' -f (SolutionRelativePath -path $destinationPath))
+
+    $destinationFolder = Split-Path -Path $destinationPath -Parent
+    if ((IsVsSharedCodeProject -project $project)) {
+        # It looks like the implementation for VS Shared Projects behaves different for the same DTE interfaces - at least in VS2013 Update 2 RC. So we handle that separately.
+        # Ensure that the destination folder exists on disk as well as a project item, and get the parent folder's project item object so we can add the file to it.
+        $parentItem = EnsureProjectFolderItem -project $project -folderPath $destinationFolder
+    } else {
+        if (-not(Test-Path -Path $destinationFolder)) { 
+            $null = New-Item $destinationFolder -ItemType Directory -Force 
+        }
+        $parentItem = $project
+    }
+
     Copy-Item -Path $templatePath -Destination $destinationPath -Force
     ReplaceStringsInFile -filePath $destinationPath -replacements $contentReplacements
 
-    $null = $project.ProjectItems.AddFromFile($destinationPath)
+    $null = $parentItem.ProjectItems.AddFromFile($destinationPath)
     $null = $dte.ItemOperations.OpenFile($destinationPath)
     return $true
 }
@@ -123,13 +171,25 @@ function AddProjectItemsFromDirectory
             if (-not $destinationPathExists) { $null = New-Item -Path $destinationPath -ItemType directory }
             AddProjectItemsFromDirectory -project $project -sourceDirectory $_.FullName -destinationDirectory $destinationPath -nameReplacements $nameReplacements -contentReplacements $contentReplacements
         } else {
+            $parentItem = $project
             if ($destinationPathExists) {
                 Write-Host ('NOT adding project item because it already exists: {0}' -f (SolutionRelativePath -path $destinationPath))
             } else {
+                $destinationFolder = Split-Path -Path $destinationPath -Parent
+                if ((IsVsSharedCodeProject -project $project)) {
+                    # It looks like the implementation for VS Shared Projects behaves different for the same DTE interfaces - at least in VS2013 Update 2 RC. So we handle that separately.
+                    # Ensure that the destination folder exists on disk as well as a project item, and get the parent folder's project item object so we can add the file to it.
+                    $parentItem = EnsureProjectFolderItem -project $project -folderPath $destinationFolder
+                } else {
+                    if (-not(Test-Path -Path $destinationFolder)) { 
+                        $null = New-Item $destinationFolder -ItemType Directory -Force 
+                    }
+                }
+
                 Copy-Item -Path $_.FullName -Destination $destinationPath -Force
                 ReplaceStringsInFile -filePath $destinationPath -replacements $contentReplacements
             }
-            $null = $project.ProjectItems.AddFromFile($destinationPath)
+            $null = $parentItem.ProjectItems.AddFromFile($destinationPath)
         }
     }
 }
@@ -349,7 +409,7 @@ function GetProjectType
 	$projectType = 'other'
 
 	if ("$($project.FullName)" -ne '') {
-		if ($project.FullName.EndsWith('.shproj')) {
+		if ((IsVsSharedCodeProject -project $project)) {
 			$projectType = 'shared'
 		} else {
 			$projectFileContent = [System.IO.File]::ReadAllText($project.FullName)
@@ -373,9 +433,11 @@ function GetProjectType
     $projectType
 }
 
+# ***HERE: find a clean solution to having projects detected and specified propertly with commands also calling each other
 $sharedCodeProjects = @()
 $applicationProjects = @()
 $otherProjects = @()
+$theSharedCodeProject = $null
 
 function InitializeProjects
 {
@@ -426,6 +488,8 @@ function Install-Mvvm
     )
 
     if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
+    $sharedCodeProjects = $script:sharedCodeProjects
+    $applicationProjects = $script:applicationProjects
 
     Write-Host "QuickCross files will be added to these projects (existing files will not be modified)"
     if ($script:sharedCodeProjects.Count -gt 0) {
@@ -456,10 +520,11 @@ function Install-Mvvm
         'wpa'     = 'NETFX_CORE';
     }
 
-    foreach ($project in $script:sharedCodeProjects)
+
+    if ($sharedCodeProjects.Count -gt 0) 
     {
-        # TODO: ?check if the shared code is already present in another (referenced?) project in the solution, if not, install the shared code into the same project - to also support one-project solutions?
-        #       OR: if shared code not installed, fail and give message to install and reference first? nonblocking Dialog needed?
+        $project = $sharedCodeProjects[0] # TODO: if a shared code project exists that has the QuickCross folder in it, pick that one. This will support multiple shared code projects.
+
         $ProjectName = $project.Name
         $defaultNamespace = $project.Properties.Item("DefaultNamespace").Value
         $platform = GetProjectPlatform -project $project
@@ -491,12 +556,12 @@ function Install-Mvvm
                                 -contentReplacements            $csContentReplacements
         New-ViewModel -ViewModelName Main
 
-		if (-not $project.FullName.EndsWith('.shproj')) {
+		if (-not (IsVsSharedCodeProject -project $project)) {
             EnsureConditionalCompilationSymbol -project $project -define $platformDefines[$platform]
         }
     }
 
-    foreach ($project in $script:applicationProjects)
+    foreach ($project in $applicationProjects)
     {
         $ProjectName = $project.Name
         $defaultNamespace = $project.Properties.Item("DefaultNamespace").Value
@@ -527,7 +592,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.ios' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main
+                New-View -ViewName Main -ProjectName $ProjectName
             }
 
             'android' {
@@ -536,7 +601,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.android' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main -ViewType MainLauncher
+                New-View -ViewName Main -ViewType MainLauncher -ProjectName $ProjectName
             }
 
             'wp' {
@@ -550,7 +615,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.wp' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main
+                New-View -ViewName Main -ProjectName $ProjectName
             }
 
             'ws' {
@@ -564,7 +629,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.ws' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main
+                New-View -ViewName Main -ProjectName $ProjectName
             }
 
             # TODO: Add wpa - maybe identical to ws?
@@ -630,12 +695,14 @@ function New-View
         Write-Host "NOT adding view code because the ViewType parameter was specified, which is platform-specific, and more than one application project was found. Please specify the project to which the view should be added by using the ProjectName parameter."
         return
     }
+    $applicationProjects = $script:applicationProjects
 
     # Create the view model if it does not exist:
     if ("$ViewModelName" -eq '') { $ViewModelName = $ViewName }
     New-ViewModel -ViewModelName $ViewModelName -NotInApplication:$WithoutNavigation
 
-    foreach ($project in $script:applicationProjects) {
+    $specifiedViewType = $ViewType
+    foreach ($project in $applicationProjects) {
         $ProjectName = $project.Name
     
         if ((GetProjectType -project $project) -ne 'application')
@@ -747,6 +814,8 @@ function New-View
 
             default { Write-Host "New-View currenty only supports iOS, Android, Windows Phone and Windows Store application projects; platform $platform is currently not supported"; return }
         }
+
+        $ViewType = $specifiedViewType
     }
 }
 
