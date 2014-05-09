@@ -434,23 +434,78 @@ function GetProjectType
 }
 
 # ***HERE: find a clean solution to having projects detected and specified propertly with commands also calling each other
-$sharedCodeProjects = @()
-$applicationProjects = @()
-$otherProjects = @()
-$theSharedCodeProject = $null
+$TheSharedCodeProject = $null
 
+function GetTheSharedCodeProject
+{
+    Param(
+       [array]$projects,
+       [switch]$force,
+       [switch]$allowEmpty
+    )
+
+    if ($force) { $script:TheSharedCodeProject = $null }
+
+    if ($TheSharedCodeProject -eq $null) {
+        if ($projects.Length -eq 0) { $projects = GetAllProjects }
+        foreach ($project in $projects)
+        {
+            if ((GetProjectType -project $project) -eq 'shared')
+            {
+                if ($allowEmpty -and ($TheSharedCodeProject -eq $null)) { $script:TheSharedCodeProject = $project }
+                if ($project.ProjectItems.Item('QuickCross') -ne $null) {
+                    $script:TheSharedCodeProject = $project
+                    break
+                }
+            }
+        }
+    }
+
+    $TheSharedCodeProject
+}
+
+function ReportIfSharedCodeProjectIsNotInstalled
+{
+    if ($TheSharedCodeProject -eq $null) {
+        Write-Host "No shared code project found with QuickCross installed. Please ensure that the solution contains either a shared code project for all target platforms, or a class library project for a single target platform, and then run the Install-Mvvm command."
+    }
+    return ($TheSharedCodeProject -eq $null)
+}
+
+function GetApplicationProjects
+{
+    Param(
+       [array]$projects
+    )
+
+    $applicationProjects = @()
+    if ($projects.Length -eq 0) { $projects = GetAllProjects }
+    foreach ($project in $projects)
+    {
+        if ((GetProjectType -project $project) -eq 'application') { $applicationProjects += $project }
+    }
+    $applicationProjects
+}
+
+# InitializeProjects will set TheSharedCodeProject and return an array of application projects.
 function InitializeProjects
 {
     Param(
-       [string]$ProjectName
+       [string]$projectName,
+       [switch]$clearCache
     )
 
-    if ("$ProjectName" -eq '') {
+
+
+
+
+
+    if ("$projectName" -eq '') {
         $projects = GetAllProjects
     } else {
-        $project = Get-Project $ProjectName
-        if ($project -eq $null)  { Write-Host "Project '$ProjectName' not found in solution."; return }
-        if ((GetProjectType -project $project) -eq 'other') { Write-Host "Project '$ProjectName' is not an application or shared code project. Please specify an application project, a shared code project for all target platforms, or a class library project for a single target platform."; return }
+        $project = Get-Project $projectName
+        if ($project -eq $null)  { Write-Host "Project '$projectName' not found in solution."; return }
+        if ((GetProjectType -project $project) -eq 'other') { Write-Host "Project '$projectName' is not an application or shared code project. Please specify an application project, a shared code project for all target platforms, or a class library project for a single target platform."; return }
         $projects = @($project);
     }
 
@@ -467,7 +522,7 @@ function InitializeProjects
         }
     }
 
-    if (("$ProjectName" -eq '') -and ($script:sharedCodeProjects.Count -eq 0)) {
+    if (("$projectName" -eq '') -and ($script:sharedCodeProjects.Count -eq 0)) {
         Write-Host "No shared code project found to install the QuickCross shared code into. Please add either a shared code project for all target platforms, or a class library project for a single target platform to the solution."
         return $false
     }
@@ -484,7 +539,8 @@ function Install-Mvvm
 {
     [CmdletBinding(HelpURI="http://github.com/MacawNL/QuickCross#install-mvvm")]
     Param(
-       [string]$ProjectName
+       [string]$ProjectName,
+       [switch]$NoMainView
     )
 
     if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
@@ -592,7 +648,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.ios' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main -ProjectName $ProjectName
+                if (-not $NoMainView) { New-View -ViewName Main -ProjectName $ProjectName }
             }
 
             'android' {
@@ -601,7 +657,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.android' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main -ViewType MainLauncher -ProjectName $ProjectName
+                if (-not $NoMainView) { New-View -ViewName Main -ViewType MainLauncher -ProjectName $ProjectName }
             }
 
             'wp' {
@@ -615,7 +671,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.wp' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main -ProjectName $ProjectName
+                if (-not $NoMainView) { New-View -ViewName Main -ProjectName $ProjectName }
             }
 
             'ws' {
@@ -629,7 +685,7 @@ function Install-Mvvm
                                         -templatePackageFolder          'app.ws' `
                                         -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Navigator.cs' `
                                         -contentReplacements            $csContentReplacements
-                New-View -ViewName Main -ProjectName $ProjectName
+                if (-not $NoMainView) { New-View -ViewName Main -ProjectName $ProjectName }
             }
 
             # TODO: Add wpa - maybe identical to ws?
