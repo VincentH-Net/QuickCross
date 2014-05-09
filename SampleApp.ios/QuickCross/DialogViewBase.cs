@@ -1,11 +1,10 @@
-﻿using System;
+﻿#if __DIALOG__  // TODO: to get MonoTouch.Dialog support, add a reference to the MonoTouch.Dialog assembly and define the __DIALOG__ compilation symbol
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-#if __DIALOG__
 using MonoTouch.Dialog;
-#endif
 
 namespace QuickCross
 {
@@ -173,4 +172,5 @@ namespace QuickCross
 		public virtual object GetCommandParameter(string commandName, object parameter = null) { return parameter; }
     }
 }
+#endif
 

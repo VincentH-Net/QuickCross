@@ -30,8 +30,8 @@ namespace QuickCross.Templates
             View.AddSubview(label);
 
             var bindingsParameters = new BindingParameters[] {
-                new BindingParameters { View = button, PropertyName = _VIEWNAME_ViewModel.COMMANDNAME_IncreaseCountCommand, Mode = BindingMode.Command },
-                new BindingParameters { View = label, PropertyName = _VIEWNAME_ViewModel.PROPERTYNAME_Count }
+                new BindingParameters { View = button, ViewModelPropertyName = _VIEWNAME_ViewModel.COMMANDNAME_IncreaseCountCommand, Mode = BindingMode.Command },
+                new BindingParameters { View = label, ViewModelPropertyName = _VIEWNAME_ViewModel.PROPERTYNAME_Count }
             };
             #endregion Bind to example property and command
 
