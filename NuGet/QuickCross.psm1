@@ -315,7 +315,7 @@ function GetContentReplacements
             '(?m)^\s*#endif\s+//\s*TEMPLATE[^\r\n]*[\r\n]*' = ''
         } 
         if ($isApplication) {
-            $libraryProject = $script:sharedCodeProjects[0]
+            $libraryProject = GetTheSharedCodeProject
             $libraryDefaultNamespace = $libraryProject.Properties.Item("DefaultNamespace").Value
             $contentReplacements.Add('QuickCrossLibrary\.Templates', $libraryDefaultNamespace)
             $libraryAssemblyName =  $libraryProject.Properties.Item("AssemblyName").Value
@@ -433,7 +433,6 @@ function GetProjectType
     $projectType
 }
 
-# ***HERE: find a clean solution to having projects detected and specified propertly with commands also calling each other
 $TheSharedCodeProject = $null
 
 function GetTheSharedCodeProject
@@ -467,7 +466,7 @@ function GetTheSharedCodeProject
 function ReportIfSharedCodeProjectIsNotInstalled
 {
     if ($TheSharedCodeProject -eq $null) {
-        Write-Host "No shared code project found with QuickCross installed. Please ensure that the solution contains either a shared code project for all target platforms, or a class library project for a single target platform, and then run the Install-Mvvm command."
+        Write-Host "No shared code project was found with QuickCross installed. Please ensure that the solution contains either a shared code project for all target platforms, or a class library project for a single target platform, and then run the Install-Mvvm command."
     }
     return ($TheSharedCodeProject -eq $null)
 }
@@ -487,54 +486,6 @@ function GetApplicationProjects
     $applicationProjects
 }
 
-# InitializeProjects will set TheSharedCodeProject and return an array of application projects.
-function InitializeProjects
-{
-    Param(
-       [string]$projectName,
-       [switch]$clearCache
-    )
-
-
-
-
-
-
-    if ("$projectName" -eq '') {
-        $projects = GetAllProjects
-    } else {
-        $project = Get-Project $projectName
-        if ($project -eq $null)  { Write-Host "Project '$projectName' not found in solution."; return }
-        if ((GetProjectType -project $project) -eq 'other') { Write-Host "Project '$projectName' is not an application or shared code project. Please specify an application project, a shared code project for all target platforms, or a class library project for a single target platform."; return }
-        $projects = @($project);
-    }
-
-    $script:sharedCodeProjects = @()
-    $script:applicationProjects = @()
-    $script:otherProjects = @()
-    foreach ($project in $projects)
-    {
-        switch ((GetProjectType -project $project))
-        {
-            'shared'      { $script:sharedCodeProjects  += $project }
-            'application' { $script:applicationProjects += $project }
-            'other'       { $script:otherProjects       += $project }
-        }
-    }
-
-    if (("$projectName" -eq '') -and ($script:sharedCodeProjects.Count -eq 0)) {
-        Write-Host "No shared code project found to install the QuickCross shared code into. Please add either a shared code project for all target platforms, or a class library project for a single target platform to the solution."
-        return $false
-    }
-    if ($script:sharedCodeProjects.Count -gt 1) {
-        Write-Host "NOT installing the QuickCross shared code because more than one shared code project was found. Please use the ProjectName parameter to specify in which one of these projects the QuickCross shared code should be installed:"
-        Write-Host ($script:sharedCodeProjects | Select -ExpandProperty Name)
-        return $false
-    }
-
-    return $true
-}
-
 function Install-Mvvm
 {
     [CmdletBinding(HelpURI="http://github.com/MacawNL/QuickCross#install-mvvm")]
@@ -543,19 +494,47 @@ function Install-Mvvm
        [switch]$NoMainView
     )
 
-    if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
-    $sharedCodeProjects = $script:sharedCodeProjects
-    $applicationProjects = $script:applicationProjects
+    $allProjects = GetAllProjects
+    $sharedProject = $null
+    $applicationProjects = @()
+
+    if ("$ProjectName" -eq '') {
+        $applicationProjects = GetApplicationProjects -projects $allProjects
+        $sharedProject = GetTheSharedCodeProject -projects $allProjects -force -allowEmpty
+        if ((ReportIfSharedCodeProjectIsNotInstalled)) { return }
+    } else {
+        $project = Get-Project $ProjectName
+        if ($project -eq $null)  { Write-Host "Project '$projectName' not found in solution."; return }
+        switch ((GetProjectType -project $project))
+        {
+            'shared'      {
+                $sharedProject = GetTheSharedCodeProject -projects $allProjects -force
+                if ($sharedProject.UniqueName -ne $project.UniqueName) {
+                    $currentSharedProjectName = $sharedProject.Name
+                    Write-Host "No action is taken because the $ProjectName project is a shared code project, but the QuickCross shared code is already installed in the $currentSharedProjectName project. To install the QuickCross shared code in the $ProjectName project, either move the shared code (including the QuickCross folder) from the $currentSharedProjectName project to the $ProjectName project, or remove the QuickCross folder from the $currentSharedProjectName project and re-run the command Install-Mvvm -ProjectName $ProjectName"
+                    return
+                }
+            }
+
+            'application' {
+                $applicationProjects += $project
+                $sharedProject = GetTheSharedCodeProject -projects $allProjects -force -allowEmpty
+                if ((ReportIfSharedCodeProjectIsNotInstalled)) { return }
+            }
+
+            default       {
+                Write-Host "Project '$projectName' is not an application or shared code project. Please specify an application project, or a shared code project for all target platforms, or a class library project for a single target platform."; 
+                return
+            }
+        }
+    }
 
     Write-Host "QuickCross files will be added to these projects (existing files will not be modified)"
-    if ($script:sharedCodeProjects.Count -gt 0) {
-        Write-host "- Shared code     : " ($script:sharedCodeProjects | Select -ExpandProperty Name) 
+    if ($sharedProject -ne $null) {
+        Write-host "- Shared code     : " $sharedProject.Name
     }
-    if ($script:applicationProjects.Count -gt 0) {
-        Write-host "- Application code: " ($script:applicationProjects | Select -ExpandProperty Name) 
-    }
-    if ($script:otherProjects.Count -gt 0) {
-        Write-host "Other projects will not be modified because they are neither an application project nor a shared code project: " ($script:otherProjects | Select -ExpandProperty Name) 
+    if ($applicationProjects.Count -gt 0) {
+        Write-host "- Application code: " ($applicationProjects | Select -ExpandProperty Name) 
     }
     Write-Host ""
     Write-Host "Press Y to continue, any other key to cancel..."
@@ -576,17 +555,15 @@ function Install-Mvvm
         'wpa'     = 'NETFX_CORE';
     }
 
-
-    if ($sharedCodeProjects.Count -gt 0) 
+    if ($sharedProject -ne $null)
     {
-        $project = $sharedCodeProjects[0] # TODO: if a shared code project exists that has the QuickCross folder in it, pick that one. This will support multiple shared code projects.
+        $project = $sharedProject
 
-        $ProjectName = $project.Name
         $defaultNamespace = $project.Properties.Item("DefaultNamespace").Value
         $platform = GetProjectPlatform -project $project
 
         Write-Host '-------------------------'
-        Write-Host "Installing QuickCross shared code files in project $ProjectName ..."
+        Write-Host "Installing QuickCross shared code files in project $($sharedProject.Name) ..."
 
         $nameReplacements = @{
             "_APPNAME_" = $appName
@@ -610,7 +587,7 @@ function Install-Mvvm
                                 -templatePackageFolder          'library' `
                                 -templateProjectRelativePath    'QuickCross\Templates\_APPNAME_Application.cs' `
                                 -contentReplacements            $csContentReplacements
-        New-ViewModel -ViewModelName Main
+        if (-not $NoMainView) { New-ViewModel -ViewModelName Main }
 
 		if (-not (IsVsSharedCodeProject -project $project)) {
             EnsureConditionalCompilationSymbol -project $project -define $platformDefines[$platform]
@@ -700,20 +677,13 @@ function New-ViewModel
     [CmdletBinding(HelpURI="http://github.com/MacawNL/QuickCross#new-viewmodel")]
     Param(
         [Parameter(Mandatory=$true)] [string]$ViewModelName,
-        [string]$ProjectName,
         [switch]$NotInApplication
     )
 
-    if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
-    $project = $script:sharedCodeProjects[0]
+    $project = GetTheSharedCodeProject
+    if ((ReportIfSharedCodeProjectIsNotInstalled)) { return }
     $ProjectName = $project.Name
     
-    if ((GetProjectType -project $project) -eq 'application')
-    {
-        Write-Host "Project $ProjectName is an application project; view models should be coded in a library project. Either specify a library project with the ProjectName parameter, or omit the ProjectName parameter to use the first class library project in the solution."
-        return
-    }
-
     $csContentReplacements = GetContentReplacements -project $project -cs
     $csContentReplacements.Add('_VIEWNAME_', $ViewModelName)
 
@@ -742,22 +712,34 @@ function New-View
         [switch]$WithoutNavigation
     )
 
-    if (-not (InitializeProjects -ProjectName $ProjectName)) { return }
-    if ($script:applicationProjects.Count -eq 0) {
-        Write-Host "NOT adding view code because no application projects were found. Please add one or mode application projects to the solution."
-        return
+    $libraryProject = GetTheSharedCodeProject
+    if ((ReportIfSharedCodeProjectIsNotInstalled)) { return }
+    $libraryProjectDirectory = Split-Path -Path $libraryProject.FullName -Parent
+
+    if ("$ProjectName" -eq '') {
+        $applicationProjects = GetApplicationProjects -projects $allProjects
+        if ($applicationProjects.Count -eq 0) {
+            Write-Host "NOT adding view code because no application projects were found. Please add one or mode application projects to the solution."
+            return
+        }
+        if (("$ViewType" -ne '') -and ($applicationProjects.Count -gt 1)) {
+            Write-Host "NOT adding view code because the ViewType parameter was specified, which is platform-specific, and more than one application project was found. Please specify the project to which the view should be added by using the ProjectName parameter."
+            return
+        }
+    } else {
+        $project = Get-Project $ProjectName
+        if ($project -eq $null)  { Write-Host "Project '$projectName' not found in solution."; return }
+        if ((GetProjectType -project $project) -ne 'application') {
+            Write-Host "Project '$projectName' is not an application project. Please specify an application project.";
+            return
+        }
+        $applicationProjects = @($project)
     }
-    if (("$ViewType" -ne '') -and ($script:applicationProjects.Count -gt 1)) {
-        Write-Host "NOT adding view code because the ViewType parameter was specified, which is platform-specific, and more than one application project was found. Please specify the project to which the view should be added by using the ProjectName parameter."
-        return
-    }
-    $applicationProjects = $script:applicationProjects
 
     # Create the view model if it does not exist:
     if ("$ViewModelName" -eq '') { $ViewModelName = $ViewName }
     New-ViewModel -ViewModelName $ViewModelName -NotInApplication:$WithoutNavigation
 
-    $specifiedViewType = $ViewType
     foreach ($project in $applicationProjects) {
         $ProjectName = $project.Name
     
@@ -774,8 +756,6 @@ function New-View
         {
             # Add the navigation code for the new view:
             $appName = $csContentReplacements._APPNAME_
-            $libraryProject = $script:sharedCodeProjects[0]
-            $libraryProjectDirectory = Split-Path -Path $libraryProject.FullName -Parent
             $applicationProjectDirectory = Split-Path -Path $project.FullName -Parent
             AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $libraryProjectDirectory     -ChildPath ('I{0}Navigator.cs'  -f $appName)) -templateName 'view' -replacements $csContentReplacements
             AddCsCodeFromInlineTemplateInVsEditor -itemPath (Join-Path -Path $applicationProjectDirectory -ChildPath ('{0}Navigator.cs'   -f $appName)) -templateName 'view' -replacements $csContentReplacements
@@ -783,33 +763,34 @@ function New-View
         }
 
         $platform = GetProjectPlatform -project $project
+        $actualViewType = $ViewType
         switch ($platform)
         {
             'ios' {
-                if ("$ViewType" -eq '') { $ViewType = 'Code' }
+                if ("$actualViewType" -eq '') { $actualViewType = 'Code' }
                 $viewNameSuffix = ''
-                if ($ViewType.StartsWith('StoryBoard')) { $viewNameSuffix = '.TODO' }
+                if ($actualViewType.StartsWith('StoryBoard')) { $viewNameSuffix = '.TODO' }
                 $null = AddProjectItem -project $project `
                                        -destinationProjectRelativePath ('{0}View{1}.cs' -f $ViewName, $viewNameSuffix) `
                                        -templatePackageFolder          'app.ios' `
-                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $actualViewType) `
                                        -contentReplacements            $csContentReplacements
-                if ($ViewType.StartsWith('Xib'))
+                if ($actualViewType.StartsWith('Xib'))
                 {
                     $null = AddProjectItem -project $project `
                                            -destinationProjectRelativePath ('{0}View{1}.designer.cs' -f $ViewName, $viewNameSuffix) `
                                            -templatePackageFolder          'app.ios' `
-                                           -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.designer.cs' -f $ViewType) `
+                                           -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.designer.cs' -f $actualViewType) `
                                            -contentReplacements            $csContentReplacements
                 }
             }
 
             'android' {
-                if ("$ViewType" -eq '') { $ViewType = 'Activity' }
+                if ("$actualViewType" -eq '') { $actualViewType = 'Activity' }
 
-			    if ($ViewType -ne 'AlertDialog')
+			    if ($actualViewType -ne 'AlertDialog')
 			    {
-				    foreach ($markupType in @($ViewType, ''))
+				    foreach ($markupType in @($actualViewType, ''))
 				    {
 					    if (AddProjectItem -project $project `
 									       -destinationProjectRelativePath ('Resources\Layout\{0}View.axml' -f $ViewName) `
@@ -824,13 +805,13 @@ function New-View
                 $null = AddProjectItem -project $project `
                                        -destinationProjectRelativePath ('{0}View.cs' -f $ViewName) `
                                        -templatePackageFolder          'app.android' `
-                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $ViewType) `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.cs' -f $actualViewType) `
                                        -contentReplacements            $csContentReplacements
             }
 
             'wp' {
-                if ("$ViewType" -eq '') { $ViewType = 'Page' }
-                foreach ($markupType in @($ViewType, ''))
+                if ("$actualViewType" -eq '') { $actualViewType = 'Page' }
+                foreach ($markupType in @($actualViewType, ''))
                 {
                     if (AddProjectItem -project $project `
                                        -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
@@ -843,13 +824,13 @@ function New-View
                 $null = AddProjectItem -project $project `
                                        -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
                                        -templatePackageFolder          'app.wp' `
-                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $actualViewType) `
                                        -contentReplacements            $csContentReplacements
             }
 
             'ws' {
-                if ("$ViewType" -eq '') { $ViewType = 'Page' }
-                foreach ($markupType in @($ViewType, ''))
+                if ("$actualViewType" -eq '') { $actualViewType = 'Page' }
+                foreach ($markupType in @($actualViewType, ''))
                 {
                     if (AddProjectItem -project $project `
                                        -destinationProjectRelativePath ('{0}View.xaml' -f $ViewName) `
@@ -862,7 +843,7 @@ function New-View
                 $null = AddProjectItem -project $project `
                                        -destinationProjectRelativePath ('{0}View.xaml.cs' -f $ViewName) `
                                        -templatePackageFolder          'app.ws' `
-                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $ViewType) `
+                                       -templateProjectRelativePath    ('QuickCross\Templates\_VIEWNAME_{0}View.xaml.cs' -f $actualViewType) `
                                        -contentReplacements            $csContentReplacements
             }
 
@@ -870,8 +851,6 @@ function New-View
 
             default { Write-Host "New-View currenty only supports iOS, Android, Windows Phone and Windows Store application projects; platform $platform is currently not supported"; return }
         }
-
-        $ViewType = $specifiedViewType
     }
 }
 
