@@ -717,7 +717,7 @@ function New-View
     $libraryProjectDirectory = Split-Path -Path $libraryProject.FullName -Parent
 
     if ("$ProjectName" -eq '') {
-        [array]$applicationProjects = GetApplicationProjects -projects $allProjects
+        [array]$applicationProjects = GetApplicationProjects
         if ($applicationProjects.Count -eq 0) {
             Write-Host "NOT adding view code because no application projects were found. Please add one or mode application projects to the solution."
             return
@@ -733,7 +733,7 @@ function New-View
             Write-Host "Project '$projectName' is not an application project. Please specify an application project.";
             return
         }
-        $applicationProjects = @($project)
+        [array]$applicationProjects = @($project)
     }
 
     # Create the view model if it does not exist:
