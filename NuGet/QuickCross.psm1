@@ -478,7 +478,7 @@ function GetApplicationProjects
     )
 
     $applicationProjects = @()
-    if ($projects.Length -eq 0) { $projects = GetAllProjects }
+    if (($projects -eq $null) -or ($projects.Length -eq 0)) { $projects = GetAllProjects }
     foreach ($project in $projects)
     {
         if ((GetProjectType -project $project) -eq 'application') { $applicationProjects += $project }
