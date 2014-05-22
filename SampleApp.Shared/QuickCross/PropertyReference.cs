@@ -37,8 +37,8 @@ namespace QuickCross
 				else if (fieldInfo != null) val = fieldInfo.GetValue(ContainingObject);
 				else throw new InvalidOperationException("Cannot access the Value because no PropertyOrFieldName was specified");
 
-                return convertBackType != null && typesDiffer ? Convert.ChangeType(val, convertBackType) : val;
-			}
+                return val != null && convertBackType != null && typesDiffer ? Convert.ChangeType(val, convertBackType) : val;
+            }
 
 			set
 			{
