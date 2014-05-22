@@ -494,9 +494,9 @@ function Install-Mvvm
        [switch]$NoMainView
     )
 
-    $allProjects = GetAllProjects
+    [array]$allProjects = GetAllProjects
     $sharedProject = $null
-    $applicationProjects = @()
+    [array]$applicationProjects = @()
 
     if ("$ProjectName" -eq '') {
         $applicationProjects = GetApplicationProjects -projects $allProjects
@@ -717,7 +717,7 @@ function New-View
     $libraryProjectDirectory = Split-Path -Path $libraryProject.FullName -Parent
 
     if ("$ProjectName" -eq '') {
-        $applicationProjects = GetApplicationProjects -projects $allProjects
+        [array]$applicationProjects = GetApplicationProjects -projects $allProjects
         if ($applicationProjects.Count -eq 0) {
             Write-Host "NOT adding view code because no application projects were found. Please add one or mode application projects to the solution."
             return
