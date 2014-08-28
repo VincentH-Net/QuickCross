@@ -26,9 +26,9 @@ While QuickCross has some unique [features](#features) (e.g. customizable code t
 
 ## News ##
 **August 28, 2014**
-Good news for QuickCross fans: version 3.0 is coming, with support for [Xamarin Forms](http://xamarin.com/forms)!
+Good news for QuickCross fans: **QuickCross 3.0** is coming, with support for [Xamarin Forms](http://xamarin.com/forms)!
 
-The QuickCross 2.5 beta release was put on hold when it was nearly completed, due to a high pressure mobile project (which of course used QuickCross - see [here](http://vincenth.net/blog/archive/2014/08/26/poollie-wk-2014-lessons-learned-from-developing-a-successful-multi-platform-app-with-xamarin.aspx) for lessons learned). Then Xamarin Forms came out, a game changer for cross-platform native development - with the MVVM pattern already built in. This required a re-evaluation of QuickCross.
+The QuickCross 2.5 beta release was put on hold when it was nearly completed, due to a high pressure mobile project (which of course used QuickCross - see [here](http://vincenth.net/blog/archive/2014/08/26/poollie-wk-2014-lessons-learned-from-developing-a-successful-multi-platform-app-with-xamarin.aspx) for lessons learned). Then **Xamarin Forms** came out, a game changer for cross-platform native development - with the MVVM pattern already built in. This required a re-evaluation of QuickCross.
 
 Fortunately QuickCross has always been lightweight, and it offers features that speed up working with the MVVM pattern in any form, e.g. with code generation. In contrast to heavier MVVM frameworks (see [here](http://forums.xamarin.com/discussion/17754/xamarin-forms-with-mvvmcross)), QuickCross can speed up Xamarin Forms development without adding a lot of unnecessary overhead.
 
