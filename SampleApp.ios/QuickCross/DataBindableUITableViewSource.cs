@@ -118,11 +118,15 @@ namespace QuickCross
 		/// <param name="e">See http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html for details</param>
 		protected virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			if (!ignoreCollectionChanged)
-			{
-				tableView.ReloadData(); // QC TODO: Check if this should & can be optimized, see for details documentation at http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html
-			}
-			if (viewExtensionPoints != null) viewExtensionPoints.OnCollectionChanged(sender, e);
+		    ApplicationBase.RunOnUIThread(() =>
+		    {
+		        if (!ignoreCollectionChanged)
+		        {
+		            tableView.ReloadData();
+		                // QC TODO: Check if this should & can be optimized, see for details documentation at http://blog.stephencleary.com/2009/07/interpreting-notifycollectionchangedeve.html
+		        }
+		        if (viewExtensionPoints != null) viewExtensionPoints.OnCollectionChanged(sender, e);
+		    });
 		}
 
 		private void DataBindableListAdapter_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
