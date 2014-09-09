@@ -451,7 +451,7 @@ function GetTheSharedCodeProject
         {
             if ((GetProjectType -project $project) -eq 'shared')
             {
-                if ($allowEmpty -and ($TheSharedCodeProject -eq $null)) { $script:TheSharedCodeProject = $project }
+                if ($allowEmpty -and (($TheSharedCodeProject -eq $null) -or ($TheSharedCodeProject.Name.Length -gt $project.Name.Length))) { $script:TheSharedCodeProject = $project }
                 if ($project.ProjectItems.Item('QuickCross') -ne $null) {
                     $script:TheSharedCodeProject = $project
                     break

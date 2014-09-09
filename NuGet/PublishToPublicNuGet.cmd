@@ -1,2 +1,2 @@
-%~dp0NuGet.exe push %~dp0..\NuGetPackages\QuickCross.2.0.5-beta.nupkg
+%~dp0NuGet.exe push %~dp0..\NuGetPackages\QuickCross.3.0.0-beta.nupkg
 pause
