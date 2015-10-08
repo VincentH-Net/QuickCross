@@ -385,17 +385,19 @@ function GetProjectPlatform
     # Xamarin.iOS:     MonoTouch,Version=v1.0
 
     $targetFrameworkName = $targetFrameworkMoniker.Split(',')[0]
-    switch ($targetFrameworkName)
+    switch ("$targetFrameworkName")
     {
         'MonoAndroid'     { $platform = 'android' }
         'MonoTouch'       { $platform = 'ios'     }
+        'Xamarin.iOS'     { $platform = 'ios'     }
         'WindowsPhone'    { $platform = 'wp'      } # Windows Phone 8 Silverlight
         '.NETCore'        { $platform = 'ws'      } # Windows Store 8
         'WindowsPhoneApp' { $platform = 'wpa'     } # Windows Phone 8.1
         '.NETPortable'    { $platform = 'pcl'     } # Portable Class Library
+        ''                { $platform = 'shproj'  } # Shared Code Project
         'none'            { $platform = 'none'    } # Miscellaneous Files
         default {
-            if ($allowUnknown) { $platform = '' } else { throw "Unsupported target framework: " + $targetFrameworkName } 
+            if ($allowUnknown) { $platform = '' } else { throw "Unsupported target framework: " + $targetFrameworkName + " for project $($project.FullName)" } 
         }
     }
 
@@ -421,6 +423,7 @@ function GetProjectType
 				'ws'      { $isApplication = $projectFileContent -match '<\s*OutputType\s*>\s*AppContainerExe\s*</\s*OutputType\s*>' }
 				'wpa'     { $isApplication = $projectFileContent -match '<\s*OutputType\s*>\s*AppContainerExe\s*</\s*OutputType\s*>' }
 				'pcl'     { $isApplication = $null }
+				'shproj'  { $isApplication = $null }
 				'none'    { $isApplication = $null }
 				default   { throw "Unknown platform: " + $platform }
 			}
